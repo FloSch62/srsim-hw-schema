@@ -245,12 +245,16 @@ export function edaConnectorBreakoutLabel(type: string): string {
   return mode.suffix ? `${type} (${mode.impact}, ${mode.suffix})` : `${type} (${mode.impact})`;
 }
 
-export function edaConnectorParentSlot(slot: string): string {
-  return slot.replace(/-\d+$/, "");
+function connectorSlotText(slot: unknown): string {
+  return typeof slot === "string" ? slot : "";
 }
 
-export function edaConnectorIndex(slot: string): number {
-  const match = slot.match(/-(\d+)$/);
+export function edaConnectorParentSlot(slot: unknown): string {
+  return connectorSlotText(slot).replace(/-\d+$/, "");
+}
+
+export function edaConnectorIndex(slot: unknown): number {
+  const match = connectorSlotText(slot).match(/-(\d+)$/);
   return match ? Number(match[1]) : 0;
 }
 
@@ -266,8 +270,9 @@ export interface EdaConnectorCompatibility {
 export function edaConnectorCompatibility(
   catalog: EdaYangCatalog,
   components: EdaTopoNodeComponent[],
-  connectorSlot: string
+  connectorSlot: unknown
 ): EdaConnectorCompatibility {
+  const slot = connectorSlotText(connectorSlot);
   const connectorIndex = edaConnectorIndex(connectorSlot);
   const parentSlot = edaConnectorParentSlot(connectorSlot);
   const parentMda = components.find((component) => component.kind === "mda" && component.slot === parentSlot);
@@ -278,7 +283,7 @@ export function edaConnectorCompatibility(
     parentMda,
     options: parentMda ? edaConnectorTypeOptionsForMda(catalog, parentMda.type, connectorIndex) : [],
     knownProfile: groups.length > 0,
-    validSlot: connectorIndex > 0 && parentSlot !== connectorSlot
+    validSlot: connectorIndex > 0 && Boolean(parentSlot) && parentSlot !== slot
   };
 }
 

@@ -126,6 +126,21 @@ describe("EDA validation", () => {
     assert.ok(report.issues.some((issue) => issue.message.includes("connector parent MDA slot 1-b is not configured")));
   });
 
+  it("reports connector components without slots instead of throwing", () => {
+    const yaml = buildEdaTopoNodeYaml(sr2s400gConfig(), getEntry(buildMatrix(hardware), "sr-2s"))
+      .replace("  component:\n", `  component:
+    - kind: connector
+      type: c1-400g
+`);
+    const report = validateEdaYaml(yaml, hardware, catalog);
+
+    assert.equal(report.valid, false);
+    assert.ok(report.issues.some((issue) =>
+      issue.path === "document 1/spec/component/0/slot" &&
+      issue.message === "connector slot must be <mda-slot>-<connector-index>"
+    ));
+  });
+
   it("rejects Component CR documents", () => {
     const yaml = `${buildEdaTopoNodeYaml(defaultConfig("sr-2s"), getEntry(buildMatrix(hardware), "sr-2s"))}---
 apiVersion: components.eda.nokia.com/v2
