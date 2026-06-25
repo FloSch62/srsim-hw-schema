@@ -290,10 +290,12 @@ function rowMdaValues(row: MatrixRow): string[] {
   return uniqueSorted(mdaFields(row).flatMap((field) => row.values[field] ?? []));
 }
 
-function rowNumberedMdaSlots(row: MatrixRow): number[] {
+function rowNumberedMdaSlots(row: MatrixRow, mdaType = ""): number[] {
+  const wantedType = canonicalToken(mdaType);
   return uniqueNumbers(
     mdaFields(row)
       .filter((field) => field.startsWith("mda_"))
+      .filter((field) => !wantedType || (row.values[field] ?? []).some((type) => canonicalToken(type) === wantedType))
       .map((field) => field.slice(4))
   );
 }
@@ -436,7 +438,7 @@ function mdaSlotOptionsFromRows(
   ).filter((slot) => slot >= minimumSlot);
   if (mdaType && restrictedSlots.length) return restrictedSlots;
 
-  const numberedSlots = uniqueNumbers(rows.flatMap(rowNumberedMdaSlots))
+  const numberedSlots = uniqueNumbers(rows.flatMap((row) => rowNumberedMdaSlots(row, mdaType)))
     .filter((slot) => slot >= minimumSlot);
   if (numberedSlots.length) return numberedSlots;
 

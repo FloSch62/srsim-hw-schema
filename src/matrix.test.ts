@@ -219,10 +219,11 @@ describe("SR-SIM matrix helpers", () => {
     const srA4LineCard = defaultComponentsForEntry(srA4).find((component) => component.slot === "1");
     assert.ok(srA4LineCard);
     assert.deepEqual(directMdaSlotOptions(srA4, srA4LineCard, ""), [1, 2, 3, 4]);
-    assert.deepEqual(directMdaSlotOptions(srA4, srA4LineCard, "", 2, 1, "ma44-1gb-csfp"), [1, 2, 3, 4]);
+    assert.deepEqual(directMdaSlotOptions(srA4, srA4LineCard, "", 2, 1, "ma44-1gb-csfp"), [2]);
 
     const sr1e = getEntry(matrix, "sr-1e");
-    assert.deepEqual(directMdaSlotOptions(sr1e, { slot: 1, type: "iom-e" }, "", 2, 1, "isa2-aa"), [1, 2, 3, 4]);
+    assert.deepEqual(directMdaSlotOptions(sr1e, { slot: 1, type: "iom-e" }, ""), [1, 2, 3, 4]);
+    assert.deepEqual(directMdaSlotOptions(sr1e, { slot: 1, type: "iom-e" }, "", 2, 1, "isa2-aa"), [4]);
 
     const ixrR4 = getEntry(matrix, "ixr-r4");
     assert.deepEqual(directMdaSlotOptions(ixrR4, { slot: 1, type: "iom-ixr-r4" }, "", 2, 1, "m20-1g-csfp"), [1, 2, 3]);

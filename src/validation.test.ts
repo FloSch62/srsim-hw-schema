@@ -303,7 +303,17 @@ describe("topology validation", () => {
     );
 
     assert.equal(report.valid, false);
-    assert.ok(report.issues.some((issue) => issue.message.includes("isa2-aa must use MDA slot(s) 1, 2, 3, 4")));
+    assert.ok(report.issues.some((issue) => issue.message.includes("isa2-aa must use MDA slot(s) 4")));
+  });
+
+  it("rejects SR-1e direct MDA type and slot combinations outside numbered fields", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-1e\n      components:\n        - slot: A\n          type: cpm-e\n        - slot: 1\n          type: iom-e\n          mda:\n            - slot: 1\n              type: isa2-aa\n",
+      hardware
+    );
+
+    assert.equal(report.valid, false);
+    assert.ok(report.issues.some((issue) => issue.message.includes("isa2-aa must use MDA slot(s) 4")));
   });
 
   it("validates split IXR-e CPM and IMM values from slash-combined appendix rows", () => {
