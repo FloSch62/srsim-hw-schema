@@ -368,6 +368,50 @@ class ClabFragmentTest(unittest.TestCase):
             ["ixr-dc-3000", "ps-a-dc-6000"],
         )
 
+    def test_yang_leaf_enums_extracts_connector_breakouts(self) -> None:
+        yang = """
+        submodule nokia-conf-port-connector {
+          grouping conf-port-connector {
+            container connector {
+              leaf breakout {
+                type enumeration {
+                  enum c1-100g { value 4; }
+                  enum c1-400g { value 8; }
+                }
+              }
+            }
+          }
+        }
+        """
+
+        self.assertEqual(srsim.yang_leaf_enums(yang, "breakout"), ["c1-100g", "c1-400g"])
+
+    def test_mda_connector_profile_derives_mixed_speed_groups(self) -> None:
+        breakouts = ["c1-100g", "c4-25g", "c1-400g", "c4-100g"]
+        profile = srsim.mda_connector_profile(
+            "ms2-400gb-qsfpdd+2-100gb-qsfp28",
+            breakouts,
+        )
+
+        self.assertEqual(
+            profile,
+            {
+                "mdaType": "ms2-400gb-qsfpdd+2-100gb-qsfp28",
+                "connectors": [
+                    {
+                        "count": 2,
+                        "defaultType": "c1-400g",
+                        "types": ["c1-400g", "c4-100g"],
+                    },
+                    {
+                        "count": 2,
+                        "defaultType": "c1-100g",
+                        "types": ["c1-100g", "c4-25g"],
+                    },
+                ],
+            },
+        )
+
     def test_yang_range_slots_expands_power_ranges(self) -> None:
         self.assertEqual(srsim.yang_range_slots("1..2"), ["1", "2"])
         self.assertEqual(srsim.yang_range_slots("1|3..4"), ["1", "3", "4"])
@@ -377,7 +421,7 @@ class ClabFragmentTest(unittest.TestCase):
         sr2s = defaults["sr-2s"]["components"]
 
         self.assertIn({"kind": "lineCard", "slot": "1", "type": "xcm-2s"}, sr2s)
-        self.assertIn({"kind": "connector", "count": 36, "type": "c1-100g"}, sr2s)
+        self.assertFalse(any(component.get("kind") == "connector" for component in sr2s))
         self.assertFalse(any(component.get("kind") == "powerShelf" for component in sr2s))
         self.assertFalse(any(component.get("kind") == "powerModule" for component in sr2s))
         self.assertFalse(any(component.get("kind") == "fan" for component in sr2s))

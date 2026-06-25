@@ -9,6 +9,9 @@ import {
   buildEdaTopoNodeYaml,
   defaultEdaVersion,
   edaComponentTypeOptions,
+  edaConnectorBreakoutMode,
+  edaConnectorCompatibility,
+  edaConnectorTypeOptionsForMda,
   edaHasPowerProfileForChassis,
   edaPowerSlotsForChassis,
   edaPowerTypesForChassis,
@@ -48,6 +51,47 @@ describe("EDA TopoNode export", () => {
     assert.equal(components.filter((component) => component.kind === "connector").length, 36);
     assert.ok(components.some((component) => component.kind === "connector" && component.slot === "1-a-36" && component.type === "c1-100g"));
     assert.equal(components.some((component) => component.kind === "controlCard"), false);
+  });
+
+  it("renders 400G MDA connectors with compatible breakout options", () => {
+    const components = buildEdaTopoNodeComponents({
+      chassis: "sr-2s",
+      sfm: "sfm-2s",
+      components: [
+        {
+          slot: 1,
+          type: "xcm-2s",
+          mda: [{ slot: 1, type: "s36-400gb-qsfpdd" }]
+        }
+      ]
+    }, catalog);
+
+    assert.equal(components.filter((component) => component.kind === "connector").length, 36);
+    assert.ok(components.some((component) => component.kind === "connector" && component.slot === "1-a-7" && component.type === "c1-400g"));
+    assert.deepEqual(edaConnectorTypeOptionsForMda(catalog, "s36-400gb-qsfpdd", 7), [
+      "c1-400g",
+      "c4-100g",
+      "c1-400g-flex",
+      "c1-400g-aui4",
+      "c1-400g-aui4-flex"
+    ]);
+  });
+
+  it("describes connector breakout impact", () => {
+    assert.deepEqual(edaConnectorBreakoutMode("c4-100g"), {
+      type: "c4-100g",
+      channels: 4,
+      speed: "100G",
+      suffix: "",
+      impact: "4 x 100G"
+    });
+    assert.deepEqual(edaConnectorBreakoutMode("c1-400g-flex"), {
+      type: "c1-400g-flex",
+      channels: 1,
+      speed: "400G",
+      suffix: "flex",
+      impact: "1 x 400G"
+    });
   });
 
   it("renders standalone SR-1s with line card, MDA, and connectors", () => {
@@ -99,8 +143,43 @@ describe("EDA TopoNode export", () => {
       { kind: "fabric", slot: "1", type: "sfm-s" },
       { kind: "xiom", slot: "1-x1", type: "iom-s-1.5t" },
       { kind: "powerShelf", slot: "1", type: "ps-a10-shelf-dc" },
-      { kind: "mda", slot: "1-x1-a", type: "ms2-400gb-qsfpdd+2-100gb-qsfp28" }
+      { kind: "mda", slot: "1-x1-a", type: "ms2-400gb-qsfpdd+2-100gb-qsfp28" },
+      { kind: "connector", slot: "1-x1-a-1", type: "c1-400g" },
+      { kind: "connector", slot: "1-x1-a-2", type: "c1-400g" },
+      { kind: "connector", slot: "1-x1-a-3", type: "c1-100g" },
+      { kind: "connector", slot: "1-x1-a-4", type: "c1-100g" }
     ]);
+  });
+
+  it("preserves compatible edited connector breakout modes", () => {
+    const config = normalizeEdaConfig({
+      labName: "srsim-lab",
+      nodeName: "sros1",
+      chassis: "sr-2s",
+      sfm: "sfm-2s",
+      components: [
+        {
+          slot: 1,
+          type: "xcm-2s",
+          mda: [{ slot: 1, type: "s36-400gb-qsfpdd" }]
+        }
+      ],
+      edaNamespace: "eda",
+      edaNodeProfile: "",
+      edaVersion: defaultEdaVersion,
+      edaComponents: [{ kind: "connector", slot: "1-a-7", type: "c4-100g" }]
+    }, catalog);
+
+    assert.ok(config.edaComponents.some((component) => component.kind === "connector" && component.slot === "1-a-7" && component.type === "c4-100g"));
+  });
+
+  it("generates only connector types compatible with their parent MDA", () => {
+    const config = defaultConfig("sr-2s");
+    for (const component of config.edaComponents.filter((item) => item.kind === "connector")) {
+      const compatibility = edaConnectorCompatibility(catalog, config.edaComponents, component.slot);
+      assert.ok(compatibility.parentMda, `${component.slot} should have a parent MDA`);
+      assert.ok(compatibility.options.includes(component.type), `${component.slot} ${component.type} should be compatible`);
+    }
   });
 
   it("renders a full TopoNode resource", () => {
@@ -130,6 +209,7 @@ describe("EDA TopoNode export", () => {
     assert.ok(edaComponentTypeOptions(catalog, { kind: "powerShelf", slot: "1", type: "" }).includes("ps-a4-shelf-dc"));
     assert.ok(edaComponentTypeOptions(catalog, { kind: "powerModule", slot: "1-1", type: "" }).includes("ps-a-dc-6000"));
     assert.ok(edaComponentTypeOptions(catalog, { kind: "mda", slot: "1-x1-a", type: "" }).includes("ms2-400gb-qsfpdd+2-100gb-qsfp28"));
+    assert.ok(edaComponentTypeOptions(catalog, { kind: "connector", slot: "1-a-1", type: "" }).includes("c1-400g"));
   });
 
   it("uses chassis power profiles when known and generic YANG suggestions otherwise", () => {

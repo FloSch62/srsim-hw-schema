@@ -88,6 +88,17 @@ export interface EdaTopoNodeComponentDefaults {
   components: EdaCatalogComponentDefault[];
 }
 
+export interface EdaConnectorGroup {
+  count: number;
+  defaultType: string;
+  types: string[];
+}
+
+export interface EdaMdaConnectorProfile {
+  mdaType: string;
+  connectors: EdaConnectorGroup[];
+}
+
 export interface EdaPowerProfileEntry {
   slot: string;
   types: string[];
@@ -122,9 +133,11 @@ export interface EdaYangCatalog {
   };
   toponode_component_kinds: EdaTopoNodeComponentKind[];
   toponode_component_defaults?: Record<string, EdaTopoNodeComponentDefaults>;
+  toponode_connector_profiles?: Record<string, EdaMdaConnectorProfile>;
   toponode_power_profiles?: Record<string, EdaPowerProfile>;
   typedefs: {
     card?: string[];
+    connector_breakout?: string[];
     control_card?: string[];
     fabric?: string[];
     mda?: string[];

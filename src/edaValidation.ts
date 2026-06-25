@@ -4,7 +4,8 @@ import YAML from "yaml";
 import {
   edaCatalogDefaults,
   edaComponentTypeOptions,
-  edaConnectorTypesForChassis,
+  edaConnectorBreakoutTypes,
+  edaConnectorCompatibility,
   edaHasPowerProfileForChassis,
   edaPowerSlotsForChassis,
   edaPowerTypesForChassis
@@ -209,9 +210,23 @@ function validateTopoNodeHardware(document: Record<string, unknown>, schema: Har
     const path = `document ${docIndex + 1}/spec/component/${index}`;
 
     if (component.kind === "connector") {
-      const connectorTypes = edaConnectorTypesForChassis(catalog, entry.chassis);
-      if (connectorTypes.length && !connectorTypes.includes(component.type)) {
-        issues.push({ source: "hardware", path: `${path}/type`, message: `${entry.chassis} connector type must be ${connectorTypes.join(", ")}` });
+      const globalConnectorTypes = edaConnectorBreakoutTypes(catalog);
+      const compatibility = edaConnectorCompatibility(catalog, components as EdaTopoNodeComponent[], component.slot);
+
+      if (!compatibility.validSlot) {
+        issues.push({ source: "hardware", path: `${path}/slot`, message: "connector slot must be <mda-slot>-<connector-index>" });
+      } else if (!compatibility.parentMda) {
+        issues.push({ source: "hardware", path: `${path}/slot`, message: `connector parent MDA slot ${compatibility.parentSlot} is not configured` });
+      } else if (compatibility.knownProfile && !compatibility.options.length) {
+        issues.push({ source: "hardware", path: `${path}/slot`, message: `${compatibility.parentMda.type} has no connector ${compatibility.connectorIndex}` });
+      } else if (compatibility.options.length && !compatibility.options.includes(component.type)) {
+        issues.push({
+          source: "hardware",
+          path: `${path}/type`,
+          message: `${compatibility.parentMda.type} connector ${compatibility.connectorIndex} type must be ${compatibility.options.join(", ")}`
+        });
+      } else if (!compatibility.knownProfile && globalConnectorTypes.length && !globalConnectorTypes.includes(component.type)) {
+        issues.push({ source: "hardware", path: `${path}/type`, message: `connector type must be ${globalConnectorTypes.join(", ")}` });
       }
       return;
     }

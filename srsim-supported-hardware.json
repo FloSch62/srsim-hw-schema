@@ -85,11 +85,6 @@
             "kind": "mda",
             "slot": "1-a",
             "type": "me12-100gb-qsfp28"
-          },
-          {
-            "count": 12,
-            "kind": "connector",
-            "type": "c1-100g"
           }
         ]
       },
@@ -104,11 +99,6 @@
             "kind": "mda",
             "slot": "1-a",
             "type": "s36-100gb-qsfp28"
-          },
-          {
-            "count": 36,
-            "kind": "connector",
-            "type": "c1-100g"
           }
         ]
       },
@@ -128,11 +118,6 @@
             "kind": "mda",
             "slot": "1-a",
             "type": "s36-100gb-qsfp28"
-          },
-          {
-            "count": 36,
-            "kind": "connector",
-            "type": "c1-100g"
           }
         ]
       }
@@ -147,6 +132,1483 @@
       "mda",
       "connector"
     ],
+    "toponode_connector_profiles": {
+      "d24-800g-qsfpdd-1": {
+        "connectors": [
+          {
+            "count": 24,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "d24-800g-qsfpdd-1"
+      },
+      "m1-400g-qsfpdd+1-100g-qsfp28": {
+        "connectors": [
+          {
+            "count": 1,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          },
+          {
+            "count": 1,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "m1-400g-qsfpdd+1-100g-qsfp28"
+      },
+      "m10-10g-sfp+": {
+        "connectors": [
+          {
+            "count": 10,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "m10-10g-sfp+"
+      },
+      "m10-1g-sfp+2-10g-sfp+": {
+        "connectors": [
+          {
+            "count": 10,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          },
+          {
+            "count": 2,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "m10-1g-sfp+2-10g-sfp+"
+      },
+      "m10-50g-sfp56": {
+        "connectors": [
+          {
+            "count": 10,
+            "defaultType": "c1-50g",
+            "types": [
+              "c1-50g"
+            ]
+          }
+        ],
+        "mdaType": "m10-50g-sfp56"
+      },
+      "m14-10g-sfp++4-1g-tx": {
+        "connectors": [
+          {
+            "count": 14,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          },
+          {
+            "count": 4,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          }
+        ],
+        "mdaType": "m14-10g-sfp++4-1g-tx"
+      },
+      "m18-25g-sfp28": {
+        "connectors": [
+          {
+            "count": 18,
+            "defaultType": "c1-25g",
+            "types": [
+              "c1-25g"
+            ]
+          }
+        ],
+        "mdaType": "m18-25g-sfp28"
+      },
+      "m2-100g-qsfp28+16-10g-sfp+": {
+        "connectors": [
+          {
+            "count": 2,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          },
+          {
+            "count": 16,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "m2-100g-qsfp28+16-10g-sfp+"
+      },
+      "m2-1g-sfp+2-10g-sfp+": {
+        "connectors": [
+          {
+            "count": 2,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          },
+          {
+            "count": 2,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "m2-1g-sfp+2-10g-sfp+"
+      },
+      "m20-10g-sfp+": {
+        "connectors": [
+          {
+            "count": 20,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "m20-10g-sfp+"
+      },
+      "m20-1g-csfp": {
+        "connectors": [
+          {
+            "count": 20,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          }
+        ],
+        "mdaType": "m20-1g-csfp"
+      },
+      "m24-800g-qsfpdd-1": {
+        "connectors": [
+          {
+            "count": 24,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "m24-800g-qsfpdd-1"
+      },
+      "m32-1g-csfp": {
+        "connectors": [
+          {
+            "count": 32,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          }
+        ],
+        "mdaType": "m32-1g-csfp"
+      },
+      "m36-100g-qsfp28": {
+        "connectors": [
+          {
+            "count": 36,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "m36-100g-qsfp28"
+      },
+      "m36-400g-qsfp112": {
+        "connectors": [
+          {
+            "count": 36,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          }
+        ],
+        "mdaType": "m36-400g-qsfp112"
+      },
+      "m36-800g-qsfpdd": {
+        "connectors": [
+          {
+            "count": 36,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "m36-800g-qsfpdd"
+      },
+      "m4-100g-cfp4": {
+        "connectors": [
+          {
+            "count": 4,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "m4-100g-cfp4"
+      },
+      "m4-10g-sfp++1-100g-cfp2": {
+        "connectors": [
+          {
+            "count": 4,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          },
+          {
+            "count": 1,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "m4-10g-sfp++1-100g-cfp2"
+      },
+      "m4-1g-rj+6-10g-sfp++2-25g-sfp28": {
+        "connectors": [
+          {
+            "count": 4,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          },
+          {
+            "count": 6,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          },
+          {
+            "count": 2,
+            "defaultType": "c1-25g",
+            "types": [
+              "c1-25g"
+            ]
+          }
+        ],
+        "mdaType": "m4-1g-rj+6-10g-sfp++2-25g-sfp28"
+      },
+      "m4-1g-tx+20-1g-sfp+6-10g-sfp+": {
+        "connectors": [
+          {
+            "count": 4,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          },
+          {
+            "count": 20,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          },
+          {
+            "count": 6,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "m4-1g-tx+20-1g-sfp+6-10g-sfp+"
+      },
+      "m40-10g-sfp": {
+        "connectors": [
+          {
+            "count": 40,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "m40-10g-sfp"
+      },
+      "m40-10g-sfp-ptp": {
+        "connectors": [
+          {
+            "count": 40,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "m40-10g-sfp-ptp"
+      },
+      "m40-200g-sfpdd+6-800g-qsfpdd-1": {
+        "connectors": [
+          {
+            "count": 40,
+            "defaultType": "c2-100g",
+            "types": [
+              "c2-100g",
+              "c1-100g-aui2"
+            ]
+          },
+          {
+            "count": 6,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "m40-200g-sfpdd+6-800g-qsfpdd-1"
+      },
+      "m46-10g-sfp+": {
+        "connectors": [
+          {
+            "count": 46,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "m46-10g-sfp+"
+      },
+      "m48-400g-qsfpdd-1": {
+        "connectors": [
+          {
+            "count": 48,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          }
+        ],
+        "mdaType": "m48-400g-qsfpdd-1"
+      },
+      "m48-800g-qsfpdd-1x": {
+        "connectors": [
+          {
+            "count": 48,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "m48-800g-qsfpdd-1x"
+      },
+      "m5-100g-qsfp28": {
+        "connectors": [
+          {
+            "count": 5,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "m5-100g-qsfp28"
+      },
+      "m5e10-100g-qsfp28": {
+        "connectors": [
+          {
+            "count": 10,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "m5e10-100g-qsfp28"
+      },
+      "m5e16-100g-sfp112": {
+        "connectors": [
+          {
+            "count": 16,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "m5e16-100g-sfp112"
+      },
+      "m5e2-100g-qsfp28+2-800g-qdd": {
+        "connectors": [
+          {
+            "count": 2,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          },
+          {
+            "count": 2,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "m5e2-100g-qsfp28+2-800g-qdd"
+      },
+      "m5e8-100g-sfp112+2-800g-qdd": {
+        "connectors": [
+          {
+            "count": 8,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          },
+          {
+            "count": 2,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "m5e8-100g-sfp112+2-800g-qdd"
+      },
+      "m6-10g-sfp++1-100g-qsfp28": {
+        "connectors": [
+          {
+            "count": 6,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          },
+          {
+            "count": 1,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "m6-10g-sfp++1-100g-qsfp28"
+      },
+      "m6-10g-sfp++4-25g-sfp28": {
+        "connectors": [
+          {
+            "count": 6,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          },
+          {
+            "count": 4,
+            "defaultType": "c1-25g",
+            "types": [
+              "c1-25g"
+            ]
+          }
+        ],
+        "mdaType": "m6-10g-sfp++4-25g-sfp28"
+      },
+      "m80-1g-csfp": {
+        "connectors": [
+          {
+            "count": 80,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          }
+        ],
+        "mdaType": "m80-1g-csfp"
+      },
+      "m80-200g-sfpdd+12-400g-qsfpdd-1": {
+        "connectors": [
+          {
+            "count": 80,
+            "defaultType": "c2-100g",
+            "types": [
+              "c2-100g",
+              "c1-100g-aui2"
+            ]
+          },
+          {
+            "count": 12,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          }
+        ],
+        "mdaType": "m80-200g-sfpdd+12-400g-qsfpdd-1"
+      },
+      "m80-200g-sfpdd+12-800g-qsfpdd-1x": {
+        "connectors": [
+          {
+            "count": 80,
+            "defaultType": "c2-100g",
+            "types": [
+              "c2-100g",
+              "c1-100g-aui2"
+            ]
+          },
+          {
+            "count": 12,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "m80-200g-sfpdd+12-800g-qsfpdd-1x"
+      },
+      "ma2-10gb-sfp+12-1gb-sfp": {
+        "connectors": [
+          {
+            "count": 2,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          },
+          {
+            "count": 12,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          }
+        ],
+        "mdaType": "ma2-10gb-sfp+12-1gb-sfp"
+      },
+      "ma20-1gb-tx": {
+        "connectors": [
+          {
+            "count": 20,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          }
+        ],
+        "mdaType": "ma20-1gb-tx"
+      },
+      "ma4-10gb-sfp+": {
+        "connectors": [
+          {
+            "count": 4,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "ma4-10gb-sfp+"
+      },
+      "ma44-1gb-csfp": {
+        "connectors": [
+          {
+            "count": 44,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          }
+        ],
+        "mdaType": "ma44-1gb-csfp"
+      },
+      "maxp1-100gb-cfp": {
+        "connectors": [
+          {
+            "count": 1,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "maxp1-100gb-cfp"
+      },
+      "maxp1-100gb-cfp2": {
+        "connectors": [
+          {
+            "count": 1,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "maxp1-100gb-cfp2"
+      },
+      "maxp1-100gb-cfp4": {
+        "connectors": [
+          {
+            "count": 1,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "maxp1-100gb-cfp4"
+      },
+      "maxp10-10/1gb-msec-sfp+": {
+        "connectors": [
+          {
+            "count": 10,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-10g",
+              "c1-1g"
+            ]
+          }
+        ],
+        "mdaType": "maxp10-10/1gb-msec-sfp+"
+      },
+      "maxp10-10gb-sfp+": {
+        "connectors": [
+          {
+            "count": 10,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "maxp10-10gb-sfp+"
+      },
+      "me1-100gb-cfp2": {
+        "connectors": [
+          {
+            "count": 1,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "me1-100gb-cfp2"
+      },
+      "me10-10gb-sfp+": {
+        "connectors": [
+          {
+            "count": 10,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "me10-10gb-sfp+"
+      },
+      "me12-10/1gb-sfp+": {
+        "connectors": [
+          {
+            "count": 12,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-10g",
+              "c1-1g"
+            ]
+          }
+        ],
+        "mdaType": "me12-10/1gb-sfp+"
+      },
+      "me12-100gb-qsfp28": {
+        "connectors": [
+          {
+            "count": 12,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "me12-100gb-qsfp28"
+      },
+      "me16-25gb-sfp28+2-100gb-qsfp-b": {
+        "connectors": [
+          {
+            "count": 16,
+            "defaultType": "c1-25g",
+            "types": [
+              "c1-25g"
+            ]
+          },
+          {
+            "count": 2,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "me16-25gb-sfp28+2-100gb-qsfp-b"
+      },
+      "me16-25gb-sfp28+2-100gb-qsfp28": {
+        "connectors": [
+          {
+            "count": 16,
+            "defaultType": "c1-25g",
+            "types": [
+              "c1-25g"
+            ]
+          },
+          {
+            "count": 2,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "me16-25gb-sfp28+2-100gb-qsfp28"
+      },
+      "me2-100gb-ms-qsfp28": {
+        "connectors": [
+          {
+            "count": 2,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "me2-100gb-ms-qsfp28"
+      },
+      "me2-100gb-qsfp28": {
+        "connectors": [
+          {
+            "count": 2,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "me2-100gb-qsfp28"
+      },
+      "me3-200gb-cfp2-dco": {
+        "connectors": [
+          {
+            "count": 3,
+            "defaultType": "c2-100g",
+            "types": [
+              "c2-100g",
+              "c1-100g-aui2"
+            ]
+          }
+        ],
+        "mdaType": "me3-200gb-cfp2-dco"
+      },
+      "me3-400gb-qsfpdd": {
+        "connectors": [
+          {
+            "count": 3,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          }
+        ],
+        "mdaType": "me3-400gb-qsfpdd"
+      },
+      "me40-1gb-csfp": {
+        "connectors": [
+          {
+            "count": 40,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          }
+        ],
+        "mdaType": "me40-1gb-csfp"
+      },
+      "me6-100gb-qsfp28": {
+        "connectors": [
+          {
+            "count": 6,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "me6-100gb-qsfp28"
+      },
+      "me6-10gb-sfp+": {
+        "connectors": [
+          {
+            "count": 6,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "me6-10gb-sfp+"
+      },
+      "me6-400gb-qsfpdd": {
+        "connectors": [
+          {
+            "count": 6,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          }
+        ],
+        "mdaType": "me6-400gb-qsfpdd"
+      },
+      "me8-10/25gb-sfp28": {
+        "connectors": [
+          {
+            "count": 8,
+            "defaultType": "c1-25g",
+            "types": [
+              "c1-10g",
+              "c1-25g"
+            ]
+          }
+        ],
+        "mdaType": "me8-10/25gb-sfp28"
+      },
+      "ms16-100gb-sfpdd+4-100gb-qsfp28": {
+        "connectors": [
+          {
+            "count": 16,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          },
+          {
+            "count": 4,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "ms16-100gb-sfpdd+4-100gb-qsfp28"
+      },
+      "ms18-100gb-qsfp28": {
+        "connectors": [
+          {
+            "count": 18,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "ms18-100gb-qsfp28"
+      },
+      "ms2-100g-qsfp28+2-800g-qsfpdd": {
+        "connectors": [
+          {
+            "count": 2,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          },
+          {
+            "count": 2,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "ms2-100g-qsfp28+2-800g-qsfpdd"
+      },
+      "ms2-400gb-qsfpdd+2-100gb-qsfp28": {
+        "connectors": [
+          {
+            "count": 2,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          },
+          {
+            "count": 2,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "ms2-400gb-qsfpdd+2-100gb-qsfp28"
+      },
+      "ms24-10/100gb-sfpdd": {
+        "connectors": [
+          {
+            "count": 24,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-10g",
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "ms24-10/100gb-sfpdd"
+      },
+      "ms24-100g-sfp112": {
+        "connectors": [
+          {
+            "count": 24,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "ms24-100g-sfp112"
+      },
+      "ms3-200gb-cfp2-dco": {
+        "connectors": [
+          {
+            "count": 3,
+            "defaultType": "c2-100g",
+            "types": [
+              "c2-100g",
+              "c1-100g-aui2"
+            ]
+          }
+        ],
+        "mdaType": "ms3-200gb-cfp2-dco"
+      },
+      "ms36-800g-qsfpdd": {
+        "connectors": [
+          {
+            "count": 36,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "ms36-800g-qsfpdd"
+      },
+      "ms4-400g-qsfpdd+4-100g-qsfp28": {
+        "connectors": [
+          {
+            "count": 4,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          },
+          {
+            "count": 4,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "ms4-400g-qsfpdd+4-100g-qsfp28"
+      },
+      "ms4-400gb-qsfpdd+4-100gb-qsfp28": {
+        "connectors": [
+          {
+            "count": 4,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          },
+          {
+            "count": 4,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "ms4-400gb-qsfpdd+4-100gb-qsfp28"
+      },
+      "ms6-200gb-cfp2-dco": {
+        "connectors": [
+          {
+            "count": 6,
+            "defaultType": "c2-100g",
+            "types": [
+              "c2-100g",
+              "c1-100g-aui2"
+            ]
+          }
+        ],
+        "mdaType": "ms6-200gb-cfp2-dco"
+      },
+      "ms8-100g-sfp112+2-800g-qsfpdd": {
+        "connectors": [
+          {
+            "count": 8,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          },
+          {
+            "count": 2,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "ms8-100g-sfp112+2-800g-qsfpdd"
+      },
+      "ms8-100gb-sfpdd+2-100gb-qsfp28": {
+        "connectors": [
+          {
+            "count": 8,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          },
+          {
+            "count": 2,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "ms8-100gb-sfpdd+2-100gb-qsfp28"
+      },
+      "mse14-800g+4-400g": {
+        "connectors": [
+          {
+            "count": 14,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          },
+          {
+            "count": 4,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          }
+        ],
+        "mdaType": "mse14-800g+4-400g"
+      },
+      "mse24-200g-sfpdd": {
+        "connectors": [
+          {
+            "count": 24,
+            "defaultType": "c2-100g",
+            "types": [
+              "c2-100g",
+              "c1-100g-aui2"
+            ]
+          }
+        ],
+        "mdaType": "mse24-200g-sfpdd"
+      },
+      "mse6-800g-cfp2-dco": {
+        "connectors": [
+          {
+            "count": 6,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "mse6-800g-cfp2-dco"
+      },
+      "mse6-800g-qsfpdd": {
+        "connectors": [
+          {
+            "count": 6,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "mse6-800g-qsfpdd"
+      },
+      "p1-100g-cfp": {
+        "connectors": [
+          {
+            "count": 1,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "p1-100g-cfp"
+      },
+      "p10-10g-sfp": {
+        "connectors": [
+          {
+            "count": 10,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "p10-10g-sfp"
+      },
+      "p20-1gb-sfp": {
+        "connectors": [
+          {
+            "count": 20,
+            "defaultType": "c1-1g",
+            "types": [
+              "c1-1g"
+            ]
+          }
+        ],
+        "mdaType": "p20-1gb-sfp"
+      },
+      "p6-10g-sfp": {
+        "connectors": [
+          {
+            "count": 6,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "p6-10g-sfp"
+      },
+      "s18-100gb-qsfp28": {
+        "connectors": [
+          {
+            "count": 18,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "s18-100gb-qsfp28"
+      },
+      "s36-100gb-qsfp28": {
+        "connectors": [
+          {
+            "count": 36,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "s36-100gb-qsfp28"
+      },
+      "s36-100gb-qsfp28-3.6t": {
+        "connectors": [
+          {
+            "count": 36,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "s36-100gb-qsfp28-3.6t"
+      },
+      "s36-400gb-qsfpdd": {
+        "connectors": [
+          {
+            "count": 36,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          }
+        ],
+        "mdaType": "s36-400gb-qsfpdd"
+      },
+      "x12-400g-qsfpdd": {
+        "connectors": [
+          {
+            "count": 12,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          }
+        ],
+        "mdaType": "x12-400g-qsfpdd"
+      },
+      "x2-s36-800g-qsfpdd-12.0t": {
+        "connectors": [
+          {
+            "count": 36,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "x2-s36-800g-qsfpdd-12.0t"
+      },
+      "x2-s36-800g-qsfpdd-18.0t": {
+        "connectors": [
+          {
+            "count": 36,
+            "defaultType": "c1-800g",
+            "types": [
+              "c1-800g",
+              "c2-400g",
+              "c2-400g-flex",
+              "c8-100g"
+            ]
+          }
+        ],
+        "mdaType": "x2-s36-800g-qsfpdd-18.0t"
+      },
+      "x24-100g-qsfp28": {
+        "connectors": [
+          {
+            "count": 24,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "x24-100g-qsfp28"
+      },
+      "x4-100g-cfp2": {
+        "connectors": [
+          {
+            "count": 4,
+            "defaultType": "c1-100g",
+            "types": [
+              "c1-100g",
+              "c4-25g"
+            ]
+          }
+        ],
+        "mdaType": "x4-100g-cfp2"
+      },
+      "x40-10g-sfp": {
+        "connectors": [
+          {
+            "count": 40,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "x40-10g-sfp"
+      },
+      "x40-10g-sfp-ptp": {
+        "connectors": [
+          {
+            "count": 40,
+            "defaultType": "c1-10g",
+            "types": [
+              "c1-10g"
+            ]
+          }
+        ],
+        "mdaType": "x40-10g-sfp-ptp"
+      },
+      "x6-200g-cfp2-dco": {
+        "connectors": [
+          {
+            "count": 6,
+            "defaultType": "c2-100g",
+            "types": [
+              "c2-100g",
+              "c1-100g-aui2"
+            ]
+          }
+        ],
+        "mdaType": "x6-200g-cfp2-dco"
+      },
+      "x6-400g-cfp8": {
+        "connectors": [
+          {
+            "count": 6,
+            "defaultType": "c1-400g",
+            "types": [
+              "c1-400g",
+              "c4-100g",
+              "c1-400g-flex",
+              "c1-400g-aui4",
+              "c1-400g-aui4-flex"
+            ]
+          }
+        ],
+        "mdaType": "x6-400g-cfp8"
+      }
+    },
     "toponode_power_profiles": {
       "sr-14s": {
         "powerModule": [
@@ -584,6 +2046,35 @@
         "xcm2-x20",
         "xcmc-2se"
       ],
+      "connector_breakout": [
+        "c1-100g",
+        "c1-100g-aui1",
+        "c1-100g-aui2",
+        "c1-10g",
+        "c1-1g",
+        "c1-25g",
+        "c1-400g",
+        "c1-400g-aui4",
+        "c1-400g-aui4-flex",
+        "c1-400g-flex",
+        "c1-40g",
+        "c1-50g",
+        "c1-800g",
+        "c10-10g",
+        "c2-100g",
+        "c2-100g-aui2",
+        "c2-1g",
+        "c2-400g",
+        "c2-400g-flex",
+        "c3-100g",
+        "c4-100g",
+        "c4-100g-aui1",
+        "c4-10g",
+        "c4-25g",
+        "c8-100g",
+        "c8-10g",
+        "c8-50g"
+      ],
       "control_card": [
         "cpiom-ixr-r6",
         "cpiom-ixr-r6d",
@@ -794,7 +2285,7 @@
       ]
     }
   },
-  "generated_at": "2026-05-21T14:59:59.842267+00:00",
+  "generated_at": "2026-06-25T06:40:53.324506+00:00",
   "models": {
     "7250 IXR-10": {
       "default_layout": [
