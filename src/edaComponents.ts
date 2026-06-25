@@ -3,6 +3,7 @@ import YAML from "yaml";
 import { clabChassisToken, isCpmSlot, uniqueSorted } from "./matrix";
 import type {
   EdaCatalogComponentDefault,
+  EdaConnectorGroup,
   EdaConnectorDefault,
   EdaPowerProfileEntry,
   EdaTopoNodeComponent,
@@ -33,6 +34,10 @@ function isConnectorDefault(component: EdaCatalogComponentDefault): component is
   return component.kind === "connector" && "count" in component;
 }
 
+function connectorProfileKey(mdaType: string): string {
+  return mdaType.trim().toLowerCase();
+}
+
 export function edaCatalogDefaults(catalog: EdaYangCatalog, chassis: string): EdaCatalogComponentDefault[] {
   return catalog.toponode_component_defaults?.[clabChassisToken(chassis)]?.components ?? [];
 }
@@ -43,6 +48,18 @@ function hasEdaCatalogDefaults(catalog: EdaYangCatalog, chassis: string): boolea
 
 function normalizedSlot(slot: string | number | undefined): string {
   return String(slot ?? "").trim();
+}
+
+function uniqueOrdered(values: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const value of values) {
+    const key = value.toLowerCase();
+    if (!value || seen.has(key)) continue;
+    seen.add(key);
+    result.push(value);
+  }
+  return result;
 }
 
 function slotSortKey(slot: string): string {
@@ -94,8 +111,8 @@ export function edaComponentSort(left: EdaTopoNodeComponent, right: EdaTopoNodeC
 
 function appendComponent(target: EdaTopoNodeComponent[], component: EdaTopoNodeComponent): void {
   if (!component.type || !component.slot) return;
-  const key = `${component.kind}:${component.slot}:${component.type}`;
-  if (!target.some((existing) => `${existing.kind}:${existing.slot}:${existing.type}` === key)) {
+  const key = `${component.kind}:${component.slot}`;
+  if (!target.some((existing) => `${existing.kind}:${existing.slot}` === key)) {
     target.push(component);
   }
 }
@@ -169,6 +186,123 @@ function appendCatalogDefaults(target: EdaTopoNodeComponent[], catalog: EdaYangC
   }
 }
 
+export function edaConnectorBreakoutTypes(catalog: EdaYangCatalog): string[] {
+  return uniqueSorted(catalog.typedefs?.connector_breakout ?? []);
+}
+
+export function edaConnectorGroupsForMda(catalog: EdaYangCatalog, mdaType: string): EdaConnectorGroup[] {
+  return catalog.toponode_connector_profiles?.[connectorProfileKey(mdaType)]?.connectors ?? [];
+}
+
+function connectorTypeOptionsForGroup(group: EdaConnectorGroup): string[] {
+  return uniqueOrdered([group.defaultType, ...(group.types ?? [])]);
+}
+
+export function edaConnectorTypeOptionsForMda(catalog: EdaYangCatalog, mdaType: string, connectorIndex: number): string[] {
+  let cursor = 1;
+  for (const group of edaConnectorGroupsForMda(catalog, mdaType)) {
+    const count = Number(group.count);
+    if (!Number.isInteger(count) || count <= 0) continue;
+    if (connectorIndex >= cursor && connectorIndex < cursor + count) {
+      return connectorTypeOptionsForGroup(group);
+    }
+    cursor += count;
+  }
+  return [];
+}
+
+function normalizedConnectorSpeed(value: string): string {
+  return value.replace(/g$/i, "G");
+}
+
+export interface EdaConnectorBreakoutMode {
+  type: string;
+  channels: number;
+  speed: string;
+  suffix: string;
+  impact: string;
+}
+
+export function edaConnectorBreakoutMode(type: string): EdaConnectorBreakoutMode {
+  const match = type.match(/^c(\d+)-(\d+g)(.*)$/i);
+  const channels = match ? Number(match[1]) : 0;
+  const speed = match ? normalizedConnectorSpeed(match[2]) : "";
+  const suffix = match?.[3]?.replace(/^-/, "") ?? "";
+  return {
+    type,
+    channels,
+    speed,
+    suffix,
+    impact: channels && speed
+      ? `${channels} x ${speed}`
+      : "Unknown"
+  };
+}
+
+export function edaConnectorBreakoutLabel(type: string): string {
+  const mode = edaConnectorBreakoutMode(type);
+  if (!mode.channels || !mode.speed) return type;
+  return mode.suffix ? `${type} (${mode.impact}, ${mode.suffix})` : `${type} (${mode.impact})`;
+}
+
+export function edaConnectorParentSlot(slot: string): string {
+  return slot.replace(/-\d+$/, "");
+}
+
+export function edaConnectorIndex(slot: string): number {
+  const match = slot.match(/-(\d+)$/);
+  return match ? Number(match[1]) : 0;
+}
+
+export interface EdaConnectorCompatibility {
+  parentSlot: string;
+  connectorIndex: number;
+  parentMda?: EdaTopoNodeComponent;
+  options: string[];
+  knownProfile: boolean;
+  validSlot: boolean;
+}
+
+export function edaConnectorCompatibility(
+  catalog: EdaYangCatalog,
+  components: EdaTopoNodeComponent[],
+  connectorSlot: string
+): EdaConnectorCompatibility {
+  const connectorIndex = edaConnectorIndex(connectorSlot);
+  const parentSlot = edaConnectorParentSlot(connectorSlot);
+  const parentMda = components.find((component) => component.kind === "mda" && component.slot === parentSlot);
+  const groups = parentMda ? edaConnectorGroupsForMda(catalog, parentMda.type) : [];
+  return {
+    parentSlot,
+    connectorIndex,
+    parentMda,
+    options: parentMda ? edaConnectorTypeOptionsForMda(catalog, parentMda.type, connectorIndex) : [],
+    knownProfile: groups.length > 0,
+    validSlot: connectorIndex > 0 && parentSlot !== connectorSlot
+  };
+}
+
+function appendGeneratedConnectors(target: EdaTopoNodeComponent[], catalog: EdaYangCatalog): void {
+  const mdas = [...target].filter((component) => component.kind === "mda" && component.slot && component.type);
+  for (const mda of mdas) {
+    let connectorIndex = 1;
+    for (const group of edaConnectorGroupsForMda(catalog, mda.type)) {
+      const count = Number(group.count);
+      if (!Number.isInteger(count) || count <= 0) continue;
+      const type = group.defaultType || group.types?.[0] || "";
+      if (!type) continue;
+      for (let index = 0; index < count; index += 1) {
+        appendComponent(target, {
+          kind: "connector",
+          slot: `${mda.slot}-${connectorIndex}`,
+          type
+        });
+        connectorIndex += 1;
+      }
+    }
+  }
+}
+
 export function buildEdaTopoNodeComponents(
   config: Pick<SrsimConfig, "chassis" | "components" | "sfm">,
   catalog: EdaYangCatalog
@@ -208,6 +342,7 @@ export function buildEdaTopoNodeComponents(
   }
 
   appendCatalogDefaults(components, catalog, config.chassis);
+  appendGeneratedConnectors(components, catalog);
   return components.sort(edaComponentSort);
 }
 
@@ -225,7 +360,17 @@ export function reconcileEdaComponents(
     options.preservePower ? !isPowerComponent(component) : true
   );
   const existingByKey = new Map(existing.map((component) => [componentKey(component), component]));
-  const merged = defaults.map((component) => existingByKey.get(componentKey(component)) ?? component);
+  const merged = defaults.map((component) => {
+    const existingComponent = existingByKey.get(componentKey(component));
+    if (!existingComponent) return component;
+    if (component.kind !== "connector") return existingComponent;
+
+    const compatibility = edaConnectorCompatibility(catalog, defaults, component.slot);
+    if (compatibility.options.length && !compatibility.options.includes(existingComponent.type)) {
+      return component;
+    }
+    return existingComponent;
+  });
   const defaultKeys = new Set(defaults.map(componentKey));
 
   for (const component of existing) {
@@ -301,6 +446,7 @@ export function edaComponentTypeOptions(catalog: EdaYangCatalog, component: EdaT
   if (component.kind === "xiom") return typedefs.xiom ?? [];
   if (component.kind === "powerShelf") return typedefs.power_shelf ?? [];
   if (component.kind === "powerModule") return typedefs.power_module ?? [];
+  if (component.kind === "connector") return typedefs.connector_breakout ?? [];
   if (component.kind === "mda") {
     const direct = typedefs.mda ?? [];
     const xiom = typedefs.xiom_mda ?? [];
@@ -374,5 +520,5 @@ export function edaConnectorTypesForChassis(catalog: EdaYangCatalog, chassis: st
   const types = edaCatalogDefaults(catalog, chassis)
     .filter(isConnectorDefault)
     .map((component) => component.type);
-  return uniqueSorted(types);
+  return uniqueSorted([...types, ...edaConnectorBreakoutTypes(catalog)]);
 }

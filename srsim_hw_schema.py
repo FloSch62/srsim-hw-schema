@@ -65,25 +65,33 @@ EDA_COMPONENT_KIND_ORDER = {
     "mda": 6,
     "connector": 7,
 }
-EDA_CONNECTOR_TYPE = "c1-100g"
 EDA_SROS_COMPONENT_DEFAULTS: dict[str, list[dict[str, Any]]] = {
     "sr-1": [
         {"kind": "lineCard", "slot": "1", "type": "iom-1"},
         {"kind": "mda", "slot": "1-a", "type": "me12-100gb-qsfp28"},
-        {"kind": "connector", "count": 12},
     ],
     "sr-1s": [
         {"kind": "lineCard", "slot": "1", "type": "xcm-1s"},
         {"kind": "mda", "slot": "1-a", "type": "s36-100gb-qsfp28"},
-        {"kind": "connector", "count": 36},
     ],
     "sr-2s": [
         {"kind": "lineCard", "slot": "1", "type": "xcm-2s"},
         {"kind": "fabric", "slot": "1", "type": "sfm-2s"},
         {"kind": "mda", "slot": "1-a", "type": "s36-100gb-qsfp28"},
-        {"kind": "connector", "count": 36},
     ],
 }
+EDA_CONNECTOR_BREAKOUT_TYPES_BY_SPEED = {
+    "1g": ["c1-1g"],
+    "10g": ["c1-10g"],
+    "25g": ["c1-25g"],
+    "40g": ["c1-40g", "c4-10g"],
+    "50g": ["c1-50g"],
+    "100g": ["c1-100g", "c4-25g"],
+    "200g": ["c2-100g", "c1-100g-aui2"],
+    "400g": ["c1-400g", "c4-100g", "c1-400g-flex", "c1-400g-aui4", "c1-400g-aui4-flex"],
+    "800g": ["c1-800g", "c2-400g", "c2-400g-flex", "c8-100g"],
+}
+EDA_MDA_CONNECTOR_OVERRIDES: dict[str, list[dict[str, Any]]] = {}
 EDA_SRS_DATA_SHEET_SOURCE = "https://www.nokia.com/asset/f/205421/"
 EDA_SRS_INTEGRATED_POWER_CHASSIS = ["sr-1s", "sr-1se", "sr-2s", "sr-2se"]
 EDA_SRS_EXTERNAL_POWER_CHASSIS = ["sr-7s", "sr-14s"]
@@ -348,6 +356,11 @@ def yang_typedef_enums(text: str, typedef_name: str) -> list[str]:
     return unique_sorted(re.findall(r"\benum\s+([^\s{;]+)", block))
 
 
+def yang_leaf_enums(text: str, leaf_name: str) -> list[str]:
+    _, leaf = yang_statement_block(text, "leaf", leaf_name)
+    return unique_sorted(re.findall(r"\benum\s+([^\s{;]+)", leaf))
+
+
 def yang_statement_block(text: str, keyword: str, name: str, start: int = 0) -> tuple[int, str]:
     match = re.search(rf"\b{re.escape(keyword)}\s+{re.escape(name)}\s*\{{", text[start:])
     if not match:
@@ -422,15 +435,106 @@ def build_eda_yang_inventory_schema(source: str = DEFAULT_YANG_SOURCE) -> dict[s
     }
 
 
+def unique_ordered(values: list[str]) -> list[str]:
+    seen: set[str] = set()
+    result: list[str] = []
+    for value in values:
+        key = value.lower()
+        if not value or key in seen:
+            continue
+        seen.add(key)
+        result.append(value)
+    return result
+
+
+def speed_token_values(speed_text: str) -> list[str]:
+    unit = "g"
+    text = speed_text.lower().replace("gb", "g")
+    if text.endswith("g"):
+        text = text[:-1]
+    speeds = []
+    for part in text.split("/"):
+        if part.isdigit():
+            speeds.append(f"{part}{unit}")
+    return speeds
+
+
+def connector_types_for_speeds(speeds: list[str], connector_breakouts: list[str]) -> list[str]:
+    values = unique_ordered(
+        [
+            connector_type
+            for speed in speeds
+            for connector_type in EDA_CONNECTOR_BREAKOUT_TYPES_BY_SPEED.get(speed, [])
+        ]
+    )
+    if connector_breakouts:
+        values = [value for value in values if value in connector_breakouts]
+    return values
+
+
+def default_connector_type_for_speeds(speeds: list[str], connector_breakouts: list[str]) -> str:
+    for speed in reversed(speeds):
+        values = connector_types_for_speeds([speed], connector_breakouts)
+        if values:
+            return values[0]
+    values = connector_types_for_speeds(speeds, connector_breakouts)
+    return values[0] if values else ""
+
+
+def parsed_mda_connector_groups(mda_type: str, connector_breakouts: list[str]) -> list[dict[str, Any]]:
+    groups: list[dict[str, Any]] = []
+    for part in mda_type.lower().split("+"):
+        match = re.search(
+            r"(?:^|[a-z])(?P<count>\d+)-(?P<speed>\d+(?:/\d+)*(?:gb|g))(?=$|-)",
+            part,
+        )
+        if not match:
+            continue
+        speeds = speed_token_values(match.group("speed"))
+        connector_types = connector_types_for_speeds(speeds, connector_breakouts)
+        default_type = default_connector_type_for_speeds(speeds, connector_breakouts)
+        if not connector_types or not default_type:
+            continue
+        groups.append(
+            {
+                "count": int(match.group("count")),
+                "defaultType": default_type,
+                "types": connector_types,
+            }
+        )
+    return groups
+
+
+def mda_connector_profile(mda_type: str, connector_breakouts: list[str]) -> dict[str, Any] | None:
+    groups = deepcopy(EDA_MDA_CONNECTOR_OVERRIDES.get(mda_type.lower()))
+    if not groups:
+        groups = parsed_mda_connector_groups(mda_type, connector_breakouts)
+    if not groups:
+        return None
+    return {
+        "mdaType": mda_type,
+        "connectors": groups,
+    }
+
+
+def build_eda_mda_connector_profiles(
+    typedefs: dict[str, list[str]],
+    connector_breakouts: list[str],
+) -> dict[str, dict[str, Any]]:
+    profiles: dict[str, dict[str, Any]] = {}
+    for mda_type in unique_sorted((typedefs.get("mda") or []) + (typedefs.get("xiom_mda") or [])):
+        profile = mda_connector_profile(mda_type, connector_breakouts)
+        if profile:
+            profiles[mda_type.lower()] = profile
+    return profiles
+
+
 def eda_toponode_component_defaults() -> dict[str, dict[str, list[dict[str, Any]]]]:
     defaults: dict[str, dict[str, list[dict[str, Any]]]] = {}
     for chassis, components in EDA_SROS_COMPONENT_DEFAULTS.items():
         catalog_components: list[dict[str, Any]] = []
         for component in components:
-            item = deepcopy(component)
-            if item.get("kind") == "connector":
-                item["type"] = str(item.get("type") or EDA_CONNECTOR_TYPE)
-            catalog_components.append(item)
+            catalog_components.append(deepcopy(component))
         defaults[chassis] = {"components": catalog_components}
     return defaults
 
@@ -441,6 +545,9 @@ def build_eda_yang_catalog(source: str = DEFAULT_YANG_SOURCE) -> dict[str, Any]:
     for name, (module_path, typedef_name) in EDA_YANG_TYPEDEFS.items():
         modules.setdefault(module_path, load_yang_module(source, module_path))
         typedefs[name] = yang_typedef_enums(modules[module_path], typedef_name)
+    connector_module = load_yang_module(source, "nokia-submodule/nokia-conf-port-connector.yang")
+    connector_breakouts = yang_leaf_enums(connector_module, "breakout")
+    typedefs["connector_breakout"] = connector_breakouts
     return {
         "$schema": "https://srl-labs.local/srsim-eda-yang-catalog.schema.v1.json",
         "source": source,
@@ -448,6 +555,7 @@ def build_eda_yang_catalog(source: str = DEFAULT_YANG_SOURCE) -> dict[str, Any]:
         "inventory_schema": build_eda_yang_inventory_schema(source),
         "toponode_component_kinds": list(EDA_COMPONENT_KIND_ORDER),
         "toponode_component_defaults": eda_toponode_component_defaults(),
+        "toponode_connector_profiles": build_eda_mda_connector_profiles(typedefs, connector_breakouts),
         "toponode_power_profiles": eda_sros_power_profiles(),
         "state_only_inventory": ["fan", "fan-trays"],
     }

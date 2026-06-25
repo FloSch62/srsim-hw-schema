@@ -1,6 +1,10 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
@@ -19,7 +23,16 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useMemo } from "react";
 
-import { edaComponentSort, edaHasPowerProfileForChassis, edaPowerSlotsForChassis, edaPowerTypesForChassis } from "../edaComponents";
+import {
+  edaConnectorBreakoutLabel,
+  edaConnectorBreakoutMode,
+  edaComponentSort,
+  edaConnectorCompatibility,
+  edaConnectorParentSlot,
+  edaHasPowerProfileForChassis,
+  edaPowerSlotsForChassis,
+  edaPowerTypesForChassis
+} from "../edaComponents";
 import {
   componentCardSlotOptions,
   componentCpmSlotOptions,
@@ -354,11 +367,14 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     setEdaComponents([...config.edaComponents, component]);
   };
 
-  const updatePowerComponent = (index: number, updates: Partial<EdaTopoNodeComponent>) => {
+  const updateEdaComponent = (index: number, updates: Partial<EdaTopoNodeComponent>) => {
     const next = [...config.edaComponents];
-    const updated = { ...next[index], ...updates };
-    next[index] = updated;
+    next[index] = { ...next[index], ...updates };
     setEdaComponents(next);
+  };
+
+  const updatePowerComponent = (index: number, updates: Partial<EdaTopoNodeComponent>) => {
+    updateEdaComponent(index, updates);
   };
 
   const removePowerComponent = (index: number) => {
@@ -595,6 +611,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
             config={config}
             catalog={edaCatalog}
             onUpdateConfig={updateConfig}
+            onUpdateEdaComponent={updateEdaComponent}
             onAddPowerComponent={addPowerComponent}
             onUpdatePowerComponent={updatePowerComponent}
             onRemovePowerComponent={removePowerComponent}
@@ -640,6 +657,7 @@ function EdaInventorySection({
   config,
   catalog,
   onUpdateConfig,
+  onUpdateEdaComponent,
   onAddPowerComponent,
   onUpdatePowerComponent,
   onRemovePowerComponent
@@ -647,6 +665,7 @@ function EdaInventorySection({
   config: SrsimConfig;
   catalog: EdaYangCatalog;
   onUpdateConfig: (updates: Partial<SrsimConfig>) => void;
+  onUpdateEdaComponent: (index: number, updates: Partial<EdaTopoNodeComponent>) => void;
   onAddPowerComponent: (kind: "powerShelf" | "powerModule") => void;
   onUpdatePowerComponent: (index: number, updates: Partial<EdaTopoNodeComponent>) => void;
   onRemovePowerComponent: (index: number) => void;
@@ -694,6 +713,12 @@ function EdaInventorySection({
         />
       </Box>
 
+      <EdaConnectorSection
+        config={config}
+        catalog={catalog}
+        onUpdate={onUpdateEdaComponent}
+      />
+
       <EdaPowerSection
         title="Power shelves"
         addLabel="Add shelf"
@@ -719,6 +744,121 @@ function EdaInventorySection({
         onUpdate={onUpdatePowerComponent}
         onRemove={onRemovePowerComponent}
       />
+    </Stack>
+  );
+}
+
+function EdaConnectorSection({
+  config,
+  catalog,
+  onUpdate
+}: {
+  config: SrsimConfig;
+  catalog: EdaYangCatalog;
+  onUpdate: (index: number, updates: Partial<EdaTopoNodeComponent>) => void;
+}) {
+  const mdaRows = config.edaComponents
+    .map((component, index) => ({ component, index }))
+    .filter(({ component }) => component.kind === "mda")
+    .sort((left, right) => edaComponentSort(left.component, right.component));
+  const connectorRows = config.edaComponents
+    .map((component, index) => ({ component, index }))
+    .filter(({ component }) => component.kind === "connector")
+    .sort((left, right) => edaComponentSort(left.component, right.component));
+
+  return (
+    <Stack spacing={1}>
+      <Typography variant="subtitle2">Connector breakout planner</Typography>
+      {connectorRows.length ? mdaRows.map(({ component: mda }) => {
+        const rows = connectorRows.filter(({ component }) => edaConnectorParentSlot(component.slot) === mda.slot);
+        if (!rows.length) return null;
+        const splitCount = rows.filter(({ component }) => edaConnectorBreakoutMode(component.type).channels > 1).length;
+        return (
+          <Accordion
+            key={mda.slot}
+            defaultExpanded={splitCount > 0}
+            disableGutters
+            sx={{
+              border: 1,
+              borderColor: "divider",
+              borderRadius: 1,
+              boxShadow: "none",
+              "&:before": { display: "none" },
+              "&.Mui-expanded": { my: 0 }
+            }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ minHeight: 48, "& .MuiAccordionSummary-content": { minWidth: 0 } }}>
+              <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ minWidth: 0 }}>
+                <Chip label={mda.slot} size="small" />
+                <Typography variant="subtitle2" noWrap>
+                  {mda.type}
+                </Typography>
+                <Chip label={`${rows.length} connectors`} size="small" variant="outlined" />
+                {splitCount ? <Chip label={`${splitCount} split`} size="small" color="secondary" /> : null}
+              </Stack>
+            </AccordionSummary>
+            <AccordionDetails sx={{ pt: 0 }}>
+              <Stack spacing={1}>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", md: "110px minmax(210px, 1fr) 150px minmax(180px, 1fr)" },
+                  gap: 1
+                }}
+              >
+                {rows.map(({ component, index }) => {
+                  const compatibility = edaConnectorCompatibility(catalog, config.edaComponents, component.slot);
+                  const value = compatibility.options.includes(component.type) ? component.type : "";
+                  const mode = edaConnectorBreakoutMode(value || component.type);
+                  const split = mode.channels > 1;
+                  return (
+                    <Box key={component.slot} sx={{ display: "contents" }}>
+                      <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
+                        <Chip label={component.slot} size="small" color={split ? "secondary" : "default"} />
+                      </Stack>
+                      <FormControl size="small" fullWidth disabled={!compatibility.options.length}>
+                        <InputLabel id={`connector-${component.slot}-label`}>Breakout</InputLabel>
+                        <Select
+                          labelId={`connector-${component.slot}-label`}
+                          label="Breakout"
+                          value={value}
+                          onChange={(event) => onUpdate(index, { type: event.target.value })}
+                        >
+                          {compatibility.options.map((option) => (
+                            <MenuItem key={option} value={option}>
+                              {edaConnectorBreakoutLabel(option)}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                      <Chip
+                        label={mode.impact}
+                        size="small"
+                        variant={split ? "filled" : "outlined"}
+                        color={split ? "secondary" : "default"}
+                        sx={{ justifySelf: { md: "start" } }}
+                      />
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        noWrap
+                        sx={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}
+                      >
+                        {split ? `${mode.channels} logical ports` : `single ${mode.speed || "port"}`}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+              </Box>
+              </Stack>
+            </AccordionDetails>
+          </Accordion>
+        );
+      }) : (
+        <Typography variant="body2" color="text.secondary">
+          No entries configured.
+        </Typography>
+      )}
     </Stack>
   );
 }
