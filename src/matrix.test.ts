@@ -10,11 +10,14 @@ import {
   componentCpmSlotOptions,
   componentTypeOptions,
   cpmOptions,
+  availableNumericSlotOptions,
   defaultImpliesFields,
   defaultComponentsForEntry,
   defaultSfmForEntry,
   deploymentMode,
+  directMdaSlotOptions,
   directMdaOptions,
+  fixedDistributedCpmTypeIsImplied,
   getEntry,
   mdaOptions,
   schemaNumericSlotOptions,
@@ -164,12 +167,44 @@ describe("SR-SIM matrix helpers", () => {
     ]);
   });
 
+  it("does not duplicate default MDAs when a row has both mda and mda_N fields", () => {
+    const entry = getEntry(buildMatrix(hardware), "sr-2s");
+    const lineCard = defaultComponentsForEntry(entry).find((component) => component.slot === "1");
+
+    assert.deepEqual(lineCard?.mda, [{ slot: 1, type: "s36-100gb-qsfp28" }]);
+  });
+
   it("splits slash-combined CPM and IMM card values for IXR-e roles", () => {
     const entry = getEntry(buildMatrix(hardware), "ixr-e");
 
     assert.ok(cpmOptions(entry, "").includes("cpm-ixr-e-gnss"));
     assert.ok(componentTypeOptions(entry, { slot: 1 }, "").includes("imm14-10g-sfp++4-1g-tx"));
     assert.equal(componentTypeOptions(entry, { slot: 1 }, "").includes("cpm-ixr-e-gnss/imm14-10g-sfp++4-1g-tx"), false);
+  });
+
+  it("splits fixed distributed slash-card defaults into CPM, line card, and MDA roles", () => {
+    const matrix = buildMatrix(hardware);
+    const sr1x48d = getEntry(matrix, "sr-1x-48d");
+    const sr192s = getEntry(matrix, "sr-1-92s");
+    const sr1xDefaults = defaultComponentsForEntry(sr1x48d);
+    const cpm = sr1xDefaults.find((component) => component.slot === "A");
+    const lineCard = sr1xDefaults.find((component) => String(component.slot) === "1");
+
+    assert.deepEqual(cpm, { slot: "A", type: "cpm-1x" });
+    assert.deepEqual(lineCard, {
+      slot: "1",
+      type: "i48-800g-qsfpdd-1x",
+      mda: [{ slot: 1, type: "m48-800g-qsfpdd-1x" }]
+    });
+    assert.equal(fixedDistributedCpmTypeIsImplied(sr1x48d, cpm ?? {}), true);
+    assert.equal(componentTypeOptions(sr1x48d, { slot: 1 }, "").includes("cpm-1x/i48-800g-qsfpdd-1x"), false);
+    assert.deepEqual(componentTypeOptions(sr1x48d, { slot: 1 }, ""), ["i48-800g-qsfpdd-1x"]);
+    assert.deepEqual(directMdaOptions(sr1x48d, lineCard ?? {}, ""), ["m48-800g-qsfpdd-1x"]);
+    assert.deepEqual(defaultComponentsForEntry(sr192s).find((component) => String(component.slot) === "1"), {
+      slot: "1",
+      type: "i80-200g-sfpdd+12-400g-qsfpdd-1",
+      mda: [{ slot: 1, type: "m80-200g-sfpdd+12-400g-qsfpdd-1" }]
+    });
   });
 
   it("knows which selected values are implied by the default layout", () => {
@@ -195,6 +230,30 @@ describe("SR-SIM matrix helpers", () => {
     assert.deepEqual(componentCardSlotOptions(entry), [1, 2, 3, 4, 5, 6, 7]);
     assert.deepEqual(schemaNumericSlotOptions([], 2), [1, 2]);
     assert.deepEqual(schemaNumericSlotOptions([{ slot: 5 }], 2), [1, 2, 3, 4, 5]);
+  });
+
+  it("builds bounded MDA slot option lists from matrix rows and footnotes", () => {
+    const matrix = buildMatrix(hardware);
+    const sr1x48d = getEntry(matrix, "sr-1x-48d");
+    assert.deepEqual(
+      directMdaSlotOptions(sr1x48d, { slot: 1, type: "i48-800g-qsfpdd-1x" }, ""),
+      [1, 2]
+    );
+    assert.deepEqual(availableNumericSlotOptions([1, 2], [{ slot: 1 }, { slot: 2 }]), []);
+
+    const srA4 = getEntry(matrix, "sr-a4");
+    const srA4LineCard = defaultComponentsForEntry(srA4).find((component) => component.slot === "1");
+    assert.ok(srA4LineCard);
+    assert.deepEqual(directMdaSlotOptions(srA4, srA4LineCard, ""), [1, 2, 3, 4]);
+    assert.deepEqual(directMdaSlotOptions(srA4, srA4LineCard, "", 2, 1, "ma44-1gb-csfp"), [2]);
+
+    const sr1e = getEntry(matrix, "sr-1e");
+    assert.deepEqual(directMdaSlotOptions(sr1e, { slot: 1, type: "iom-e" }, ""), [1, 2, 3, 4]);
+    assert.deepEqual(directMdaSlotOptions(sr1e, { slot: 1, type: "iom-e" }, "", 2, 1, "isa2-aa"), [4]);
+
+    const ixrR4 = getEntry(matrix, "ixr-r4");
+    assert.deepEqual(directMdaSlotOptions(ixrR4, { slot: 1, type: "iom-ixr-r4" }, "", 2, 1, "m20-1g-csfp"), [1, 2, 3]);
+    assert.deepEqual(directMdaSlotOptions(ixrR4, { slot: 1, type: "iom-ixr-r4" }, "", 2, 1, "m10-1g-sfp+2-10g-sfp+"), [5]);
   });
 
   it("converts matrix rows into editor components", () => {

@@ -34,6 +34,7 @@ import {
   edaPowerTypesForChassis
 } from "../edaComponents";
 import {
+  availableNumericSlotOptions,
   componentCardSlotOptions,
   componentCpmSlotOptions,
   componentTypeOptions,
@@ -41,6 +42,7 @@ import {
   defaultComponentsForEntry,
   defaultImpliesFields,
   defaultSfmForEntry,
+  directMdaSlotOptions,
   directMdaOptions,
   type DeploymentMode,
   deploymentMode,
@@ -50,6 +52,7 @@ import {
   nextNumericSlot,
   schemaNumericSlotOptions,
   sfmOptions,
+  xiomMdaSlotOptions,
   xiomMdaOptions,
   xiomOptions
 } from "../matrix";
@@ -82,6 +85,7 @@ interface IndexedComponent {
 
 type SlotOption = string | number;
 const nestedComponentGridColumns = { xs: "1fr", sm: "120px minmax(0, 1fr) auto" } as const;
+const nestedSlotCount = 2;
 
 function deploymentModeLabel(mode: DeploymentMode): string {
   if (mode === "distributed") return "Distributed";
@@ -123,8 +127,33 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   const availableCpmSlots = cpmSlotOptions.filter((slot) => !usedCpmSlots.has(String(slot).toUpperCase()));
   const availableCardSlots = cardSlotOptions.filter((slot) => !usedCardSlots.has(String(slot)));
   const integratedComponent = config.components[0] ?? { mda: [] };
+  const xiomSlotOptions = schemaNumericSlotOptions([], nestedSlotCount, slotRules.xiomIntegerMinimum);
 
   const updateConfig = (updates: Partial<SrsimConfig>) => onChange({ ...config, ...updates });
+
+  const directMdaSlotsFor = (component: SrsimComponent, mdaType = "") =>
+    directMdaSlotOptions(selectedEntry, component, config.sfm, nestedSlotCount, slotRules.mdaIntegerMinimum, mdaType);
+
+  const xiomMdaSlotsFor = (component: SrsimComponent, xiom: SrsimXiom, mdaType = "") =>
+    xiomMdaSlotOptions(selectedEntry, component, xiom, config.sfm, nestedSlotCount, slotRules.mdaIntegerMinimum, mdaType);
+
+  const nextDirectMdaFor = (component: SrsimComponent): SrsimMda | null => {
+    const mdas = component.mda ?? [];
+    for (const type of directMdaOptions(selectedEntry, component, config.sfm)) {
+      const slot = availableNumericSlotOptions(directMdaSlotsFor(component, type), mdas)[0];
+      if (slot) return { slot, type };
+    }
+    return null;
+  };
+
+  const nextXiomMdaFor = (component: SrsimComponent, xiom: SrsimXiom): SrsimMda | null => {
+    const mdas = xiom.mda ?? [];
+    for (const type of xiomMdaOptions(selectedEntry, component, xiom, config.sfm)) {
+      const slot = availableNumericSlotOptions(xiomMdaSlotsFor(component, xiom, type), mdas)[0];
+      if (slot) return { slot, type };
+    }
+    return null;
+  };
 
   const setChassis = (chassis: string) => {
     const entry = getEntry(matrix, chassis);
@@ -237,16 +266,20 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   const addMda = (componentIndex: number) => {
     const component = config.components[componentIndex];
     const mdas = component.mda ?? [];
+    const nextMda = nextDirectMdaFor(component);
+    if (!nextMda) return;
     updateComponent(componentIndex, {
-      mda: [...mdas, { slot: nextNumericSlot(mdas), type: directMdaOptions(selectedEntry, component, config.sfm)[0] ?? "" }]
+      mda: [...mdas, nextMda]
     });
   };
 
   const addIntegratedMda = () => {
     const mdas = integratedComponent.mda ?? [];
+    const nextMda = nextDirectMdaFor(integratedComponent);
+    if (!nextMda) return;
     setIntegratedComponent({
       ...integratedComponent,
-      mda: [...mdas, { slot: nextNumericSlot(mdas), type: directMdaOptions(selectedEntry, integratedComponent, config.sfm)[0] ?? "" }]
+      mda: [...mdas, nextMda]
     });
   };
 
@@ -278,11 +311,13 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   const addXiom = (componentIndex: number) => {
     const component = config.components[componentIndex];
     const xioms = component.xiom ?? [];
+    const slot = availableNumericSlotOptions(xiomSlotOptions, xioms)[0];
+    if (!slot) return;
     updateComponent(componentIndex, {
       xiom: [
         ...xioms,
         {
-          slot: nextNumericSlot(xioms),
+          slot,
           type: xiomOptions(selectedEntry, component, config.sfm)[0] ?? "",
           mda: []
         }
@@ -307,9 +342,11 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     const xioms = [...(component.xiom ?? [])];
     const xiom = xioms[xiomIndex];
     const mdas = xiom.mda ?? [];
+    const nextMda = nextXiomMdaFor(component, xiom);
+    if (!nextMda) return;
     xioms[xiomIndex] = {
       ...xiom,
-      mda: [...mdas, { slot: nextNumericSlot(mdas), type: xiomMdaOptions(selectedEntry, component, xiom, config.sfm)[0] ?? "" }]
+      mda: [...mdas, nextMda]
     };
     updateComponent(componentIndex, { xiom: xioms });
   };
@@ -457,7 +494,9 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
           <IntegratedComponentSection
             component={integratedComponent}
             mdaOptions={directMdaOptions(selectedEntry, integratedComponent, config.sfm)}
-            mdaSlotOptions={schemaNumericSlotOptions(integratedComponent.mda ?? [], 2, slotRules.mdaIntegerMinimum)}
+            mdaSlotOptions={directMdaSlotsFor(integratedComponent)}
+            slotOptionsByMda={(integratedComponent.mda ?? []).map((mda) => directMdaSlotsFor(integratedComponent, mda.type))}
+            addMdaDisabled={!nextDirectMdaFor(integratedComponent)}
             mdaDefaultSlots={(integratedComponent.mda ?? []).map((mda) =>
               defaultImpliesFields(selectedEntry, { ...integratedComponent, mda: [mda] }, config.sfm, ["mda"]) ? [mda.slot ?? 1] : []
             )}
@@ -549,9 +588,11 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 title="Direct MDAs"
                 mdas={component.mda ?? []}
                 options={directMdaOptions(selectedEntry, component, config.sfm)}
-                slotOptions={schemaNumericSlotOptions(component.mda ?? [], 2, slotRules.mdaIntegerMinimum)}
+                slotOptions={directMdaSlotsFor(component)}
+                slotOptionsByMda={(component.mda ?? []).map((mda) => directMdaSlotsFor(component, mda.type))}
+                addDisabled={!nextDirectMdaFor(component)}
                 defaultSlots={(component.mda ?? []).map((mda) =>
-                  defaultImpliesFields(selectedEntry, { ...component, mda: [mda] }, config.sfm, ["mda"]) ? [1] : []
+                  defaultImpliesFields(selectedEntry, { ...component, mda: [mda] }, config.sfm, ["mda"]) ? [mda.slot ?? 1] : []
                 )}
                 defaultTypes={(component.mda ?? []).map((mda) =>
                   directMdaOptions(selectedEntry, component, config.sfm).filter((type) =>
@@ -567,7 +608,12 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 xioms={component.xiom ?? []}
                 xiomOptions={xiomOptions(selectedEntry, component, config.sfm)}
                 mdaOptionsByXiom={(component.xiom ?? []).map((xiom) => xiomMdaOptions(selectedEntry, component, xiom, config.sfm))}
-                xiomSlotOptions={schemaNumericSlotOptions(component.xiom ?? [], 2, slotRules.xiomIntegerMinimum)}
+                mdaSlotOptionsByXiom={(component.xiom ?? []).map((xiom) => xiomMdaSlotsFor(component, xiom))}
+                mdaSlotOptionsByXiomMda={(component.xiom ?? []).map((xiom) =>
+                  (xiom.mda ?? []).map((mda) => xiomMdaSlotsFor(component, xiom, mda.type))
+                )}
+                canAddMdaByXiom={(component.xiom ?? []).map((xiom) => Boolean(nextXiomMdaFor(component, xiom)))}
+                xiomSlotOptions={xiomSlotOptions}
                 xiomDefaultSlots={(component.xiom ?? []).map((xiom) =>
                   defaultImpliesFields(selectedEntry, { ...component, xiom: [xiom] }, config.sfm, ["xiom", "mda"]) ? [1] : []
                 )}
@@ -578,7 +624,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 )}
                 mdaDefaultSlots={(component.xiom ?? []).map((xiom) =>
                   (xiom.mda ?? []).map((mda) =>
-                    defaultImpliesFields(selectedEntry, { ...component, xiom: [{ ...xiom, mda: [mda] }] }, config.sfm, ["mda"]) ? [1] : []
+                    defaultImpliesFields(selectedEntry, { ...component, xiom: [{ ...xiom, mda: [mda] }] }, config.sfm, ["mda"]) ? [mda.slot ?? 1] : []
                   )
                 )}
                 mdaDefaultTypes={(component.xiom ?? []).map((xiom) =>
@@ -945,6 +991,8 @@ function IntegratedComponentSection({
   component,
   mdaOptions: mdaTypeOptions,
   mdaSlotOptions,
+  slotOptionsByMda,
+  addMdaDisabled,
   mdaDefaultSlots,
   mdaDefaultTypes,
   onAddMda,
@@ -954,6 +1002,8 @@ function IntegratedComponentSection({
   component: SrsimComponent;
   mdaOptions: string[];
   mdaSlotOptions: number[];
+  slotOptionsByMda?: number[][];
+  addMdaDisabled?: boolean;
   mdaDefaultSlots?: SlotOption[][];
   mdaDefaultTypes?: string[][];
   onAddMda: () => void;
@@ -983,6 +1033,8 @@ function IntegratedComponentSection({
           mdas={component.mda ?? []}
           options={mdaTypeOptions}
           slotOptions={mdaSlotOptions}
+          slotOptionsByMda={slotOptionsByMda}
+          addDisabled={addMdaDisabled}
           defaultSlots={mdaDefaultSlots}
           defaultTypes={mdaDefaultTypes}
           onAdd={onAddMda}
@@ -1085,6 +1137,8 @@ function NestedMdaSection({
   mdas,
   options,
   slotOptions,
+  slotOptionsByMda,
+  addDisabled,
   defaultSlots,
   defaultTypes,
   onAdd,
@@ -1095,6 +1149,8 @@ function NestedMdaSection({
   mdas: SrsimMda[];
   options: string[];
   slotOptions: number[];
+  slotOptionsByMda?: number[][];
+  addDisabled?: boolean;
   defaultSlots?: SlotOption[][];
   defaultTypes?: string[][];
   onAdd: () => void;
@@ -1105,7 +1161,7 @@ function NestedMdaSection({
     <Stack spacing={1} sx={{ mt: 1.5 }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
         <Typography variant="subtitle2">{title}</Typography>
-        <Button size="small" startIcon={<AddIcon />} onClick={onAdd}>
+        <Button size="small" startIcon={<AddIcon />} onClick={onAdd} disabled={addDisabled}>
           Add
         </Button>
       </Box>
@@ -1122,7 +1178,7 @@ function NestedMdaSection({
           <SlotSelect
             label="Slot"
             value={mda.slot}
-            options={slotOptions}
+            options={slotOptionsByMda?.[index] ?? slotOptions}
             defaultOptions={defaultSlots?.[index] ?? []}
             onChange={(slot) => onUpdate(index, { slot })}
           />
@@ -1147,6 +1203,9 @@ function NestedXiomSection({
   xioms,
   xiomOptions: xiomTypeOptions,
   mdaOptionsByXiom,
+  mdaSlotOptionsByXiom,
+  mdaSlotOptionsByXiomMda,
+  canAddMdaByXiom,
   xiomSlotOptions,
   xiomDefaultSlots,
   xiomDefaultTypes,
@@ -1162,6 +1221,9 @@ function NestedXiomSection({
   xioms: SrsimXiom[];
   xiomOptions: string[];
   mdaOptionsByXiom: string[][];
+  mdaSlotOptionsByXiom: number[][];
+  mdaSlotOptionsByXiomMda: number[][][];
+  canAddMdaByXiom: boolean[];
   xiomSlotOptions: number[];
   xiomDefaultSlots?: SlotOption[][];
   xiomDefaultTypes?: string[][];
@@ -1178,7 +1240,12 @@ function NestedXiomSection({
     <Stack spacing={1} sx={{ mt: 1.5 }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
         <Typography variant="subtitle2">XIOMs</Typography>
-        <Button size="small" startIcon={<AddIcon />} onClick={onAdd} disabled={xioms.length >= 2}>
+        <Button
+          size="small"
+          startIcon={<AddIcon />}
+          onClick={onAdd}
+          disabled={!xiomTypeOptions.length || !availableNumericSlotOptions(xiomSlotOptions, xioms).length}
+        >
           Add XIOM
         </Button>
       </Box>
@@ -1215,7 +1282,9 @@ function NestedXiomSection({
             title="XIOM MDAs"
             mdas={xiom.mda ?? []}
             options={mdaOptionsByXiom[xiomIndex] ?? []}
-            slotOptions={schemaNumericSlotOptions(xiom.mda ?? [], 2, slotRules.mdaIntegerMinimum)}
+            slotOptions={mdaSlotOptionsByXiom[xiomIndex] ?? []}
+            slotOptionsByMda={mdaSlotOptionsByXiomMda[xiomIndex] ?? []}
+            addDisabled={!canAddMdaByXiom[xiomIndex]}
             defaultSlots={mdaDefaultSlots?.[xiomIndex]}
             defaultTypes={mdaDefaultTypes?.[xiomIndex]}
             onAdd={() => onAddMda(xiomIndex)}

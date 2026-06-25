@@ -8,9 +8,11 @@ import {
   canonicalToken,
   clabChassisToken,
   cleanText,
+  directMdaSlotOptions,
   deploymentMode,
   isEmptyValue,
-  splitValues
+  splitValues,
+  xiomMdaSlotOptions
 } from "./matrix";
 import type {
   HardwareModelEntry,
@@ -27,12 +29,6 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 }
 
 let compiledValidator: ValidateFunction | null = null;
-const mdaSlotRestrictions = new Map<string, number[]>([
-  ["ixr-r4:m20-1g-csfp", [1, 2, 3]],
-  ["ixr-r4:m10-1g-sfp+2-10g-sfp+", [5]],
-  ["ixr-r6:a32-chds1v2", [5, 6]],
-  ["ixr-r6:m20-1g-csfp", [3, 4]]
-]);
 
 function clabValidator(): ValidateFunction {
   if (compiledValidator) return compiledValidator;
@@ -177,10 +173,6 @@ function cleanCriteria(criteria: Record<string, string>): Record<string, string>
   );
 }
 
-function restrictedMdaSlots(chassis: string, mdaType: string): number[] {
-  return mdaSlotRestrictions.get(`${clabChassisToken(chassis)}:${canonicalToken(mdaType)}`) ?? [];
-}
-
 function validateCriteria(params: {
   schema: HardwareSchema;
   nodeName: string;
@@ -232,19 +224,6 @@ function validateCriteria(params: {
     }
   }
 
-  const mdaType = criteria.mda;
-  const mdaSlot = Number(params.criteria._mda_slot);
-  const allowedSlots = mdaType ? restrictedMdaSlots(modelName, mdaType) : [];
-  if (allowedSlots.length && !allowedSlots.includes(mdaSlot)) {
-    return [
-      {
-        source: "hardware",
-        path: location,
-        message: `${mdaType} must use MDA slot(s) ${allowedSlots.join(", ")}`
-      }
-    ];
-  }
-
   return [];
 }
 
@@ -256,6 +235,39 @@ function asList(value: unknown, label: string): unknown[] {
 
 function componentName(nodeName: string, slot: unknown): string {
   return `${nodeName}[slot=${slot === undefined || slot === null ? "?" : String(slot)}]`;
+}
+
+function numericSlot(slot: unknown): number | null {
+  const value = Number(slot);
+  return Number.isInteger(value) && value > 0 ? value : null;
+}
+
+function validateNestedMdaSlot(params: {
+  location: string;
+  slot: unknown;
+  type: unknown;
+  allowedSlots: number[];
+  seenSlots: Set<string>;
+}): ValidationIssue[] {
+  const { location, slot, type, allowedSlots, seenSlots } = params;
+  const slotText = String(slot ?? "").trim();
+  const issues: ValidationIssue[] = [];
+
+  if (slotText) {
+    if (seenSlots.has(slotText)) {
+      issues.push({ source: "hardware", path: location, message: `duplicate MDA slot ${slotText}` });
+    } else {
+      seenSlots.add(slotText);
+    }
+  }
+
+  const slotNumber = numericSlot(slot);
+  if (slotNumber !== null && allowedSlots.length && !allowedSlots.includes(slotNumber)) {
+    const label = String(type ?? "MDA");
+    issues.push({ source: "hardware", path: location, message: `${label} must use MDA slot(s) ${allowedSlots.join(", ")}` });
+  }
+
+  return issues;
 }
 
 function validateComponent(params: {
@@ -274,6 +286,8 @@ function validateComponent(params: {
     sfm: String(component.sfm ?? ""),
     card: String(component.type ?? "")
   };
+  const matrixEntry = buildMatrix(schema).find((entry) => entry.chassis === clabChassisToken(chassis));
+  const baseComponent = { slot: component.slot as string | number | undefined, type: String(component.type ?? "") };
 
   let xioms: unknown[];
   let mdas: unknown[];
@@ -289,17 +303,28 @@ function validateComponent(params: {
   }
 
   const issues: ValidationIssue[] = [];
+  const seenDirectMdaSlots = new Set<string>();
   for (const mda of mdas) {
     const mdaRecord = asRecord(mda);
     if (!mdaRecord) {
       issues.push({ source: "hardware", path: location, message: "MDA entries must be mappings" });
       continue;
     }
+    const mdaLocation = `${location}.mda[${String(mdaRecord.slot ?? "?")}]`;
+    issues.push(
+      ...validateNestedMdaSlot({
+        location: mdaLocation,
+        slot: mdaRecord.slot,
+        type: mdaRecord.type,
+        allowedSlots: directMdaSlotOptions(matrixEntry, baseComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
+        seenSlots: seenDirectMdaSlots
+      })
+    );
     issues.push(
       ...validateCriteria({
         schema,
         nodeName,
-        location: `${location}.mda[${String(mdaRecord.slot ?? "?")}]`,
+        location: mdaLocation,
         modelName: chassis,
         criteria: { ...base, mda: String(mdaRecord.type ?? ""), _mda_slot: String(mdaRecord.slot ?? "") },
         strict
@@ -327,6 +352,7 @@ function validateComponent(params: {
     }
 
     const xiomBase = { ...base, xiom: String(xiomRecord.type ?? "") };
+    const xiomComponent = { slot: xiomRecord.slot as string | number | undefined, type: String(xiomRecord.type ?? "") };
     if (!xiomMdas.length) {
       issues.push(
         ...validateCriteria({
@@ -341,6 +367,7 @@ function validateComponent(params: {
       continue;
     }
 
+    const seenXiomMdaSlots = new Set<string>();
     for (const mda of xiomMdas) {
       const mdaRecord = asRecord(mda);
       if (!mdaRecord) {
@@ -351,11 +378,21 @@ function validateComponent(params: {
         });
         continue;
       }
+      const mdaLocation = `${location}.xiom[${String(xiomRecord.slot ?? "?")}].mda[${String(mdaRecord.slot ?? "?")}]`;
+      issues.push(
+        ...validateNestedMdaSlot({
+          location: mdaLocation,
+          slot: mdaRecord.slot,
+          type: mdaRecord.type,
+          allowedSlots: xiomMdaSlotOptions(matrixEntry, baseComponent, xiomComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
+          seenSlots: seenXiomMdaSlots
+        })
+      );
       issues.push(
         ...validateCriteria({
           schema,
           nodeName,
-          location: `${location}.xiom[${String(xiomRecord.slot ?? "?")}].mda[${String(mdaRecord.slot ?? "?")}]`,
+          location: mdaLocation,
           modelName: chassis,
           criteria: { ...xiomBase, mda: String(mdaRecord.type ?? ""), _mda_slot: String(mdaRecord.slot ?? "") },
           strict

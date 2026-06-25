@@ -5,24 +5,24 @@
         "srsim-card-types": {
             "description": "SR-SIM line card types generated from Nokia supported hardware tables.",
             "enum": [
-                "cpm-1se/imm36-800g-qsfpdd",
-                "cpm-1x/dms24-800g-qsfpdd-1",
-                "cpm-1x/i24-800g-qsfpdd-1",
-                "cpm-1x/i40-200g-sfpdd+6-800g-qsfpdd-1",
-                "cpm-1x/i48-400g-qsfpdd-1",
-                "cpm-1x/i48-800g-qsfpdd-1x",
-                "cpm-1x/i80-200g-sfpdd+12-400g-qsfpdd-1",
-                "cpm-1x/i80-200g-sfpdd+12-800g-qsfpdd-1x",
-                "cpm-ixr-s/imm48-sfp++6-qsfp28",
+                "dms24-800g-qsfpdd-1",
+                "i24-800g-qsfpdd-1",
+                "i40-200g-sfpdd+6-800g-qsfpdd-1",
+                "i48-400g-qsfpdd-1",
+                "i48-800g-qsfpdd-1x",
+                "i80-200g-sfpdd+12-400g-qsfpdd-1",
+                "i80-200g-sfpdd+12-800g-qsfpdd-1x",
                 "imm-2pac-fp3",
                 "imm14-10g-sfp++4-1g-tx",
                 "imm24-sfp++8-sfp28+2-qsfp28",
                 "imm32-qsfp28+4-qsfpdd",
                 "imm36-100g-qsfp28",
+                "imm36-800g-qsfpdd",
                 "imm36-qsfpdd",
                 "imm4-100gb-cfp4",
                 "imm40-10gb-sfp",
                 "imm48-1gb-sfp-c",
+                "imm48-sfp++6-qsfp28",
                 "imm48-sfp+2-qsfp28",
                 "imm6-qsfpdd+48-sfp56",
                 "iom-a",
@@ -193,7 +193,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/dms24-800g-qsfpdd-1"
+                                    "cpm-1x"
                                 ]
                             }
                         }
@@ -214,7 +214,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/dms24-800g-qsfpdd-1"
+                                    "dms24-800g-qsfpdd-1"
                                 ]
                             }
                         }
@@ -224,7 +224,44 @@
                     "if": {
                         "properties": {
                             "type": {
-                                "const": "cpm-1x/dms24-800g-qsfpdd-1"
+                                "const": "cpm-1x"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "mda"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "xiom"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "dms24-800g-qsfpdd-1"
                             }
                         },
                         "required": [
@@ -2523,7 +2560,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-ixr-s/imm48-sfp++6-qsfp28"
+                                    "cpm-ixr-s"
                                 ]
                             }
                         }
@@ -2544,7 +2581,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-ixr-s/imm48-sfp++6-qsfp28"
+                                    "imm48-sfp++6-qsfp28"
                                 ]
                             }
                         }
@@ -2554,7 +2591,44 @@
                     "if": {
                         "properties": {
                             "type": {
-                                "const": "cpm-ixr-s/imm48-sfp++6-qsfp28"
+                                "const": "cpm-ixr-s"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "mda"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "xiom"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "imm48-sfp++6-qsfp28"
                             }
                         },
                         "required": [
@@ -3547,7 +3621,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i24-800g-qsfpdd-1"
+                                    "cpm-1x"
                                 ]
                             }
                         }
@@ -3568,7 +3642,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i24-800g-qsfpdd-1"
+                                    "i24-800g-qsfpdd-1"
                                 ]
                             }
                         }
@@ -3578,7 +3652,44 @@
                     "if": {
                         "properties": {
                             "type": {
-                                "const": "cpm-1x/i24-800g-qsfpdd-1"
+                                "const": "cpm-1x"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "mda"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "xiom"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "i24-800g-qsfpdd-1"
                             }
                         },
                         "required": [
@@ -3642,7 +3753,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i40-200g-sfpdd+6-800g-qsfpdd-1"
+                                    "cpm-1x"
                                 ]
                             }
                         }
@@ -3663,7 +3774,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i40-200g-sfpdd+6-800g-qsfpdd-1"
+                                    "i40-200g-sfpdd+6-800g-qsfpdd-1"
                                 ]
                             }
                         }
@@ -3673,7 +3784,44 @@
                     "if": {
                         "properties": {
                             "type": {
-                                "const": "cpm-1x/i40-200g-sfpdd+6-800g-qsfpdd-1"
+                                "const": "cpm-1x"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "mda"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "xiom"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "i40-200g-sfpdd+6-800g-qsfpdd-1"
                             }
                         },
                         "required": [
@@ -3737,7 +3885,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i48-400g-qsfpdd-1"
+                                    "cpm-1x"
                                 ]
                             }
                         }
@@ -3758,7 +3906,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i48-400g-qsfpdd-1"
+                                    "i48-400g-qsfpdd-1"
                                 ]
                             }
                         }
@@ -3768,7 +3916,44 @@
                     "if": {
                         "properties": {
                             "type": {
-                                "const": "cpm-1x/i48-400g-qsfpdd-1"
+                                "const": "cpm-1x"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "mda"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "xiom"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "i48-400g-qsfpdd-1"
                             }
                         },
                         "required": [
@@ -3832,7 +4017,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i80-200g-sfpdd+12-400g-qsfpdd-1"
+                                    "cpm-1x"
                                 ]
                             }
                         }
@@ -3853,7 +4038,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i80-200g-sfpdd+12-400g-qsfpdd-1"
+                                    "i80-200g-sfpdd+12-400g-qsfpdd-1"
                                 ]
                             }
                         }
@@ -3863,7 +4048,44 @@
                     "if": {
                         "properties": {
                             "type": {
-                                "const": "cpm-1x/i80-200g-sfpdd+12-400g-qsfpdd-1"
+                                "const": "cpm-1x"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "mda"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "xiom"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "i80-200g-sfpdd+12-400g-qsfpdd-1"
                             }
                         },
                         "required": [
@@ -5541,7 +5763,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1se/imm36-800g-qsfpdd"
+                                    "cpm-1se"
                                 ]
                             }
                         }
@@ -5562,7 +5784,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1se/imm36-800g-qsfpdd"
+                                    "imm36-800g-qsfpdd"
                                 ]
                             }
                         }
@@ -5572,7 +5794,44 @@
                     "if": {
                         "properties": {
                             "type": {
-                                "const": "cpm-1se/imm36-800g-qsfpdd"
+                                "const": "cpm-1se"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "mda"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "xiom"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "imm36-800g-qsfpdd"
                             }
                         },
                         "required": [
@@ -5636,7 +5895,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i48-800g-qsfpdd-1x"
+                                    "cpm-1x"
                                 ]
                             }
                         }
@@ -5657,7 +5916,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i48-800g-qsfpdd-1x"
+                                    "i48-800g-qsfpdd-1x"
                                 ]
                             }
                         }
@@ -5667,7 +5926,44 @@
                     "if": {
                         "properties": {
                             "type": {
-                                "const": "cpm-1x/i48-800g-qsfpdd-1x"
+                                "const": "cpm-1x"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "mda"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "xiom"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "i48-800g-qsfpdd-1x"
                             }
                         },
                         "required": [
@@ -5731,7 +6027,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i80-200g-sfpdd+12-800g-qsfpdd-1x"
+                                    "cpm-1x"
                                 ]
                             }
                         }
@@ -5752,7 +6048,7 @@
                         "properties": {
                             "type": {
                                 "enum": [
-                                    "cpm-1x/i80-200g-sfpdd+12-800g-qsfpdd-1x"
+                                    "i80-200g-sfpdd+12-800g-qsfpdd-1x"
                                 ]
                             }
                         }
@@ -5762,7 +6058,44 @@
                     "if": {
                         "properties": {
                             "type": {
-                                "const": "cpm-1x/i80-200g-sfpdd+12-800g-qsfpdd-1x"
+                                "const": "cpm-1x"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "mda"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "xiom"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "i80-200g-sfpdd+12-800g-qsfpdd-1x"
                             }
                         },
                         "required": [
@@ -7834,14 +8167,8 @@
                 "cpiom-ixr-r6",
                 "cpm-1",
                 "cpm-1s",
-                "cpm-1se/imm36-800g-qsfpdd",
-                "cpm-1x/dms24-800g-qsfpdd-1",
-                "cpm-1x/i24-800g-qsfpdd-1",
-                "cpm-1x/i40-200g-sfpdd+6-800g-qsfpdd-1",
-                "cpm-1x/i48-400g-qsfpdd-1",
-                "cpm-1x/i48-800g-qsfpdd-1x",
-                "cpm-1x/i80-200g-sfpdd+12-400g-qsfpdd-1",
-                "cpm-1x/i80-200g-sfpdd+12-800g-qsfpdd-1x",
+                "cpm-1se",
+                "cpm-1x",
                 "cpm-2s",
                 "cpm-2se",
                 "cpm-a",
@@ -7858,7 +8185,7 @@
                 "cpm-ixr-ec",
                 "cpm-ixr-r4",
                 "cpm-ixr-r6d",
-                "cpm-ixr-s/imm48-sfp++6-qsfp28",
+                "cpm-ixr-s",
                 "cpm-ixr-x",
                 "cpm-s",
                 "cpm-sar-hm",
@@ -9869,7 +10196,7 @@
         "chassis": 49,
         "component_definitions": 43,
         "default_rows": 83,
-        "generated_at": "2026-05-21T11:29:28.532062+00:00",
+        "generated_at": "2026-06-25T06:40:53.324506+00:00",
         "models": 51,
         "source": "https://documentation.nokia.com/sr/26-3/7x50-shared/srsim-installation-setup/appendices.html",
         "supported_rows": 411

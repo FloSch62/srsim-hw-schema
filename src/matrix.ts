@@ -12,6 +12,12 @@ import type {
 const hardwareFields = new Set(["card", "sfm", "xiom", "mda"]);
 const integratedChassis = new Set(["sr-1", "sr-1s", "ixr-r6", "ixr-ec", "ixr-e2", "ixr-e2c"]);
 const redundantIntegratedChassis = new Set(["ixr-r6"]);
+const mdaSlotRestrictions = new Map<string, number[]>([
+  ["ixr-r4:m20-1g-csfp", [1, 2, 3]],
+  ["ixr-r4:m10-1g-sfp+2-10g-sfp+", [5]],
+  ["ixr-r6:a32-chds1v2", [5, 6]],
+  ["ixr-r6:m20-1g-csfp", [3, 4]]
+]);
 
 export type DeploymentMode = "standalone" | "integrated_redundant" | "distributed";
 export type MatrixRowAction = "add" | "replace";
@@ -192,11 +198,11 @@ export function rowCpmCards(row: MatrixRow, entry?: MatrixEntry): string[] {
   const mode = deploymentMode(entry);
   const values: string[] = [];
   for (const card of row.values.card ?? []) {
-    const splitForRoles = splitCardParts(card) !== null && !combinedCardPreserved(entry, card);
+    const splitForRoles = splitCardParts(card) !== null;
     if (mode === "standalone" || mode === "integrated_redundant") {
-      values.push(roleCardValue(card, entry, "cpm"));
+      values.push(roleCardValue(card, "cpm"));
     } else if (rowHasAlphaSlot(row) || splitForRoles || (cardLooksCpm(card) && !rowHasPayload(row))) {
-      values.push(roleCardValue(card, entry, "cpm"));
+      values.push(roleCardValue(card, "cpm"));
     }
   }
   return uniqueSorted(values);
@@ -209,7 +215,7 @@ export function rowLineCards(row: MatrixRow, entry?: MatrixEntry): string[] {
   const values: string[] = [];
   for (const card of row.values.card ?? []) {
     if (rowHasNumericSlot(row) || rowHasPayload(row) || !cardLooksCpm(card)) {
-      values.push(roleCardValue(card, entry, "line"));
+      values.push(roleCardValue(card, "line"));
     }
   }
   return uniqueSorted(values);
@@ -257,7 +263,7 @@ function splitCardParts(card: string): [string, string] | null {
   return cardLooksCpm(cpm) && lineCard ? [cpm, lineCard] : null;
 }
 
-function combinedCardPreserved(entry: MatrixEntry | undefined, card: string): boolean {
+function defaultCombinedCardHasBothRoles(entry: MatrixEntry | undefined, card: string): boolean {
   let alpha = false;
   let numeric = false;
   for (const row of entry?.rows ?? []) {
@@ -268,12 +274,23 @@ function combinedCardPreserved(entry: MatrixEntry | undefined, card: string): bo
   return alpha && numeric;
 }
 
-function roleCardValue(card: string, entry: MatrixEntry | undefined, role: "cpm" | "line"): string {
+function roleCardValue(card: string, role: "cpm" | "line"): string {
   const parts = splitCardParts(card);
-  if (parts && !combinedCardPreserved(entry, card)) {
+  if (parts) {
     return role === "cpm" ? parts[0] : parts[1];
   }
   return card;
+}
+
+export function fixedDistributedCpmTypeIsImplied(entry: MatrixEntry | undefined, component: SrsimComponent): boolean {
+  if (deploymentMode(entry) !== "distributed" || !isCpmSlot(component.slot) || !component.type) return false;
+  return (entry?.rows ?? []).some((row) =>
+    row.source === "default_layout" &&
+    row.values.card?.some((card) =>
+      defaultCombinedCardHasBothRoles(entry, card) &&
+      roleCardValue(card, "cpm") === component.type
+    )
+  );
 }
 
 function mdaFields(row: MatrixRow): string[] {
@@ -284,9 +301,21 @@ function rowMdaValues(row: MatrixRow): string[] {
   return uniqueSorted(mdaFields(row).flatMap((field) => row.values[field] ?? []));
 }
 
+function rowNumberedMdaSlots(row: MatrixRow, mdaType = ""): number[] {
+  const wantedType = canonicalToken(mdaType);
+  return uniqueNumbers(
+    mdaFields(row)
+      .filter((field) => field.startsWith("mda_"))
+      .filter((field) => !wantedType || (row.values[field] ?? []).some((type) => canonicalToken(type) === wantedType))
+      .map((field) => field.slice(4))
+  );
+}
+
 function directMdasFromRow(row: MatrixRow): SrsimMda[] {
   const mdas: SrsimMda[] = [];
-  for (const field of mdaFields(row)) {
+  const fields = mdaFields(row);
+  const numberedFields = fields.filter((field) => field.startsWith("mda_"));
+  for (const field of numberedFields.length ? numberedFields : fields) {
     const slot = field.startsWith("mda_") ? Number(field.slice(4)) : 1;
     for (const type of row.values[field] ?? []) {
       mdas.push({ slot, type });
@@ -403,6 +432,62 @@ export function xiomMdaOptions(
   );
 }
 
+export function restrictedMdaSlots(chassis: string | undefined, mdaType: string): number[] {
+  return mdaSlotRestrictions.get(`${clabChassisToken(chassis)}:${canonicalToken(mdaType)}`) ?? [];
+}
+
+function mdaSlotOptionsFromRows(
+  entry: MatrixEntry | undefined,
+  rows: MatrixRow[],
+  fallbackSlotCount: number,
+  minimumSlot: number,
+  mdaType = ""
+): number[] {
+  const restrictedSlots = uniqueNumbers(
+    (mdaType ? [mdaType] : uniqueSorted(rows.flatMap(rowMdaValues)))
+      .flatMap((type) => restrictedMdaSlots(entry?.chassis, type))
+  ).filter((slot) => slot >= minimumSlot);
+  if (mdaType && restrictedSlots.length) return restrictedSlots;
+
+  const numberedSlots = uniqueNumbers(rows.flatMap((row) => rowNumberedMdaSlots(row, mdaType)))
+    .filter((slot) => slot >= minimumSlot);
+  if (numberedSlots.length) return numberedSlots;
+
+  const fallbackSlots = numberRange(fallbackSlotCount, minimumSlot);
+  return restrictedSlots.length ? uniqueNumbers([...fallbackSlots, ...restrictedSlots]) : fallbackSlots;
+}
+
+export function directMdaSlotOptions(
+  entry: MatrixEntry | undefined,
+  component: SrsimComponent,
+  sfm: string,
+  fallbackSlotCount = 2,
+  minimumSlot = 1,
+  mdaType = ""
+): number[] {
+  const base = { slot: component.slot, type: component.type };
+  const rows = optionRows(entry, base, sfm, "mda").filter((row) => !(row.values.xiom ?? []).length);
+  return mdaSlotOptionsFromRows(entry, rows, fallbackSlotCount, minimumSlot, mdaType);
+}
+
+export function xiomMdaSlotOptions(
+  entry: MatrixEntry | undefined,
+  component: SrsimComponent,
+  xiom: SrsimXiom,
+  sfm: string,
+  fallbackSlotCount = 2,
+  minimumSlot = 1,
+  mdaType = ""
+): number[] {
+  const base = {
+    slot: component.slot,
+    type: component.type,
+    xiom: xiom.type ? [{ slot: xiom.slot, type: xiom.type }] : []
+  };
+  const rows = optionRows(entry, base, sfm, "mda").filter((row) => (row.values.xiom ?? []).length);
+  return mdaSlotOptionsFromRows(entry, rows, fallbackSlotCount, minimumSlot, mdaType);
+}
+
 export function mdaOptions(entry: MatrixEntry | undefined, component: SrsimComponent, sfm: string): string[] {
   const mode = deploymentMode(entry);
   return uniqueSorted(
@@ -468,6 +553,14 @@ export function schemaNumericSlotOptions(
   const configuredSlots = uniqueNumbers(items.map((item) => item.slot));
   const maxSlot = Math.max(minimumVisibleSlots, ...configuredSlots, minimumSlot);
   return numberRange(maxSlot, minimumSlot);
+}
+
+export function availableNumericSlotOptions(
+  slotOptions: number[],
+  items: Array<{ slot?: string | number }> = []
+): number[] {
+  const used = new Set(uniqueNumbers(items.map((item) => item.slot)).map(String));
+  return slotOptions.filter((slot) => !used.has(String(slot)));
 }
 
 export function matrixSearchRows(entry: MatrixEntry | undefined, query: string): MatrixRow[] {
@@ -607,6 +700,11 @@ export function defaultComponentsForEntry(entry: MatrixEntry | undefined): Srsim
         component.xiom = [makeXiom(1, xiom, mdas[0]?.type ?? "")];
       } else if (mdas.length) {
         component.mda = mdas;
+      } else {
+        const fixedMdas = directMdaOptions(entry, component, firstValue(row, "sfm"));
+        if (fixedMdas.length === 1) {
+          component.mda = [makeMda(1, fixedMdas[0])];
+        }
       }
       addComponent(component);
     }
