@@ -8,6 +8,7 @@ import {
   defaultComponentsForEntry,
   defaultImpliesFields,
   deploymentMode,
+  fixedDistributedCpmTypeIsImplied,
   firstValue,
   getEntry,
   upsertComponentBySlot
@@ -64,6 +65,40 @@ describe("topology validation", () => {
     assert.equal(yaml.includes("slot: A\n          sfm: sfm2-s\n          type: cpm2-s"), true);
     assert.equal((yaml.match(/sfm: sfm2-s/g) ?? []).length, 2);
     assert.equal(yaml.includes("mda:"), false);
+    assert.equal(validateTopologyYaml(yaml, hardware).valid, true);
+  });
+
+  it("writes fixed distributed slash-card chassis as slot-only CPM plus line-card MDA", () => {
+    const entry = getEntry(buildMatrix(hardware), "sr-1-92s");
+    const distributed = deploymentMode(entry) === "distributed";
+    const yaml = buildTopologyYaml(
+      {
+        labName: "srsim-lab",
+        nodeName: "sros1",
+        chassis: "sr-1-92s",
+        sfm: "",
+        components: defaultComponentsForEntry(entry)
+      },
+      {
+        shouldWriteComponentSlot: (component) =>
+          distributed || !defaultImpliesFields(entry, component, "", []),
+        shouldWriteComponentType: (component) =>
+          (distributed && !fixedDistributedCpmTypeIsImplied(entry, component)) ||
+          !defaultImpliesFields(entry, component, "", []),
+        shouldWriteSfm: (component) => distributed && Boolean(component.slot),
+        shouldWriteDirectMda: (component, mda) =>
+          !distributed || !defaultImpliesFields(entry, { ...component, mda: [mda] }, "", ["mda"])
+      }
+    );
+
+    assert.equal(yaml.includes("type: cpm-1x/i80-200g-sfpdd+12-400g-qsfpdd-1"), false);
+    assert.equal(yaml.includes("type: cpm-1x\n"), false);
+    assert.equal(
+      yaml.includes(
+        "- slot: A\n        - slot: 1\n          type: i80-200g-sfpdd+12-400g-qsfpdd-1\n          mda:\n            - slot: 1\n              type: m80-200g-sfpdd+12-400g-qsfpdd-1"
+      ),
+      true
+    );
     assert.equal(validateTopologyYaml(yaml, hardware).valid, true);
   });
 
@@ -288,7 +323,7 @@ describe("topology validation", () => {
 
   it("rejects direct MDA slots outside the matrix slot options", () => {
     const report = validateTopologyYaml(
-      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-1x-48d\n      components:\n        - slot: A\n          type: cpm-1x/i48-800g-qsfpdd-1x\n        - slot: 1\n          type: cpm-1x/i48-800g-qsfpdd-1x\n          mda:\n            - slot: 3\n              type: m48-800g-qsfpdd-1x\n",
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-1x-48d\n      components:\n        - slot: A\n        - slot: 1\n          type: i48-800g-qsfpdd-1x\n          mda:\n            - slot: 3\n              type: m48-800g-qsfpdd-1x\n",
       hardware
     );
 

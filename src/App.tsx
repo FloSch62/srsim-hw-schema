@@ -32,6 +32,7 @@ import {
   componentFromMatrixRow,
   defaultComponentsForEntry,
   defaultImpliesFields,
+  fixedDistributedCpmTypeIsImplied,
   deploymentMode,
   defaultSfmForEntry,
   firstValue,
@@ -165,7 +166,8 @@ export function App() {
         includeDefaultsInYaml || selectedDeploymentMode === "distributed" ||
         !defaultImpliesFields(selectedEntry, component, config.sfm, []),
       shouldWriteComponentType: (component: SrsimConfig["components"][number]) =>
-        includeDefaultsInYaml || selectedDeploymentMode === "distributed" ||
+        includeDefaultsInYaml ||
+        (selectedDeploymentMode === "distributed" && !fixedDistributedCpmTypeIsImplied(selectedEntry, component)) ||
         !defaultImpliesFields(selectedEntry, component, config.sfm, []),
       shouldWriteSfm: (component: SrsimConfig["components"][number]) =>
         selectedDeploymentMode === "distributed" && Boolean(component.slot),

@@ -198,11 +198,11 @@ export function rowCpmCards(row: MatrixRow, entry?: MatrixEntry): string[] {
   const mode = deploymentMode(entry);
   const values: string[] = [];
   for (const card of row.values.card ?? []) {
-    const splitForRoles = splitCardParts(card) !== null && !combinedCardPreserved(entry, card);
+    const splitForRoles = splitCardParts(card) !== null;
     if (mode === "standalone" || mode === "integrated_redundant") {
-      values.push(roleCardValue(card, entry, "cpm"));
+      values.push(roleCardValue(card, "cpm"));
     } else if (rowHasAlphaSlot(row) || splitForRoles || (cardLooksCpm(card) && !rowHasPayload(row))) {
-      values.push(roleCardValue(card, entry, "cpm"));
+      values.push(roleCardValue(card, "cpm"));
     }
   }
   return uniqueSorted(values);
@@ -215,7 +215,7 @@ export function rowLineCards(row: MatrixRow, entry?: MatrixEntry): string[] {
   const values: string[] = [];
   for (const card of row.values.card ?? []) {
     if (rowHasNumericSlot(row) || rowHasPayload(row) || !cardLooksCpm(card)) {
-      values.push(roleCardValue(card, entry, "line"));
+      values.push(roleCardValue(card, "line"));
     }
   }
   return uniqueSorted(values);
@@ -263,7 +263,7 @@ function splitCardParts(card: string): [string, string] | null {
   return cardLooksCpm(cpm) && lineCard ? [cpm, lineCard] : null;
 }
 
-function combinedCardPreserved(entry: MatrixEntry | undefined, card: string): boolean {
+function defaultCombinedCardHasBothRoles(entry: MatrixEntry | undefined, card: string): boolean {
   let alpha = false;
   let numeric = false;
   for (const row of entry?.rows ?? []) {
@@ -274,12 +274,23 @@ function combinedCardPreserved(entry: MatrixEntry | undefined, card: string): bo
   return alpha && numeric;
 }
 
-function roleCardValue(card: string, entry: MatrixEntry | undefined, role: "cpm" | "line"): string {
+function roleCardValue(card: string, role: "cpm" | "line"): string {
   const parts = splitCardParts(card);
-  if (parts && !combinedCardPreserved(entry, card)) {
+  if (parts) {
     return role === "cpm" ? parts[0] : parts[1];
   }
   return card;
+}
+
+export function fixedDistributedCpmTypeIsImplied(entry: MatrixEntry | undefined, component: SrsimComponent): boolean {
+  if (deploymentMode(entry) !== "distributed" || !isCpmSlot(component.slot) || !component.type) return false;
+  return (entry?.rows ?? []).some((row) =>
+    row.source === "default_layout" &&
+    row.values.card?.some((card) =>
+      defaultCombinedCardHasBothRoles(entry, card) &&
+      roleCardValue(card, "cpm") === component.type
+    )
+  );
 }
 
 function mdaFields(row: MatrixRow): string[] {
@@ -689,6 +700,11 @@ export function defaultComponentsForEntry(entry: MatrixEntry | undefined): Srsim
         component.xiom = [makeXiom(1, xiom, mdas[0]?.type ?? "")];
       } else if (mdas.length) {
         component.mda = mdas;
+      } else {
+        const fixedMdas = directMdaOptions(entry, component, firstValue(row, "sfm"));
+        if (fixedMdas.length === 1) {
+          component.mda = [makeMda(1, fixedMdas[0])];
+        }
       }
       addComponent(component);
     }

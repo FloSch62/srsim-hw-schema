@@ -980,21 +980,9 @@ def split_card_parts(card: str) -> tuple[str, str] | None:
     return cpm, line_card
 
 
-def combined_card_preserved(chassis_entry: dict[str, Any], card: str) -> bool:
-    alpha = False
-    numeric = False
-    for row in chassis_entry.get("default_layout", []):
-        if card not in row.get("card", []):
-            continue
-        slots = row.get("slot", [])
-        alpha = alpha or any(re.fullmatch(r"[A-Za-z]", slot) for slot in slots)
-        numeric = numeric or any(slot.isdigit() for slot in slots)
-    return alpha and numeric
-
-
 def role_card_values(card: str, chassis_entry: dict[str, Any], role: str) -> list[str]:
     parts = split_card_parts(card)
-    if parts and not combined_card_preserved(chassis_entry, card):
+    if parts:
         return [parts[0] if role == "cpm" else parts[1]]
     return [card]
 
@@ -1052,7 +1040,7 @@ def classify_card_values(
             continue
 
         split_parts = split_card_parts(card)
-        split_for_roles = split_parts is not None and not combined_card_preserved(chassis_entry, card)
+        split_for_roles = split_parts is not None
 
         if has_alpha_slot or split_for_roles or (card_is_cpm(card) and not has_payload):
             merge_values(cpms, role_card_values(card, chassis_entry, "cpm"))
@@ -2115,6 +2103,14 @@ def first_matrix_value(row: dict[str, list[str]], field: str) -> str:
     return row.get(field, [""])[0] if row.get(field) else ""
 
 
+def first_alpha_slot(row: dict[str, list[str]]) -> str:
+    return next((slot for slot in row.get("slot", []) if re.fullmatch(r"[A-Za-z]", slot)), "")
+
+
+def first_numeric_slot(row: dict[str, list[str]]) -> str:
+    return next((slot for slot in row.get("slot", []) if slot.isdigit()), "")
+
+
 def matrix_mda_fields(row: dict[str, list[str]]) -> list[str]:
     return sorted(field for field in row if field == "mda" or field.startswith("mda_"))
 
@@ -2142,15 +2138,20 @@ def default_sfm_for_chassis_entry(chassis_entry: dict[str, Any]) -> str:
 def default_components_for_chassis_entry(chassis: str, chassis_entry: dict[str, Any]) -> list[dict[str, Any]]:
     components: list[dict[str, Any]] = []
     seen: set[str] = set()
+    seen_slots: set[str] = set()
     mode = deployment_mode(chassis, chassis_entry)
+    compatibility = card_compatibility(chassis_entry) if mode == "distributed" else {}
 
     def add(component: dict[str, Any]) -> None:
         if not component.get("type") and not component.get("mda") and not component.get("xiom"):
             return
         key = json.dumps(component, sort_keys=True)
-        if key in seen:
+        slot_key = str(component.get("slot", "")).strip().upper()
+        if key in seen or (slot_key and slot_key in seen_slots):
             return
         seen.add(key)
+        if slot_key:
+            seen_slots.add(slot_key)
         components.append(component)
 
     for row in chassis_entry.get("default_layout", []):
@@ -2159,7 +2160,7 @@ def default_components_for_chassis_entry(chassis: str, chassis_entry: dict[str, 
             mdas = matrix_mdas_from_row(row)
             add(
                 {
-                    "slot": first_matrix_value(row, "slot") or "A",
+                    "slot": first_alpha_slot(row) or "A",
                     "type": cpms[0] if cpms else "",
                     **({"mda": mdas} if mdas else {}),
                 }
@@ -2168,10 +2169,10 @@ def default_components_for_chassis_entry(chassis: str, chassis_entry: dict[str, 
 
         cpms, line_cards = classify_card_values(row, chassis_entry)
         for cpm in cpms:
-            add({"slot": first_matrix_value(row, "slot") or "A", "type": cpm})
+            add({"slot": first_alpha_slot(row) or "A", "type": cpm})
         for card in line_cards:
             component: dict[str, Any] = {
-                "slot": first_matrix_value(row, "slot") or 1,
+                "slot": first_numeric_slot(row) or 1,
                 "type": card,
             }
             xiom = first_matrix_value(row, "xiom")
@@ -2186,6 +2187,10 @@ def default_components_for_chassis_entry(chassis: str, chassis_entry: dict[str, 
                 ]
             elif mdas:
                 component["mda"] = mdas
+            else:
+                fixed_mdas = compatibility.get(card, {}).get("direct_mda", [])
+                if len(fixed_mdas) == 1:
+                    component["mda"] = [{"slot": 1, "type": fixed_mdas[0]}]
             add(component)
 
     return components
