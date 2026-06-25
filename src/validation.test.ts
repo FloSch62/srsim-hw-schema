@@ -286,6 +286,26 @@ describe("topology validation", () => {
     assert.ok(report.issues.some((issue) => issue.message.includes("m20-1g-csfp must use MDA slot(s) 1, 2, 3")));
   });
 
+  it("rejects direct MDA slots outside the matrix slot options", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-1x-48d\n      components:\n        - slot: A\n          type: cpm-1x/i48-800g-qsfpdd-1x\n        - slot: 1\n          type: cpm-1x/i48-800g-qsfpdd-1x\n          mda:\n            - slot: 3\n              type: m48-800g-qsfpdd-1x\n",
+      hardware
+    );
+
+    assert.equal(report.valid, false);
+    assert.ok(report.issues.some((issue) => issue.message.includes("m48-800g-qsfpdd-1x must use MDA slot(s) 1, 2")));
+  });
+
+  it("rejects SR-1e direct MDA slots above the numbered default slots", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-1e\n      components:\n        - slot: A\n          type: cpm-e\n        - slot: 1\n          type: iom-e\n          mda:\n            - slot: 5\n              type: isa2-aa\n",
+      hardware
+    );
+
+    assert.equal(report.valid, false);
+    assert.ok(report.issues.some((issue) => issue.message.includes("isa2-aa must use MDA slot(s) 1, 2, 3, 4")));
+  });
+
   it("validates split IXR-e CPM and IMM values from slash-combined appendix rows", () => {
     const report = validateTopologyYaml(
       "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: ixr-e\n      components:\n        - slot: A\n          type: cpm-ixr-e-gnss\n        - slot: 1\n          type: imm14-10g-sfp++4-1g-tx\n          mda:\n            - slot: 1\n              type: m14-10g-sfp++4-1g-tx\n",

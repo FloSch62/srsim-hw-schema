@@ -12,6 +12,12 @@ import type {
 const hardwareFields = new Set(["card", "sfm", "xiom", "mda"]);
 const integratedChassis = new Set(["sr-1", "sr-1s", "ixr-r6", "ixr-ec", "ixr-e2", "ixr-e2c"]);
 const redundantIntegratedChassis = new Set(["ixr-r6"]);
+const mdaSlotRestrictions = new Map<string, number[]>([
+  ["ixr-r4:m20-1g-csfp", [1, 2, 3]],
+  ["ixr-r4:m10-1g-sfp+2-10g-sfp+", [5]],
+  ["ixr-r6:a32-chds1v2", [5, 6]],
+  ["ixr-r6:m20-1g-csfp", [3, 4]]
+]);
 
 export type DeploymentMode = "standalone" | "integrated_redundant" | "distributed";
 export type MatrixRowAction = "add" | "replace";
@@ -284,9 +290,19 @@ function rowMdaValues(row: MatrixRow): string[] {
   return uniqueSorted(mdaFields(row).flatMap((field) => row.values[field] ?? []));
 }
 
+function rowNumberedMdaSlots(row: MatrixRow): number[] {
+  return uniqueNumbers(
+    mdaFields(row)
+      .filter((field) => field.startsWith("mda_"))
+      .map((field) => field.slice(4))
+  );
+}
+
 function directMdasFromRow(row: MatrixRow): SrsimMda[] {
   const mdas: SrsimMda[] = [];
-  for (const field of mdaFields(row)) {
+  const fields = mdaFields(row);
+  const numberedFields = fields.filter((field) => field.startsWith("mda_"));
+  for (const field of numberedFields.length ? numberedFields : fields) {
     const slot = field.startsWith("mda_") ? Number(field.slice(4)) : 1;
     for (const type of row.values[field] ?? []) {
       mdas.push({ slot, type });
@@ -403,6 +419,62 @@ export function xiomMdaOptions(
   );
 }
 
+export function restrictedMdaSlots(chassis: string | undefined, mdaType: string): number[] {
+  return mdaSlotRestrictions.get(`${clabChassisToken(chassis)}:${canonicalToken(mdaType)}`) ?? [];
+}
+
+function mdaSlotOptionsFromRows(
+  entry: MatrixEntry | undefined,
+  rows: MatrixRow[],
+  fallbackSlotCount: number,
+  minimumSlot: number,
+  mdaType = ""
+): number[] {
+  const restrictedSlots = uniqueNumbers(
+    (mdaType ? [mdaType] : uniqueSorted(rows.flatMap(rowMdaValues)))
+      .flatMap((type) => restrictedMdaSlots(entry?.chassis, type))
+  ).filter((slot) => slot >= minimumSlot);
+  if (mdaType && restrictedSlots.length) return restrictedSlots;
+
+  const numberedSlots = uniqueNumbers(rows.flatMap(rowNumberedMdaSlots))
+    .filter((slot) => slot >= minimumSlot);
+  if (numberedSlots.length) return numberedSlots;
+
+  const fallbackSlots = numberRange(fallbackSlotCount, minimumSlot);
+  return restrictedSlots.length ? uniqueNumbers([...fallbackSlots, ...restrictedSlots]) : fallbackSlots;
+}
+
+export function directMdaSlotOptions(
+  entry: MatrixEntry | undefined,
+  component: SrsimComponent,
+  sfm: string,
+  fallbackSlotCount = 2,
+  minimumSlot = 1,
+  mdaType = ""
+): number[] {
+  const base = { slot: component.slot, type: component.type };
+  const rows = optionRows(entry, base, sfm, "mda").filter((row) => !(row.values.xiom ?? []).length);
+  return mdaSlotOptionsFromRows(entry, rows, fallbackSlotCount, minimumSlot, mdaType);
+}
+
+export function xiomMdaSlotOptions(
+  entry: MatrixEntry | undefined,
+  component: SrsimComponent,
+  xiom: SrsimXiom,
+  sfm: string,
+  fallbackSlotCount = 2,
+  minimumSlot = 1,
+  mdaType = ""
+): number[] {
+  const base = {
+    slot: component.slot,
+    type: component.type,
+    xiom: xiom.type ? [{ slot: xiom.slot, type: xiom.type }] : []
+  };
+  const rows = optionRows(entry, base, sfm, "mda").filter((row) => (row.values.xiom ?? []).length);
+  return mdaSlotOptionsFromRows(entry, rows, fallbackSlotCount, minimumSlot, mdaType);
+}
+
 export function mdaOptions(entry: MatrixEntry | undefined, component: SrsimComponent, sfm: string): string[] {
   const mode = deploymentMode(entry);
   return uniqueSorted(
@@ -468,6 +540,14 @@ export function schemaNumericSlotOptions(
   const configuredSlots = uniqueNumbers(items.map((item) => item.slot));
   const maxSlot = Math.max(minimumVisibleSlots, ...configuredSlots, minimumSlot);
   return numberRange(maxSlot, minimumSlot);
+}
+
+export function availableNumericSlotOptions(
+  slotOptions: number[],
+  items: Array<{ slot?: string | number }> = []
+): number[] {
+  const used = new Set(uniqueNumbers(items.map((item) => item.slot)).map(String));
+  return slotOptions.filter((slot) => !used.has(String(slot)));
 }
 
 export function matrixSearchRows(entry: MatrixEntry | undefined, query: string): MatrixRow[] {
