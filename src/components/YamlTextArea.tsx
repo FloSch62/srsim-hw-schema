@@ -59,7 +59,6 @@ export function YamlTextArea({
         "--yaml-text": theme.palette.text.primary,
         "--yaml-placeholder": theme.palette.text.disabled,
         "--yaml-selection-bg": alpha(theme.palette.primary.main, theme.palette.mode === "dark" ? 0.32 : 0.2),
-        "--yaml-selection-text": theme.palette.text.primary,
         bgcolor: "background.paper",
         border: "1px solid",
         borderColor: "divider",
