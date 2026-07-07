@@ -261,8 +261,8 @@ body {
 
 .yaml-text-area__input::selection {
   background: var(--yaml-selection-bg);
-  color: var(--yaml-selection-text);
-  -webkit-text-fill-color: var(--yaml-selection-text);
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 @media (max-width: 1280px) {
