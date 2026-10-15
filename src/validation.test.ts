@@ -9,6 +9,7 @@ import {
   defaultImpliesFields,
   deploymentMode,
   fixedDistributedCpmTypeIsImplied,
+  integratedCardTypeIsImplied,
   firstValue,
   getEntry,
   upsertComponentBySlot
@@ -119,6 +120,24 @@ describe("topology validation", () => {
     assert.equal(yaml.includes("type: cpm-1s"), false);
     assert.equal(yaml.includes("slot: 1\n          type: cpm-1s"), false);
     assert.equal(validateTopologyYaml(yaml, hardware).valid, true);
+  });
+
+  it("never writes the implied card type of containerlab integrated chassis", () => {
+    const entry = getEntry(buildMatrix(hardware), "sr-1s");
+    const yaml = buildTopologyYaml({
+      labName: "srsimtest",
+      nodeName: "sros1",
+      chassis: "sr-1s",
+      sfm: "",
+      components: [{ slot: "A", type: "cpm-1s", mda: [{ slot: 1, type: "s18-100gb-qsfp28" }] }]
+    }, {
+      shouldWriteComponentType: (component) => !integratedCardTypeIsImplied(entry, component)
+    });
+
+    assert.equal(yaml.includes("type: cpm-1s"), false);
+    assert.equal(yaml.includes("- slot: A\n          mda:\n            - slot: 1\n              type: s18-100gb-qsfp28"), true);
+    assert.equal(validateTopologyYaml(yaml, hardware).valid, true);
+    assert.equal(integratedCardTypeIsImplied(getEntry(buildMatrix(hardware), "sar-mx"), { slot: "A", type: "iom-sar-1x" }), false);
   });
 
   it("can include integrated default slot and CPM type in generated YAML", () => {

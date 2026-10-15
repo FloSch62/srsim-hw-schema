@@ -24,8 +24,9 @@ from urllib.request import Request, urlopen
 import yaml
 
 
+SROS_RELEASE = "26.7"
 DEFAULT_APPENDIX_URL = (
-    "https://documentation.nokia.com/sr/26-3/7x50-shared/"
+    f"https://documentation.nokia.com/sr/{SROS_RELEASE.replace('.', '-')}/7x50-shared/"
     "srsim-installation-setup/appendices.html"
 )
 
@@ -34,6 +35,7 @@ CLAB_SRSIM_SCHEMA = "https://raw.githubusercontent.com/srl-labs/containerlab/mai
 DEFAULT_SRSIM_SCHEMA_REF = CLAB_SRSIM_SCHEMA
 DEFAULT_SRSIM_SCHEMA_FILE = "srsim-hw.schema.json"
 CLAB_MATRIX_VERSION = 1
+KIND_SPECIFIC_CONFIG_PREFIX = "kind-specific-config-"
 CLAB_COMPONENT_DEFINITIONS = (
     "srsim-chassis-types",
     "srsim-card-types",
@@ -47,7 +49,19 @@ CLAB_COMPONENT_DEFINITIONS = (
 )
 CLAB_SRSIM_DEFINITION_NAMES = set(CLAB_COMPONENT_DEFINITIONS) | {"srsim-node"}
 MATRIX_SUPPORTED_VALUE_FIELDS = ("card", "sfm", "xiom", "mda")
-INTEGRATED_CHASSIS = {"sr-1", "sr-1s", "ixr-r6", "ixr-ec", "ixr-e2", "ixr-e2c"}
+INTEGRATED_CHASSIS = {
+    "sr-1",
+    "sr-1s",
+    "ixr-r6",
+    "ixr-ec",
+    "ixr-e2",
+    "ixr-e2c",
+    "ixr-e2n",
+    "ixr-e2n-s",
+    "ixr-e2sc",
+    "ixr-e3c",
+    "ixr-e3x",
+}
 REDUNDANT_INTEGRATED_CHASSIS = {"ixr-r6"}
 MDA_SLOT_RESTRICTIONS: dict[tuple[str, str], list[int]] = {
     ("ixr-r4", "m20-1g-csfp"): [1, 2, 3],
@@ -95,7 +109,7 @@ EDA_MDA_CONNECTOR_OVERRIDES: dict[str, list[dict[str, Any]]] = {}
 EDA_SRS_DATA_SHEET_SOURCE = "https://www.nokia.com/asset/f/205421/"
 EDA_SRS_INTEGRATED_POWER_CHASSIS = ["sr-1s", "sr-1se", "sr-2s", "sr-2se"]
 EDA_SRS_EXTERNAL_POWER_CHASSIS = ["sr-7s", "sr-14s"]
-DEFAULT_YANG_SOURCE = "https://raw.githubusercontent.com/nokia/7x50_YangModels/master/latest_sros_26.3"
+DEFAULT_YANG_SOURCE = f"https://raw.githubusercontent.com/nokia/7x50_YangModels/master/latest_sros_{SROS_RELEASE}"
 EDA_YANG_TYPEDEFS = {
     "card": ("nokia-types-card.yang", "sros-iom-type"),
     "control_card": ("nokia-types-card.yang", "sros-cpm-type"),
@@ -201,8 +215,13 @@ def normalize_field_value(field: str, value: str) -> str:
             continue
         # Some cells include explanatory labels or notes in the value text,
         # while the actual SR-SIM environment value is the leading token.
+        # Label-only lines such as "Pluggable in MDA/1:" introduce a list of
+        # values and are not values themselves.
+        if re.fullmatch(r"(?:fixed|pluggable)\s+in\s+MDA/[^:]*:", line, flags=re.I):
+            continue
         line = re.sub(r"^(?:ION|MDA)\s*:\s*", "", line, flags=re.I)
         line = re.sub(r"\s*\((?:fixed|pluggable)\s+in\s+MDA/[^)]*\)\s*$", "", line, flags=re.I)
+        line = re.sub(r"\s*/\s*", "/", line)
         normalized_lines.append(line)
 
     return clean_text("\n".join(normalized_lines))
@@ -1661,6 +1680,7 @@ def write_json_output(
     if output == "-":
         print(text, end="")
         return
+    Path(output).parent.mkdir(parents=True, exist_ok=True)
     Path(output).write_text(text, encoding="utf-8")
     print(f"wrote {output}")
 
@@ -1674,7 +1694,10 @@ def find_srsim_branch(clab_schema: dict[str, Any]) -> dict[str, Any]:
             .get("kind", {})
             .get("pattern", "")
         )
-        if "nokia_srsim" in pattern:
+        # Containerlab dispatches kind-specific config keys through a separate
+        # branch per kind; that one must be left alone.
+        then_ref = str(branch.get("then", {}).get("$ref", ""))
+        if "nokia_srsim" in pattern and not then_ref.startswith(f"#/definitions/{KIND_SPECIFIC_CONFIG_PREFIX}"):
             return branch
     branch = {
         "if": {
@@ -1693,6 +1716,32 @@ def component_items_reference(item: dict[str, Any], ref: str) -> bool:
     return any(child.get("$ref") == ref for child in item.get("anyOf", []))
 
 
+def is_component_ref(item: dict[str, Any], name: str) -> bool:
+    return str(item.get("$ref", "")).endswith(f"#/definitions/{name}")
+
+
+def rewire_srsim_kind_components(definitions: dict[str, Any], srsim_component_ref: str) -> None:
+    """Point the nokia_srsim kind-specific components at the SR-SIM component schema.
+
+    Containerlab constrains nokia_srsim components to the classic SR OS
+    component schema, which rejects SR-SIM fields such as ``sfm`` and only
+    knows the SR OS hardware enums.
+    """
+    kind_config = definitions.get(f"{KIND_SPECIFIC_CONFIG_PREFIX}nokia_srsim", {})
+    components = kind_config.get("properties", {}).get("components", {})
+    items = components.get("items")
+    if not isinstance(items, dict):
+        return
+    parts = items.get("allOf", [items])
+    rewired = [
+        {"$ref": srsim_component_ref}
+        if is_component_ref(part, "sros-component") or is_component_ref(part, "srsim-component")
+        else part
+        for part in parts
+    ]
+    components["items"] = {**items, "allOf": rewired} if "allOf" in items else rewired[0]
+
+
 def apply_clab_fragment(clab_schema: dict[str, Any], fragment: dict[str, Any]) -> dict[str, Any]:
     updated = deepcopy(clab_schema)
     srsim_schema_ref = fragment["x-srsim-schema-ref"]
@@ -1701,21 +1750,27 @@ def apply_clab_fragment(clab_schema: dict[str, Any], fragment: dict[str, Any]) -
     component_schema = node_config["properties"]["components"]
     current_component_item = component_schema["items"]
 
+    srsim_component_ref = f"{srsim_schema_ref}#/definitions/srsim-component"
+
     if "sros-component" not in definitions:
         if component_items_reference(current_component_item, "#/definitions/srsim-component"):
             raise SystemExit("cannot infer original sros component schema from already-rewired components")
         definitions["sros-component"] = deepcopy(current_component_item)
+        alternatives = [{"$ref": "#/definitions/sros-component"}]
+    else:
+        # Keep component schemas of other kinds, such as srl-component.
+        alternatives = [
+            item
+            for item in current_component_item.get("anyOf", [current_component_item])
+            if not is_component_ref(item, "srsim-component")
+        ]
 
     for name in list(definitions):
         if name in CLAB_SRSIM_DEFINITION_NAMES or name.startswith("srsim-component-"):
             definitions.pop(name, None)
 
-    component_schema["items"] = {
-        "anyOf": [
-            {"$ref": "#/definitions/sros-component"},
-            {"$ref": f"{srsim_schema_ref}#/definitions/srsim-component"},
-        ]
-    }
+    component_schema["items"] = {"anyOf": [*alternatives, {"$ref": srsim_component_ref}]}
+    rewire_srsim_kind_components(definitions, srsim_component_ref)
 
     srsim_branch = find_srsim_branch(updated)
     srsim_branch["then"] = {
@@ -2338,7 +2393,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     generate.add_argument(
         "--yang-source",
         help=(
-            "Nokia latest_sros_26.3 YANG directory URL or local directory used to extend the schema; "
+            f"Nokia latest_sros_{SROS_RELEASE} YANG directory URL or local directory used to extend the schema; "
             "defaults to Nokia's remote YANG source when --source is a URL"
         ),
     )
@@ -2437,12 +2492,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
     catalog = sub.add_parser(
         "generate-eda-catalog",
-        help="generate an EDA hardware type catalog from Nokia 26.3 YANG typedefs",
+        help=f"generate an EDA hardware type catalog from Nokia {SROS_RELEASE} YANG typedefs",
     )
     catalog.add_argument(
         "--yang-source",
         default=DEFAULT_YANG_SOURCE,
-        help="Nokia latest_sros_26.3 YANG directory URL or local directory",
+        help=f"Nokia latest_sros_{SROS_RELEASE} YANG directory URL or local directory",
     )
     catalog.add_argument("--output", "-o", default="-", help="output JSON path or '-'")
     catalog.set_defaults(func=cmd_generate_eda_catalog)

@@ -37,6 +37,8 @@ import {
   defaultSfmForEntry,
   firstValue,
   getEntry,
+  integratedCardTypeIsImplied,
+  srosReleaseFromSource,
   upsertComponentBySlot
 } from "./matrix";
 import { buildTopologyYaml } from "./topologyYaml";
@@ -50,7 +52,8 @@ const hardwareSchema = hardwareSchemaData as HardwareSchema;
 const edaCatalog = (hardwareSchema.eda ?? edaCatalogData) as EdaYangCatalog;
 const colorModeKey = "srsim-hw-schema-color-mode";
 const appendixDocsUrl = hardwareSchema.source ||
-  "https://documentation.nokia.com/sr/26-3/7x50-shared/srsim-installation-setup/appendices.html";
+  "https://documentation.nokia.com/sr/26-7/7x50-shared/srsim-installation-setup/appendices.html";
+const srosRelease = srosReleaseFromSource(appendixDocsUrl);
 
 function createAppTheme(mode: PaletteMode) {
   const isDark = mode === "dark";
@@ -166,9 +169,11 @@ export function App() {
         includeDefaultsInYaml || selectedDeploymentMode === "distributed" ||
         !defaultImpliesFields(selectedEntry, component, config.sfm, []),
       shouldWriteComponentType: (component: SrsimConfig["components"][number]) =>
-        includeDefaultsInYaml ||
-        (selectedDeploymentMode === "distributed" && !fixedDistributedCpmTypeIsImplied(selectedEntry, component)) ||
-        !defaultImpliesFields(selectedEntry, component, config.sfm, []),
+        !integratedCardTypeIsImplied(selectedEntry, component) && (
+          includeDefaultsInYaml ||
+          (selectedDeploymentMode === "distributed" && !fixedDistributedCpmTypeIsImplied(selectedEntry, component)) ||
+          !defaultImpliesFields(selectedEntry, component, config.sfm, [])
+        ),
       shouldWriteSfm: (component: SrsimConfig["components"][number]) =>
         selectedDeploymentMode === "distributed" && Boolean(component.slot),
       shouldWriteDirectMda: (component: SrsimConfig["components"][number], mda: { slot?: string | number; type?: string }) =>
@@ -252,7 +257,7 @@ export function App() {
                 className="summary-chip"
                 size="small"
                 color="primary"
-                label="SR OS 26.3"
+                label={srosRelease ? `SR OS ${srosRelease}` : "SR OS docs"}
                 component="a"
                 href={appendixDocsUrl}
                 target="_blank"

@@ -17,7 +17,7 @@ import type {
 } from "./types";
 
 export const defaultEdaNamespace = "eda";
-export const defaultEdaVersion = "26.3.R1";
+export const defaultEdaVersion = "26.7.R1";
 
 const kindOrder = new Map<EdaTopoNodeComponentKind, number>([
   ["controlCard", 0],
