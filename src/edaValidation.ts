@@ -10,7 +10,7 @@ import {
   edaPowerSlotsForChassis,
   edaPowerTypesForChassis
 } from "./edaComponents";
-import { buildMatrix, clabChassisToken, rowCpmCards, rowLineCards, uniqueSorted } from "./matrix";
+import { buildMatrix, clabChassisToken, rowCpmCards, rowLineCards, srosReleaseFromSource, uniqueSorted } from "./matrix";
 import type { EdaTopoNodeComponent, EdaTopoNodeComponentKind, EdaYangCatalog, HardwareSchema, MatrixEntry, ValidationIssue, ValidationReport } from "./types";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -238,7 +238,9 @@ function validateTopoNodeHardware(document: Record<string, unknown>, schema: Har
 
     const options = edaComponentTypeOptions(catalog, component);
     if (options.length && !options.includes(component.type)) {
-      issues.push({ source: "hardware", path: `${path}/type`, message: `${component.type} is not in the SR OS 26.3 YANG typedefs for ${component.kind}` });
+      const release = srosReleaseFromSource(catalog.source);
+      const typedefs = release ? `SR OS ${release} YANG typedefs` : "SR OS YANG typedefs";
+      issues.push({ source: "hardware", path: `${path}/type`, message: `${component.type} is not in the ${typedefs} for ${component.kind}` });
       return;
     }
     issues.push(...validateMatrixComponent(component, entry, catalog, path));

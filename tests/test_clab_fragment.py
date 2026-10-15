@@ -207,13 +207,11 @@ class ClabFragmentTest(unittest.TestCase):
         self.assertNotIn("cpm-1s", definitions["srsim-card-types"]["enum"])
         self.assertIn("cpm2-s", definitions["srsim-cpm-types"]["enum"])
         self.assertIn("cpm-1s", definitions["srsim-cpm-types"]["enum"])
-        self.assertIn(
+        self.assertIn("dms24-800g-qsfpdd-1", definitions["srsim-card-types"]["enum"])
+        self.assertIn("cpm-1x", definitions["srsim-cpm-types"]["enum"])
+        self.assertNotIn(
             "cpm-1x/dms24-800g-qsfpdd-1",
-            definitions["srsim-card-types"]["enum"],
-        )
-        self.assertIn(
-            "cpm-1x/dms24-800g-qsfpdd-1",
-            definitions["srsim-cpm-types"]["enum"],
+            definitions["srsim-card-types"]["enum"] + definitions["srsim-cpm-types"]["enum"],
         )
         self.assertIn("iom-s-1.5t", definitions["srsim-xiom-types"]["enum"])
         self.assertIn(
@@ -350,6 +348,77 @@ class ClabFragmentTest(unittest.TestCase):
             srsim_ref,
         )
         self.assertNotIn("x-srsim-compatibility-matrix", updated)
+
+    def test_apply_clab_fragment_keeps_other_kinds_and_rewires_srsim_kind_config(self) -> None:
+        fragment = srsim.build_clab_fragment(SAMPLE_HARDWARE_SCHEMA)
+        clab_schema = deepcopy(MINIMAL_CLAB_SCHEMA)
+        definitions = clab_schema["definitions"]
+        definitions["sros-component"] = {"type": "object", "additionalProperties": False}
+        definitions["srl-component"] = {"type": "object"}
+        definitions["node-config"]["properties"]["components"]["items"] = {
+            "anyOf": [
+                {"$ref": "#/definitions/sros-component"},
+                {"$ref": "#/definitions/srl-component"},
+            ]
+        }
+        not_sros_only = {"not": {"anyOf": [{"required": ["cpu"]}]}}
+        definitions["kind-specific-config-nokia_srsim"] = {
+            "properties": {
+                "components": {
+                    "items": {
+                        "allOf": [
+                            {"$ref": "#/definitions/sros-component"},
+                            not_sros_only,
+                        ]
+                    }
+                }
+            }
+        }
+        kind_dispatch = {
+            "if": {"properties": {"kind": {"pattern": "^nokia_srsim$"}}, "required": ["kind"]},
+            "then": {"$ref": "#/definitions/kind-specific-config-nokia_srsim"},
+        }
+        definitions["node-config"]["allOf"].insert(0, deepcopy(kind_dispatch))
+
+        updated = srsim.apply_clab_fragment(clab_schema, fragment)
+        srsim_component = {"$ref": f"{srsim.DEFAULT_SRSIM_SCHEMA_REF}#/definitions/srsim-component"}
+
+        self.assertEqual(updated, srsim.apply_clab_fragment(updated, fragment))
+        self.assertEqual(
+            updated["definitions"]["node-config"]["properties"]["components"]["items"],
+            {
+                "anyOf": [
+                    {"$ref": "#/definitions/sros-component"},
+                    {"$ref": "#/definitions/srl-component"},
+                    srsim_component,
+                ]
+            },
+        )
+        self.assertEqual(
+            updated["definitions"]["kind-specific-config-nokia_srsim"]["properties"]["components"]["items"],
+            {"allOf": [srsim_component, not_sros_only]},
+        )
+        self.assertIn(kind_dispatch, updated["definitions"]["node-config"]["allOf"])
+        self.assertEqual(
+            srsim.find_srsim_branch(updated)["then"],
+            {"allOf": [{"$ref": f"{srsim.DEFAULT_SRSIM_SCHEMA_REF}#/definitions/srsim-node"}]},
+        )
+
+    def test_appendix_cells_drop_mda_labels_and_slash_spacing(self) -> None:
+        self.assertEqual(
+            srsim.split_values(
+                "Pluggable in MDA/1:\nm2-1g-sfp+2-10g-sfp+\nm8-1g-rj45"
+            ),
+            ["m2-1g-sfp+2-10g-sfp+", "m8-1g-rj45"],
+        )
+        self.assertEqual(
+            srsim.normalize_field_value("card", "cpm-ixr-e2sc /imm16-sfp++4-sfp28"),
+            "cpm-ixr-e2sc/imm16-sfp++4-sfp28",
+        )
+        self.assertEqual(
+            srsim.normalize_field_value("mda", "isa-ms-v (fixed in MDA/3 and MDA/4)"),
+            "isa-ms-v",
+        )
 
     def test_yang_typedef_catalog_extracts_eda_types(self) -> None:
         yang = """

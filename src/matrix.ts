@@ -10,7 +10,19 @@ import type {
 } from "./types";
 
 const hardwareFields = new Set(["card", "sfm", "xiom", "mda"]);
-const integratedChassis = new Set(["sr-1", "sr-1s", "ixr-r6", "ixr-ec", "ixr-e2", "ixr-e2c"]);
+const integratedChassis = new Set([
+  "sr-1",
+  "sr-1s",
+  "ixr-r6",
+  "ixr-ec",
+  "ixr-e2",
+  "ixr-e2c",
+  "ixr-e2n",
+  "ixr-e2n-s",
+  "ixr-e2sc",
+  "ixr-e3c",
+  "ixr-e3x"
+]);
 const redundantIntegratedChassis = new Set(["ixr-r6"]);
 const mdaSlotRestrictions = new Map<string, number[]>([
   ["ixr-r4:m20-1g-csfp", [1, 2, 3]],
@@ -21,6 +33,14 @@ const mdaSlotRestrictions = new Map<string, number[]>([
 
 export type DeploymentMode = "standalone" | "integrated_redundant" | "distributed";
 export type MatrixRowAction = "add" | "replace";
+
+// Extracts the SR OS release (for example "26.7") from a Nokia documentation
+// URL (".../sr/26-7/...") or a YANG model URL (".../latest_sros_26.7").
+export function srosReleaseFromSource(source: string | undefined): string {
+  const match = String(source ?? "").match(/\/sr\/(\d+)-(\d+)\/|latest_sros_(\d+)\.(\d+)/);
+  if (!match) return "";
+  return match[1] ? `${match[1]}.${match[2]}` : `${match[3]}.${match[4]}`;
+}
 
 export function cleanText(value: unknown): string {
   return String(value ?? "")
@@ -291,6 +311,13 @@ export function fixedDistributedCpmTypeIsImplied(entry: MatrixEntry | undefined,
       roleCardValue(card, "cpm") === component.type
     )
   );
+}
+
+// Containerlab derives the card of integrated chassis from the node type and
+// rejects a component type override, so their default type stays implicit.
+export function integratedCardTypeIsImplied(entry: MatrixEntry | undefined, component: SrsimComponent): boolean {
+  if (!entry || !integratedChassis.has(entry.chassis) || !component.type) return false;
+  return defaultComponentsForEntry(entry).some((defaultComponent) => defaultComponent.type === component.type);
 }
 
 function mdaFields(row: MatrixRow): string[] {

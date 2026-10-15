@@ -20,6 +20,7 @@ import {
   fixedDistributedCpmTypeIsImplied,
   getEntry,
   mdaOptions,
+  srosReleaseFromSource,
   schemaNumericSlotOptions,
   sfmOptions,
   upsertComponentBySlot,
@@ -152,6 +153,36 @@ describe("SR-SIM matrix helpers", () => {
       mda: [{ slot: 1, type: "m2-1g-sfp+2-10g-sfp+" }]
     });
     assert.equal(componentFromMatrixRow(supportedRow, defaultComponentsForEntry(entry), entry, "add"), null);
+  });
+
+  it("lists only real MDA types for pluggable integrated MDA slots", () => {
+    const entry = getEntry(buildMatrix(hardware), "sar-hx");
+    const options = directMdaOptions(entry, { slot: "A", type: "iom-sar-1x" }, "");
+
+    assert.ok(options.includes("m8-1g-sfp"));
+    assert.ok(options.includes("m8-1g-rj45"));
+    assert.equal(options.some((option) => option.includes(":") || option.includes(" ")), false);
+  });
+
+  it("treats the IXR-e2sc fixed CPM/IMM card as a standalone chassis", () => {
+    const entry = getEntry(buildMatrix(hardware), "ixr-e2sc");
+
+    assert.equal(deploymentMode(entry), "standalone");
+    assert.deepEqual(defaultComponentsForEntry(entry), [
+      { slot: "A", type: "cpm-ixr-e2sc", mda: [{ slot: 1, type: "m16-sfp++4-sfp28" }] }
+    ]);
+  });
+
+  it("derives the SR OS release from documentation and YANG sources", () => {
+    assert.equal(
+      srosReleaseFromSource("https://documentation.nokia.com/sr/26-7/7x50-shared/srsim-installation-setup/appendices.html"),
+      "26.7"
+    );
+    assert.equal(
+      srosReleaseFromSource("https://raw.githubusercontent.com/nokia/7x50_YangModels/master/latest_sros_26.10"),
+      "26.10"
+    );
+    assert.equal(srosReleaseFromSource("fixture.html"), "");
   });
 
   it("preserves numbered MDA defaults from appendix mda_N columns", () => {

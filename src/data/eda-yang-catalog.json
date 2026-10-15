@@ -66,7 +66,7 @@
             "type_leaf": "power-module-type"
         }
     },
-    "source": "https://raw.githubusercontent.com/nokia/7x50_YangModels/master/latest_sros_26.3",
+    "source": "https://raw.githubusercontent.com/nokia/7x50_YangModels/master/latest_sros_26.7",
     "state_only_inventory": [
         "fan",
         "fan-trays"
@@ -676,6 +676,30 @@
                 }
             ],
             "mdaType": "m6-10g-sfp++4-25g-sfp28"
+        },
+        "m8-1g-rj45": {
+            "connectors": [
+                {
+                    "count": 8,
+                    "defaultType": "c1-1g",
+                    "types": [
+                        "c1-1g"
+                    ]
+                }
+            ],
+            "mdaType": "m8-1g-rj45"
+        },
+        "m8-1g-sfp": {
+            "connectors": [
+                {
+                    "count": 8,
+                    "defaultType": "c1-1g",
+                    "types": [
+                        "c1-1g"
+                    ]
+                }
+            ],
+            "mdaType": "m8-1g-sfp"
         },
         "m80-1g-csfp": {
             "connectors": [
@@ -1999,6 +2023,7 @@
             "imm-2pac-fp3",
             "imm12-sfp28+2-qsfp28",
             "imm14-10g-sfp++4-1g-tx",
+            "imm16-sfp++4-sfp28",
             "imm16-sfp112+15-sfp56+6-qsfpdd",
             "imm2-qsfpdd+2-qsfp28+24-sfp28",
             "imm24-sfp++8-sfp28+2-qsfp28",
@@ -2016,6 +2041,7 @@
             "imm48-sfp++6-qsfp28",
             "imm48-sfp+2-qsfp28",
             "imm6-qsfpdd+48-sfp56",
+            "imm8-sfp112+18-sfp28+2-qsfpdd",
             "iom-1",
             "iom-a",
             "iom-e",
@@ -2091,6 +2117,8 @@
             "cpm-ixr-e2c",
             "cpm-ixr-e2n",
             "cpm-ixr-e2n-s",
+            "cpm-ixr-e2sc",
+            "cpm-ixr-e3",
             "cpm-ixr-e3c",
             "cpm-ixr-e3x",
             "cpm-ixr-ec",
@@ -2148,6 +2176,7 @@
             "m10-sfp++6-sfp",
             "m12-sfp28+2-qsfp28",
             "m14-10g-sfp++4-1g-tx",
+            "m16-sfp++4-sfp28",
             "m16-sfp112+15-sfp56+6-qsfpdd",
             "m18-25g-sfp28",
             "m2-100g-qsfp28+16-10g-sfp+",
@@ -2187,6 +2216,9 @@
             "m6-10g-sfp++1-100g-qsfp28",
             "m6-10g-sfp++4-25g-sfp28",
             "m6-qsfpdd+48-sfp56",
+            "m8-1g-rj45",
+            "m8-1g-sfp",
+            "m8-sfp112+18-sfp28+2-qsfpdd",
             "m8-t1e1-rj48",
             "m80-1g-csfp",
             "m80-200g-sfpdd+12-400g-qsfpdd-1",
