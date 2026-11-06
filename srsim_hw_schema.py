@@ -1250,7 +1250,6 @@ def build_clab_definitions(values: dict[str, list[str]], allow_unknown: bool = F
                     ],
                 },
                 "type": {"description": "Set SR-SIM component type"},
-                "sfm": {"$ref": "#/definitions/srsim-sfm-types"},
                 "xiom": {
                     "type": "array",
                     "items": {"$ref": "#/definitions/srsim-xiom"},
@@ -1419,11 +1418,6 @@ def component_rule_for_card(card: str, entry: dict[str, Any], chassis: str) -> d
     then: dict[str, Any] = {"properties": {}}
     all_of: list[dict[str, Any]] = []
 
-    if entry["sfm"]:
-        then["properties"]["sfm"] = {"enum": entry["sfm"]}
-    else:
-        all_of.append(disallow_property("sfm"))
-
     if entry["direct_mda"]:
         then["properties"]["mda"] = array_item_type_schema(
             entry["direct_mda"],
@@ -1491,7 +1485,7 @@ def build_chassis_component_definition(chassis: str, chassis_entry: dict[str, An
                     }
                 }
             )
-        rules.extend([disallow_property("sfm"), disallow_property("xiom")])
+        rules.append(disallow_property("xiom"))
     elif cpms:
         rules.append(
             {
@@ -1525,6 +1519,39 @@ def build_chassis_component_definition(chassis: str, chassis_entry: dict[str, An
     if mode == "distributed":
         definition["required"] = ["slot"]
     return definition
+
+
+def chassis_sfm_values(chassis_entry: dict[str, Any]) -> list[str]:
+    sfms: list[str] = []
+    for entry in card_compatibility(chassis_entry).values():
+        merge_values(sfms, entry["sfm"])
+    return sfms
+
+
+def node_sfm_rules(chassis_entry: dict[str, Any]) -> list[dict[str, Any]]:
+    """Constrain the node-level sfm key and the cards each SFM supports."""
+    sfms = chassis_sfm_values(chassis_entry)
+    if not sfms:
+        return [disallow_property("sfm")]
+
+    rules: list[dict[str, Any]] = [{"properties": {"sfm": {"enum": sfms}}}]
+    compatibility = card_compatibility(chassis_entry)
+    for sfm in sfms:
+        cards = sorted(card for card, entry in compatibility.items() if sfm in entry["sfm"])
+        rules.append(
+            {
+                "if": {
+                    "properties": {"sfm": {"const": sfm}},
+                    "required": ["sfm"],
+                },
+                "then": {
+                    "properties": {
+                        "components": {"items": {"properties": {"type": {"enum": cards}}}}
+                    }
+                },
+            }
+        )
+    return rules
 
 
 def schema_key(schema: dict[str, Any]) -> str:
@@ -1568,10 +1595,12 @@ def build_srsim_schema_module(schema: dict[str, Any], allow_unknown: bool = Fals
     chassis_component_groups: dict[str, dict[str, Any]] = {}
     for chassis, chassis_entry in sorted(matrix["chassis"].items()):
         component_definition = build_chassis_component_definition(chassis, chassis_entry)
+        sfm_rules = node_sfm_rules(chassis_entry)
         group = chassis_component_groups.setdefault(
-            schema_key(component_definition),
+            schema_key({"components": component_definition, "sfm": sfm_rules}),
             {
                 "definition": component_definition,
+                "sfm_rules": sfm_rules,
                 "chassis": [],
                 "mode": deployment_mode(chassis, chassis_entry),
             },
@@ -1597,7 +1626,8 @@ def build_srsim_schema_module(schema: dict[str, Any], allow_unknown: bool = Fals
                 "then": {
                     "properties": {
                         "components": node_components_schema(name, group["mode"])
-                    }
+                    },
+                    "allOf": group["sfm_rules"],
                 },
             }
         )
@@ -1606,6 +1636,7 @@ def build_srsim_schema_module(schema: dict[str, Any], allow_unknown: bool = Fals
         "type": "object",
         "properties": {
             "type": {"$ref": "#/definitions/srsim-chassis-types"},
+            "sfm": {"$ref": "#/definitions/srsim-sfm-types"},
             "components": {
                 "type": "array",
                 "items": {"$ref": "#/definitions/srsim-component"},
@@ -1724,8 +1755,7 @@ def rewire_srsim_kind_components(definitions: dict[str, Any], srsim_component_re
     """Point the nokia_srsim kind-specific components at the SR-SIM component schema.
 
     Containerlab constrains nokia_srsim components to the classic SR OS
-    component schema, which rejects SR-SIM fields such as ``sfm`` and only
-    knows the SR OS hardware enums.
+    component schema, which only knows the SR OS hardware enums.
     """
     kind_config = definitions.get(f"{KIND_SPECIFIC_CONFIG_PREFIX}nokia_srsim", {})
     components = kind_config.get("properties", {}).get("components", {})
@@ -1933,7 +1963,9 @@ def validate_criteria(
         except KeyError:
             pass
         if missing:
-            if re.fullmatch(r"[A-Za-z]", clean_criteria.get("slot", "")) and card_is_cpm(clean_criteria.get("card", "")):
+            card = clean_criteria.get("card", "")
+            slot_only = not card and "mda" not in clean_criteria and "xiom" not in clean_criteria
+            if re.fullmatch(r"[A-Za-z]", clean_criteria.get("slot", "")) and (slot_only or card_is_cpm(card)):
                 missing.discard("mda")
                 missing.discard("xiom")
         if missing:
@@ -1963,6 +1995,7 @@ def validate_component(
     schema: dict[str, Any],
     node_name: str,
     chassis: str,
+    sfm: str,
     component: dict[str, Any],
     strict: bool,
 ) -> list[str]:
@@ -1972,7 +2005,7 @@ def validate_component(
     base = {
         "chassis": chassis,
         "slot": str(slot) if slot is not None else "",
-        "sfm": str(component.get("sfm", "")),
+        "sfm": sfm,
         "card": str(component.get("type", "")),
     }
 
@@ -2085,6 +2118,7 @@ def validate_component_list_shape(
     node_name: str,
     chassis: str,
     components: list[Any],
+    sfm: str = "",
 ) -> list[str]:
     try:
         matrix_entry = build_clab_matrix(schema)["chassis"][clab_chassis_token(chassis)]
@@ -2112,6 +2146,12 @@ def validate_component_list_shape(
         else:
             seen_slots.add(key)
 
+    if sfm and not chassis_sfm_values(matrix_entry):
+        errors.append(f"{node_name}: SR-SIM chassis {chassis} does not use an SFM, remove sfm")
+    for component in components:
+        if isinstance(component, dict) and "sfm" in component:
+            errors.append(f"{component_name(node_name, slot_value(component))}: sfm must be set on the node, not on a component")
+
     if mode == "standalone":
         if len(components) > 1:
             errors.append(f"{node_name}: standalone SR-SIM chassis {chassis} accepts at most one component override")
@@ -2119,8 +2159,6 @@ def validate_component_list_shape(
             slot = slot_value(component)
             if slot and slot.upper() != "A":
                 errors.append(f"{component_name(node_name, slot)}: standalone component slot must be omitted or A")
-            if isinstance(component, dict) and component.get("sfm"):
-                errors.append(f"{component_name(node_name, slot)}: standalone component must not set sfm")
             if isinstance(component, dict) and component.get("xiom"):
                 errors.append(f"{component_name(node_name, slot)}: standalone component must not set xiom")
         return errors
@@ -2345,12 +2383,14 @@ def cmd_validate_topology(args: argparse.Namespace) -> int:
         except TypeError as exc:
             errors.append(f"{node_name}: components {exc}")
             continue
+        sfm = str(node.get("sfm") or "")
         errors.extend(
             validate_component_list_shape(
                 schema=schema,
                 node_name=node_name,
                 chassis=chassis,
                 components=component_list,
+                sfm=sfm,
             )
         )
         for component in component_list:
@@ -2363,6 +2403,7 @@ def cmd_validate_topology(args: argparse.Namespace) -> int:
                     schema=schema,
                     node_name=node_name,
                     chassis=chassis,
+                    sfm=sfm,
                     component=component,
                     strict=not args.no_strict,
                 )

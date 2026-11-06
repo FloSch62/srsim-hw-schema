@@ -486,7 +486,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
               ))}
           </Select>
           <FormHelperText>
-            {sharedSfmOptions.length ? "Default is used for compatibility and omitted from YAML." : "This chassis has no SFM constraint"}
+            {sharedSfmOptions.length ? "Set once on the node and applies to the whole chassis." : "This chassis has no SFM constraint"}
           </FormHelperText>
         </FormControl>
 

@@ -40,7 +40,9 @@ uv run srsim-hw-schema validate-topology \
 ```
 
 Topology validation checks `topology.nodes.*` entries with
-`kind: nokia_srsim` and validates their `components` list against the schema.
+`kind: nokia_srsim` and validates their node-level `sfm` and `components` list
+against the schema. Containerlab only accepts `sfm` on the node, so setting it
+on a component is reported as an error.
 It is strict by default so missing required fields, such as `sfm` for an
 `xcm-7s` XIOM tuple, are reported. Use `--no-strict` to only check explicit
 values that are present in the YAML.
