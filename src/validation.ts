@@ -11,6 +11,7 @@ import {
   directMdaSlotOptions,
   deploymentMode,
   isEmptyValue,
+  sfmOptions,
   splitValues,
   xiomMdaSlotOptions
 } from "./matrix";
@@ -77,7 +78,9 @@ function filterSchemaIssues(issues: ValidationIssue[]): ValidationIssue[] {
     }
     return true;
   });
-  return filtered.length ? filtered : issues;
+  const kept = filtered.length ? filtered : issues;
+  // Every anyOf branch of the component schema reports the same error.
+  return [...new Map(kept.map((issue) => [`${issue.path}|${issue.message}`, issue])).values()];
 }
 
 function entryAliases(model: string, entry: HardwareModelEntry): string[] {
@@ -209,7 +212,9 @@ function validateCriteria(params: {
     if (["standalone", "integrated_redundant"].includes(deploymentMode(matrixEntry))) {
       missing.delete("card");
     }
-    if (/^[A-Z]$/i.test(criteria.slot ?? "") && /^(?:cpm|cpiom)/.test(canonicalToken(criteria.card ?? ""))) {
+    const card = canonicalToken(criteria.card ?? "");
+    const slotOnly = !card && !criteria.mda && !criteria.xiom;
+    if (/^[A-Z]$/i.test(criteria.slot ?? "") && (slotOnly || /^(?:cpm|cpiom)/.test(card))) {
       missing.delete("mda");
       missing.delete("xiom");
     }
@@ -274,16 +279,17 @@ function validateComponent(params: {
   schema: HardwareSchema;
   nodeName: string;
   chassis: string;
+  sfm: string;
   component: Record<string, unknown>;
   strict: boolean;
 }): ValidationIssue[] {
-  const { schema, nodeName, chassis, component, strict } = params;
+  const { schema, nodeName, chassis, sfm, component, strict } = params;
   const slot = component.slot;
   const location = componentName(nodeName, slot);
   const base = {
     chassis,
     slot: slot === undefined || slot === null ? "" : String(slot),
-    sfm: String(component.sfm ?? ""),
+    sfm,
     card: String(component.type ?? "")
   };
   const matrixEntry = buildMatrix(schema).find((entry) => entry.chassis === clabChassisToken(chassis));
@@ -419,9 +425,10 @@ function validateComponentListShape(params: {
   schema: HardwareSchema;
   nodeName: string;
   chassis: string;
+  sfm: string;
   components: unknown[];
 }): ValidationIssue[] {
-  const { schema, nodeName, chassis, components } = params;
+  const { schema, nodeName, chassis, sfm, components } = params;
   const matrixEntry = buildMatrix(schema).find((entry) => entry.chassis === clabChassisToken(chassis));
   const mode = deploymentMode(matrixEntry);
   const issues: ValidationIssue[] = [];
@@ -443,6 +450,16 @@ function validateComponentListShape(params: {
     }
   }
 
+  if (sfm && !sfmOptions(matrixEntry, []).length) {
+    issues.push({ source: "hardware", message: `${nodeName}: SR-SIM chassis ${chassis} does not use an SFM, remove sfm` });
+  }
+  for (const component of components) {
+    const record = asRecord(component);
+    if (record && "sfm" in record) {
+      issues.push({ source: "hardware", path: componentName(nodeName, slotValue(component)), message: "sfm must be set on the node, not on a component" });
+    }
+  }
+
   if (mode === "standalone") {
     if (components.length > 1) {
       issues.push({ source: "hardware", message: `${nodeName}: standalone SR-SIM chassis ${chassis} accepts at most one component override` });
@@ -452,9 +469,6 @@ function validateComponentListShape(params: {
       const slot = slotValue(component);
       if (slot && slot.toUpperCase() !== "A") {
         issues.push({ source: "hardware", path: componentName(nodeName, slot), message: "standalone component slot must be omitted or A" });
-      }
-      if (record?.sfm) {
-        issues.push({ source: "hardware", path: componentName(nodeName, slot), message: "standalone component must not set sfm" });
       }
       if (record?.xiom) {
         issues.push({ source: "hardware", path: componentName(nodeName, slot), message: "standalone component must not set xiom" });
@@ -536,7 +550,8 @@ export function validateSrsimHardware(topology: unknown, schema: HardwareSchema,
       continue;
     }
 
-    issues.push(...validateComponentListShape({ schema, nodeName, chassis, components }));
+    const sfm = String(node.sfm ?? "");
+    issues.push(...validateComponentListShape({ schema, nodeName, chassis, sfm, components }));
 
     for (const component of components) {
       const componentRecord = asRecord(component);
@@ -548,11 +563,25 @@ export function validateSrsimHardware(topology: unknown, schema: HardwareSchema,
         });
         continue;
       }
-      issues.push(...validateComponent({ schema, nodeName, chassis, component: componentRecord, strict }));
+      issues.push(...validateComponent({ schema, nodeName, chassis, sfm, component: componentRecord, strict }));
     }
   }
 
   return issues;
+}
+
+// Containerlab trims and lowercases the SR-SIM chassis type, but the schema enums
+// and per-chassis rules only know the lowercase form.
+function withCanonicalChassisTypes(topology: unknown): unknown {
+  const canonical = structuredClone(topology);
+  const nodes = asRecord(asRecord(asRecord(canonical)?.topology)?.nodes) ?? {};
+  for (const value of Object.values(nodes)) {
+    const node = asRecord(value);
+    if (node?.kind === "nokia_srsim" && typeof node.type === "string") {
+      node.type = node.type.trim().toLowerCase();
+    }
+  }
+  return canonical;
 }
 
 export function validateTopologyYaml(yamlText: string, hardwareSchema: HardwareSchema): ValidationReport {
@@ -567,7 +596,7 @@ export function validateTopologyYaml(yamlText: string, hardwareSchema: HardwareS
 
   const parsed = document.toJSON();
   const validate = clabValidator();
-  const schemaValid = validate(parsed);
+  const schemaValid = validate(withCanonicalChassisTypes(parsed));
   const schemaIssues = schemaValid ? [] : filterSchemaIssues((validate.errors ?? []).map(formatAjvError));
   const hardwareIssues = validateSrsimHardware(parsed, hardwareSchema, true);
   const issues = [...schemaIssues, ...hardwareIssues];

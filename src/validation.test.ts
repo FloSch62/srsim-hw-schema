@@ -42,7 +42,7 @@ const validConfig = {
 };
 
 describe("topology validation", () => {
-  it("writes distributed SFM explicitly while omitting default MDAs", () => {
+  it("writes distributed SFM once at node level while omitting default MDAs", () => {
     const entry = getEntry(buildMatrix(hardware), "sr-7s");
     const distributed = deploymentMode(entry) === "distributed";
     const yaml = buildTopologyYaml(
@@ -57,14 +57,14 @@ describe("topology validation", () => {
         ]
       },
       {
-        shouldWriteSfm: (component) => distributed && Boolean(component.slot),
+        writeSfm: distributed,
         shouldWriteDirectMda: (component, mda) =>
           !defaultImpliesFields(entry, { ...component, mda: [mda] }, "sfm2-s", ["mda"])
       }
     );
 
-    assert.equal(yaml.includes("slot: A\n          sfm: sfm2-s\n          type: cpm2-s"), true);
-    assert.equal((yaml.match(/sfm: sfm2-s/g) ?? []).length, 2);
+    assert.equal(yaml.includes("type: sr-7s\n      sfm: sfm2-s\n      components:\n        - slot: A\n          type: cpm2-s"), true);
+    assert.equal((yaml.match(/sfm: sfm2-s/g) ?? []).length, 1);
     assert.equal(yaml.includes("mda:"), false);
     assert.equal(validateTopologyYaml(yaml, hardware).valid, true);
   });
@@ -86,7 +86,7 @@ describe("topology validation", () => {
         shouldWriteComponentType: (component) =>
           (distributed && !fixedDistributedCpmTypeIsImplied(entry, component)) ||
           !defaultImpliesFields(entry, component, "", []),
-        shouldWriteSfm: (component) => distributed && Boolean(component.slot),
+        writeSfm: distributed,
         shouldWriteDirectMda: (component, mda) =>
           !distributed || !defaultImpliesFields(entry, { ...component, mda: [mda] }, "", ["mda"])
       }
@@ -281,17 +281,92 @@ describe("topology validation", () => {
 
   it("requires SFM for non-default supported CPMs", () => {
     const invalid = validateTopologyYaml(
-      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      components:\n        - slot: A\n          type: cpm-s\n        - slot: 1\n          sfm: sfm-s\n          type: xcm-7s\n          xiom:\n            - slot: 1\n              type: iom-s-1.5t\n              mda:\n                - slot: 1\n                  type: ms2-400gb-qsfpdd+2-100gb-qsfp28\n",
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      components:\n        - slot: A\n          type: cpm-s\n        - slot: 1\n          type: xcm-7s\n          xiom:\n            - slot: 1\n              type: iom-s-1.5t\n              mda:\n                - slot: 1\n                  type: ms2-400gb-qsfpdd+2-100gb-qsfp28\n",
       hardware
     );
     const valid = validateTopologyYaml(
-      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      components:\n        - slot: A\n          sfm: sfm-s\n          type: cpm-s\n        - slot: 1\n          sfm: sfm-s\n          type: xcm-7s\n          xiom:\n            - slot: 1\n              type: iom-s-1.5t\n              mda:\n                - slot: 1\n                  type: ms2-400gb-qsfpdd+2-100gb-qsfp28\n",
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm-s\n        - slot: 1\n          type: xcm-7s\n          xiom:\n            - slot: 1\n              type: iom-s-1.5t\n              mda:\n                - slot: 1\n                  type: ms2-400gb-qsfpdd+2-100gb-qsfp28\n",
       hardware
     );
 
     assert.equal(invalid.valid, false);
     assert.equal(invalid.issues[0].message.startsWith("sros1[slot=A]:"), false);
     assert.equal(valid.valid, true);
+  });
+
+  it("accepts SFM at node level, the only place containerlab allows it", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n        - slot: 2\n          type: xcm-7s\n          xiom:\n            - slot: 1\n              type: iom-s-3.0t\n              mda:\n                - slot: 1\n                  type: ms2-400gb-qsfpdd+2-100gb-qsfp28\n",
+      hardware
+    );
+
+    assert.deepEqual(report.issues, []);
+    assert.equal(report.valid, true);
+  });
+
+  it("rejects SFM on a component because containerlab fails to parse it", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      components:\n        - slot: A\n          sfm: sfm2-s\n          type: cpm2-s\n        - slot: 1\n          sfm: sfm2-s\n          type: xcm2-7s\n",
+      hardware
+    );
+
+    assert.equal(report.valid, false);
+    assert.ok(report.issues.some((issue) =>
+      issue.path === "sros1[slot=1]" && issue.message === "sfm must be set on the node, not on a component"
+    ));
+  });
+
+  it("rejects a node SFM that does not support a card", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      sfm: sfm2-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n",
+      hardware
+    );
+
+    assert.equal(report.valid, false);
+    assert.ok(report.issues.some((issue) => issue.source === "schema"));
+    assert.ok(report.issues.some((issue) => issue.source === "hardware" && issue.message.startsWith("unsupported tuple")));
+  });
+
+  it("rejects a node SFM on a chassis without SFMs", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-1s\n      sfm: sfm-s\n      components:\n        - mda:\n            - slot: 1\n              type: s18-100gb-qsfp28\n",
+      hardware
+    );
+
+    assert.equal(report.valid, false);
+    assert.ok(report.issues.some((issue) => issue.message.includes("does not use an SFM")));
+  });
+
+  it("asks for the CPM type when a non-default SFM has a slot-only CPM", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n",
+      hardware
+    );
+
+    assert.equal(report.valid, false);
+    assert.ok(report.issues.some((issue) =>
+      issue.path === "sros1[slot=A]" && issue.message.startsWith("missing required field(s): card;")
+    ));
+  });
+
+  it("accepts an uppercase chassis type because containerlab lowercases it", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: SR-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n",
+      hardware
+    );
+
+    assert.deepEqual(report.issues, []);
+    assert.equal(report.valid, true);
+  });
+
+  it("still applies the per-chassis schema rules to an uppercase chassis type", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: SR-7s\n      sfm: sfm2-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n",
+      hardware
+    );
+
+    assert.equal(report.valid, false);
+    assert.ok(report.issues.some((issue) => issue.source === "schema" && issue.path === "/topology/nodes/sros1/components/1/type"));
   });
 
   it("rejects pasted SR-1s configs that model the CPM as a slot-1 line card", () => {
@@ -310,7 +385,7 @@ describe("topology validation", () => {
       hardware
     );
     const outOfRange = validateTopologyYaml(
-      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      components:\n        - slot: A\n          sfm: sfm2-s\n          type: cpm2-s\n        - slot: 99\n          sfm: sfm2-s\n          type: xcm2-7s\n",
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      sfm: sfm2-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 99\n          type: xcm2-7s\n",
       hardware
     );
 

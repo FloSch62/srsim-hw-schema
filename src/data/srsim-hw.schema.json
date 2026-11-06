@@ -145,9 +145,6 @@
                     "type": "array",
                     "uniqueItems": true
                 },
-                "sfm": {
-                    "$ref": "#/definitions/srsim-sfm-types"
-                },
                 "slot": {
                     "anyOf": [
                         {
@@ -237,13 +234,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -271,13 +261,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -380,14 +363,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm6-7/12"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -422,11 +398,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -511,14 +482,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "sfm-ixr-10"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -553,11 +517,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm-ixr-10"
-                                ]
                             }
                         }
                     }
@@ -594,11 +553,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm-ixr-10"
-                                ]
                             }
                         }
                     }
@@ -683,14 +637,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "sfm-ixr-6"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -725,11 +672,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm-ixr-6"
-                                ]
                             }
                         }
                     }
@@ -766,11 +708,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm-ixr-6"
-                                ]
                             }
                         }
                     }
@@ -845,13 +782,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -882,13 +812,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -916,13 +839,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -959,13 +875,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -1055,13 +964,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -1079,13 +981,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -1172,13 +1067,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -1196,13 +1084,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -1289,13 +1170,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -1313,13 +1187,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -1407,13 +1274,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -1431,13 +1291,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -1474,13 +1327,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -1567,13 +1413,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -1591,13 +1430,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -1684,13 +1516,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -1708,13 +1533,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -1801,13 +1619,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -1825,13 +1636,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -1918,13 +1722,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -1942,13 +1739,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -2037,13 +1827,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -2071,13 +1854,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -2271,13 +2047,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -2295,13 +2064,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -2441,13 +2203,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -2475,13 +2230,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -2580,13 +2328,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -2614,13 +2355,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -2721,13 +2455,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -2755,13 +2482,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -2854,13 +2574,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -2888,13 +2601,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -2931,13 +2637,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -3029,13 +2728,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -3063,13 +2755,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -3160,13 +2845,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -3184,13 +2862,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -3282,13 +2953,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -3306,13 +2970,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -3406,13 +3063,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -3430,13 +3080,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -3532,13 +3175,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -3556,13 +3192,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -3665,13 +3294,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -3689,13 +3311,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -3794,13 +3409,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -3828,13 +3436,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -3926,13 +3527,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -3960,13 +3554,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -4058,13 +3645,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -4092,13 +3672,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -4190,13 +3763,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -4224,13 +3790,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -4338,15 +3897,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12",
-                                    "m-sfm6-7/12"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -4387,12 +3938,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12",
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -4429,12 +3974,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12",
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -4481,12 +4020,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12",
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -4533,12 +4066,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12",
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -4582,12 +4109,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12",
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -4628,11 +4149,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -4722,15 +4238,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12e",
-                                    "m-sfm6-12e"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -4771,12 +4279,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12e",
-                                    "m-sfm6-12e"
-                                ]
                             }
                         }
                     }
@@ -4813,12 +4315,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12e",
-                                    "m-sfm6-12e"
-                                ]
                             }
                         }
                     }
@@ -4855,12 +4351,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12e",
-                                    "m-sfm6-12e"
-                                ]
                             }
                         }
                     }
@@ -4907,12 +4397,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12e",
-                                    "m-sfm6-12e"
-                                ]
                             }
                         }
                     }
@@ -4959,12 +4443,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12e",
-                                    "m-sfm6-12e"
-                                ]
                             }
                         }
                     }
@@ -5008,12 +4486,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12e",
-                                    "m-sfm6-12e"
-                                ]
                             }
                         }
                     }
@@ -5060,11 +4532,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm6-12e"
-                                ]
                             }
                         }
                     }
@@ -5151,14 +4618,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "sfm-s"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -5188,15 +4648,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "sfm-s",
-                                    "sfm2-s"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -5225,11 +4677,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm-s"
-                                ]
                             },
                             "xiom": {
                                 "items": {
@@ -5351,11 +4798,6 @@
                                     }
                                 }
                             },
-                            "sfm": {
-                                "enum": [
-                                    "sfm2-s"
-                                ]
-                            },
                             "xiom": {
                                 "items": {
                                     "allOf": [
@@ -5475,11 +4917,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm2-s"
-                                ]
                             },
                             "xiom": {
                                 "items": {
@@ -5682,13 +5119,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -5716,13 +5146,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -5825,13 +5248,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -5849,13 +5265,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -5947,13 +5356,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -5981,13 +5383,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -6079,13 +5474,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -6113,13 +5501,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -6211,13 +5592,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -6245,13 +5619,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -6354,14 +5721,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "sfm-2s"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -6390,11 +5750,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm-2s"
-                                ]
                             },
                             "xiom": {
                                 "items": {
@@ -6571,14 +5926,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "sfm-2se"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -6605,11 +5953,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm-2se"
-                                ]
                             },
                             "xiom": {
                                 "items": {
@@ -6766,11 +6109,6 @@
                             }
                         ],
                         "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "sfm-2se"
-                                ]
-                            },
                             "xiom": {
                                 "items": {
                                     "allOf": [
@@ -6988,15 +6326,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-7",
-                                    "m-sfm6-7/12"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -7035,12 +6365,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-7",
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -7077,12 +6401,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-7",
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -7129,12 +6447,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-7",
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -7181,12 +6493,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-7",
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -7230,12 +6536,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm5-12",
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -7276,11 +6576,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "m-sfm6-7/12"
-                                ]
                             }
                         }
                     }
@@ -7367,14 +6662,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "sfm-s"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -7404,15 +6692,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "sfm-s",
-                                    "sfm2-s"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -7441,11 +6721,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm-s"
-                                ]
                             },
                             "xiom": {
                                 "items": {
@@ -7569,11 +6844,6 @@
                                     }
                                 }
                             },
-                            "sfm": {
-                                "enum": [
-                                    "sfm2-s"
-                                ]
-                            },
                             "xiom": {
                                 "items": {
                                     "allOf": [
@@ -7693,11 +6963,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm2-s"
-                                ]
                             },
                             "xiom": {
                                 "items": {
@@ -7900,13 +7165,6 @@
                             {
                                 "not": {
                                     "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
-                            {
-                                "not": {
-                                    "required": [
                                         "mda"
                                     ]
                                 }
@@ -7934,13 +7192,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -8038,13 +7289,6 @@
                 {
                     "not": {
                         "required": [
-                            "sfm"
-                        ]
-                    }
-                },
-                {
-                    "not": {
-                        "required": [
                             "xiom"
                         ]
                     }
@@ -8062,13 +7306,6 @@
                     },
                     "then": {
                         "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "sfm"
-                                    ]
-                                }
-                            },
                             {
                                 "not": {
                                     "required": [
@@ -8170,17 +7407,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "sfm-x20",
-                                    "sfm-x20-b",
-                                    "sfm-x20s-b",
-                                    "sfm2-x20s"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -8210,14 +7437,7 @@
                                     ]
                                 }
                             }
-                        ],
-                        "properties": {
-                            "sfm": {
-                                "enum": [
-                                    "sfm2-x20s"
-                                ]
-                            }
-                        }
+                        ]
                     }
                 },
                 {
@@ -8254,14 +7474,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm-x20",
-                                    "sfm-x20-b",
-                                    "sfm-x20s-b",
-                                    "sfm2-x20s"
-                                ]
                             }
                         }
                     }
@@ -8301,11 +7513,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "sfm": {
-                                "enum": [
-                                    "sfm2-x20s"
-                                ]
                             }
                         }
                     }
@@ -8518,6 +7725,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -8571,6 +7787,45 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "sfm": {
+                                        "enum": [
+                                            "m-sfm6-7/12"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "m-sfm6-7/12"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm5",
+                                                            "iom5-e"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -8621,6 +7876,46 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "sfm": {
+                                        "enum": [
+                                            "sfm-ixr-10"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm-ixr-10"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm-ixr",
+                                                            "imm36-100g-qsfp28",
+                                                            "imm48-sfp+2-qsfp28"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -8671,6 +7966,46 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "sfm": {
+                                        "enum": [
+                                            "sfm-ixr-6"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm-ixr-6"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm-ixr",
+                                                            "imm36-100g-qsfp28",
+                                                            "imm48-sfp+2-qsfp28"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -8721,6 +8056,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -8771,6 +8115,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -8795,6 +8148,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -8819,6 +8181,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -8843,6 +8214,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -8867,6 +8247,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -8891,6 +8280,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -8915,6 +8313,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -8939,6 +8346,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -8963,6 +8379,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9013,6 +8438,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -9037,6 +8471,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9087,6 +8530,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9137,6 +8589,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9187,6 +8648,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9237,6 +8707,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9287,6 +8766,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -9311,6 +8799,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -9335,6 +8832,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -9362,6 +8868,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -9386,6 +8901,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -9410,6 +8934,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9460,6 +8993,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9510,6 +9052,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9560,6 +9111,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9610,6 +9170,83 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "sfm": {
+                                        "enum": [
+                                            "m-sfm5-12",
+                                            "m-sfm6-7/12"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "m-sfm5-12"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm5",
+                                                            "imm-2pac-fp3",
+                                                            "imm48-1gb-sfp-c",
+                                                            "iom4-e",
+                                                            "iom4-e-b",
+                                                            "iom4-e-hs"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "m-sfm6-7/12"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm5",
+                                                            "imm-2pac-fp3",
+                                                            "imm48-1gb-sfp-c",
+                                                            "iom4-e",
+                                                            "iom4-e-b",
+                                                            "iom4-e-hs",
+                                                            "iom5-e"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9660,6 +9297,85 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "sfm": {
+                                        "enum": [
+                                            "m-sfm5-12e",
+                                            "m-sfm6-12e"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "m-sfm5-12e"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm5",
+                                                            "imm-2pac-fp3",
+                                                            "imm4-100gb-cfp4",
+                                                            "imm40-10gb-sfp",
+                                                            "iom4-e",
+                                                            "iom4-e-b",
+                                                            "iom4-e-hs"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "m-sfm6-12e"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm5",
+                                                            "imm-2pac-fp3",
+                                                            "imm4-100gb-cfp4",
+                                                            "imm40-10gb-sfp",
+                                                            "iom4-e",
+                                                            "iom4-e-b",
+                                                            "iom4-e-hs",
+                                                            "iom5-e"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9710,6 +9426,76 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "sfm": {
+                                        "enum": [
+                                            "sfm-s",
+                                            "sfm2-s"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm-s"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm-s",
+                                                            "cpm2-s",
+                                                            "xcm-14s"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm2-s"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm2-s",
+                                                            "xcm-14s-b",
+                                                            "xcm2-14s"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9764,6 +9550,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9814,6 +9609,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -9838,6 +9642,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9888,6 +9701,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9938,6 +9760,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -9988,6 +9819,45 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "sfm": {
+                                        "enum": [
+                                            "sfm-2s"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm-2s"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm-2s",
+                                                            "xcm-2s"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -10038,6 +9908,46 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "sfm": {
+                                        "enum": [
+                                            "sfm-2se"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm-2se"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm-2se",
+                                                            "xcm-2se",
+                                                            "xcmc-2se"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -10088,6 +9998,110 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "sfm": {
+                                        "enum": [
+                                            "m-sfm5-12",
+                                            "m-sfm5-7",
+                                            "m-sfm6-7/12"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "m-sfm5-12"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "iom4-e-hs"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "m-sfm5-7"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm5",
+                                                            "imm-2pac-fp3",
+                                                            "imm48-1gb-sfp-c",
+                                                            "iom4-e",
+                                                            "iom4-e-b"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "m-sfm6-7/12"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm5",
+                                                            "imm-2pac-fp3",
+                                                            "imm48-1gb-sfp-c",
+                                                            "iom4-e",
+                                                            "iom4-e-b",
+                                                            "iom4-e-hs",
+                                                            "iom5-e"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -10138,6 +10152,76 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "sfm": {
+                                        "enum": [
+                                            "sfm-s",
+                                            "sfm2-s"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm-s"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm-s",
+                                                            "cpm2-s",
+                                                            "xcm-7s"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm2-s"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm2-s",
+                                                            "xcm-7s-b",
+                                                            "xcm2-7s"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -10191,6 +10275,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -10241,6 +10334,15 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "items": {
@@ -10268,6 +10370,134 @@
                         ]
                     },
                     "then": {
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "sfm": {
+                                        "enum": [
+                                            "sfm-x20",
+                                            "sfm-x20-b",
+                                            "sfm-x20s-b",
+                                            "sfm2-x20s"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm-x20"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm-x20",
+                                                            "xcm-x20"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm-x20-b"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm-x20",
+                                                            "xcm-x20"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm-x20s-b"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm-x20",
+                                                            "xcm-x20"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "properties": {
+                                        "sfm": {
+                                            "const": "sfm2-x20s"
+                                        }
+                                    },
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                },
+                                "then": {
+                                    "properties": {
+                                        "components": {
+                                            "items": {
+                                                "properties": {
+                                                    "type": {
+                                                        "enum": [
+                                                            "cpm-x20",
+                                                            "cpm2-x20",
+                                                            "xcm-x20",
+                                                            "xcm2-x20"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ],
                         "properties": {
                             "components": {
                                 "allOf": [
@@ -10314,6 +10544,9 @@
                     },
                     "type": "array",
                     "uniqueItems": true
+                },
+                "sfm": {
+                    "$ref": "#/definitions/srsim-sfm-types"
                 },
                 "type": {
                     "$ref": "#/definitions/srsim-chassis-types"

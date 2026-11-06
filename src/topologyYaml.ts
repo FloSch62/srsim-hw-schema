@@ -7,7 +7,7 @@ type ContainerlabConfig = Pick<SrsimConfig, "labName" | "nodeName" | "chassis" |
 export interface TopologyYamlOptions {
   shouldWriteComponentSlot?: (component: SrsimComponent) => boolean;
   shouldWriteComponentType?: (component: SrsimComponent) => boolean;
-  shouldWriteSfm?: (component: SrsimComponent) => boolean;
+  writeSfm?: boolean;
   shouldWriteDirectMda?: (component: SrsimComponent, mda: SrsimMda) => boolean;
   shouldWriteXiom?: (component: SrsimComponent, xiom: SrsimXiom) => boolean;
   shouldWriteXiomMda?: (component: SrsimComponent, xiom: SrsimXiom, mda: SrsimMda) => boolean;
@@ -41,11 +41,10 @@ function compactXiom(component: SrsimComponent, xiom: SrsimXiom, options: Topolo
   return Object.keys(out).length ? out : null;
 }
 
-function compactComponent(component: SrsimComponent, sfm: string, options: TopologyYamlOptions): Record<string, unknown> | null {
+function compactComponent(component: SrsimComponent, options: TopologyYamlOptions): Record<string, unknown> | null {
   const out: Record<string, unknown> = {};
   const slot = normalizedSlot(component.slot);
   if (slot !== undefined && (options.shouldWriteComponentSlot?.(component) ?? true)) out.slot = slot;
-  if (sfm && (options.shouldWriteSfm?.(component) ?? true)) out.sfm = sfm;
   if (component.type && (options.shouldWriteComponentType?.(component) ?? true)) out.type = component.type;
 
   const mdas = (component.mda ?? [])
@@ -78,8 +77,9 @@ function componentOrder(left: SrsimComponent, right: SrsimComponent): number {
 export function buildTopologyObject(config: ContainerlabConfig, options: TopologyYamlOptions = {}): Record<string, unknown> {
   const components = [...config.components]
     .sort(componentOrder)
-    .map((component) => compactComponent(component, config.sfm, options))
+    .map((component) => compactComponent(component, options))
     .filter((item): item is Record<string, unknown> => item !== null);
+  const writeSfm = Boolean(config.sfm) && (options.writeSfm ?? true);
 
   return {
     name: config.labName || "srsim-lab",
@@ -88,6 +88,7 @@ export function buildTopologyObject(config: ContainerlabConfig, options: Topolog
         [config.nodeName || "sros1"]: {
           kind: "nokia_srsim",
           type: config.chassis || "select-chassis",
+          ...(writeSfm ? { sfm: config.sfm } : {}),
           components
         }
       }

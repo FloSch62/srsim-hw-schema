@@ -240,6 +240,81 @@ class ClabFragmentTest(unittest.TestCase):
             1,
         )
 
+    def test_sidecar_sets_sfm_on_the_node_like_containerlab(self) -> None:
+        definitions = srsim.build_srsim_schema_module(SAMPLE_HARDWARE_SCHEMA)["definitions"]
+
+        # Mirrors the fields of containerlab's sros.Component struct, which
+        # fails to parse a topology that sets anything else on a component.
+        self.assertEqual(
+            set(definitions["srsim-component"]["properties"]),
+            {"slot", "type", "env", "xiom", "mda"},
+        )
+        self.assertFalse(definitions["srsim-component"]["additionalProperties"])
+        self.assertEqual(
+            definitions["srsim-node"]["properties"]["sfm"],
+            {"$ref": "#/definitions/srsim-sfm-types"},
+        )
+
+        def node_rules(chassis: str) -> list[dict]:
+            for rule in definitions["srsim-node"]["allOf"]:
+                condition = rule["if"]["properties"]["type"]
+                if chassis in condition.get("enum", [condition.get("const")]):
+                    return rule["then"]["allOf"]
+            self.fail(f"no node rule for {chassis}")
+
+        sr7s_rules = node_rules("sr-7s")
+        self.assertIn({"properties": {"sfm": {"enum": ["sfm-s", "sfm2-s"]}}}, sr7s_rules)
+        sfm_s_rule = next(
+            rule
+            for rule in sr7s_rules
+            if rule.get("if", {}).get("properties", {}).get("sfm") == {"const": "sfm-s"}
+        )
+        sfm_s_cards = sfm_s_rule["then"]["properties"]["components"]["items"]["properties"]["type"]["enum"]
+        self.assertIn("xcm-7s", sfm_s_cards)
+        self.assertNotIn("xcm2-7s", sfm_s_cards)
+
+        self.assertEqual(node_rules("sr-1s"), [{"not": {"required": ["sfm"]}}])
+
+    def test_component_shape_validation_rejects_misplaced_sfm(self) -> None:
+        on_component = srsim.validate_component_list_shape(
+            schema=SAMPLE_HARDWARE_SCHEMA,
+            node_name="sros1",
+            chassis="sr-7s",
+            components=[{"slot": "A", "sfm": "sfm-s", "type": "cpm2-s"}, {"slot": 1, "type": "xcm-7s"}],
+        )
+        no_sfm_chassis = srsim.validate_component_list_shape(
+            schema=SAMPLE_HARDWARE_SCHEMA,
+            node_name="sros1",
+            chassis="sr-1s",
+            components=[{"slot": "A", "type": "cpm-1s"}],
+            sfm="sfm-s",
+        )
+
+        self.assertIn("sros1[slot=A]: sfm must be set on the node, not on a component", on_component)
+        self.assertTrue(any("does not use an SFM" in error for error in no_sfm_chassis))
+
+    def test_validate_component_reads_sfm_from_the_node(self) -> None:
+        component = {"slot": 1, "type": "xcm-7s"}
+        unsupported = srsim.validate_component(
+            schema=SAMPLE_HARDWARE_SCHEMA,
+            node_name="sros1",
+            chassis="sr-7s",
+            sfm="sfm2-s",
+            component=component,
+            strict=False,
+        )
+        supported = srsim.validate_component(
+            schema=SAMPLE_HARDWARE_SCHEMA,
+            node_name="sros1",
+            chassis="sr-7s",
+            sfm="sfm-s",
+            component=component,
+            strict=False,
+        )
+
+        self.assertTrue(any("unsupported tuple" in error for error in unsupported))
+        self.assertEqual(supported, [])
+
     def test_component_shape_validation_rejects_wrong_chassis_modes(self) -> None:
         sr1s_errors = srsim.validate_component_list_shape(
             schema=SAMPLE_HARDWARE_SCHEMA,

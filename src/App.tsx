@@ -174,8 +174,7 @@ export function App() {
           (selectedDeploymentMode === "distributed" && !fixedDistributedCpmTypeIsImplied(selectedEntry, component)) ||
           !defaultImpliesFields(selectedEntry, component, config.sfm, [])
         ),
-      shouldWriteSfm: (component: SrsimConfig["components"][number]) =>
-        selectedDeploymentMode === "distributed" && Boolean(component.slot),
+      writeSfm: selectedDeploymentMode === "distributed",
       shouldWriteDirectMda: (component: SrsimConfig["components"][number], mda: { slot?: string | number; type?: string }) =>
         includeDefaultsInYaml || selectedDeploymentMode !== "distributed" ||
         !defaultImpliesFields(selectedEntry, { ...component, mda: [mda] }, config.sfm, ["mda"]),
