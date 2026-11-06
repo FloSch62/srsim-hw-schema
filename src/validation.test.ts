@@ -349,6 +349,26 @@ describe("topology validation", () => {
     ));
   });
 
+  it("accepts an uppercase chassis type because containerlab lowercases it", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: SR-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n",
+      hardware
+    );
+
+    assert.deepEqual(report.issues, []);
+    assert.equal(report.valid, true);
+  });
+
+  it("still applies the per-chassis schema rules to an uppercase chassis type", () => {
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: SR-7s\n      sfm: sfm2-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n",
+      hardware
+    );
+
+    assert.equal(report.valid, false);
+    assert.ok(report.issues.some((issue) => issue.source === "schema" && issue.path === "/topology/nodes/sros1/components/1/type"));
+  });
+
   it("rejects pasted SR-1s configs that model the CPM as a slot-1 line card", () => {
     const report = validateTopologyYaml(
       "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-1s\n      components:\n        - slot: 1\n          type: cpm-1s\n",

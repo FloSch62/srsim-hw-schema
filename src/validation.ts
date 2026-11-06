@@ -570,6 +570,20 @@ export function validateSrsimHardware(topology: unknown, schema: HardwareSchema,
   return issues;
 }
 
+// Containerlab trims and lowercases the SR-SIM chassis type, but the schema enums
+// and per-chassis rules only know the lowercase form.
+function withCanonicalChassisTypes(topology: unknown): unknown {
+  const canonical = structuredClone(topology);
+  const nodes = asRecord(asRecord(asRecord(canonical)?.topology)?.nodes) ?? {};
+  for (const value of Object.values(nodes)) {
+    const node = asRecord(value);
+    if (node?.kind === "nokia_srsim" && typeof node.type === "string") {
+      node.type = node.type.trim().toLowerCase();
+    }
+  }
+  return canonical;
+}
+
 export function validateTopologyYaml(yamlText: string, hardwareSchema: HardwareSchema): ValidationReport {
   const document = YAML.parseDocument(yamlText, { prettyErrors: true });
   if (document.errors.length) {
@@ -582,7 +596,7 @@ export function validateTopologyYaml(yamlText: string, hardwareSchema: HardwareS
 
   const parsed = document.toJSON();
   const validate = clabValidator();
-  const schemaValid = validate(parsed);
+  const schemaValid = validate(withCanonicalChassisTypes(parsed));
   const schemaIssues = schemaValid ? [] : filterSchemaIssues((validate.errors ?? []).map(formatAjvError));
   const hardwareIssues = validateSrsimHardware(parsed, hardwareSchema, true);
   const issues = [...schemaIssues, ...hardwareIssues];
