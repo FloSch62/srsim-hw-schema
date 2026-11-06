@@ -473,3 +473,73 @@ describe("topology validation", () => {
     assert.equal(report.issues[0].source, "yaml");
   });
 });
+
+describe("XIOM and XCM slot limits", () => {
+  const topology = (chassis: string, sfm: string, cpm: string, card: string, modules: string) =>
+    `name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: ${chassis}\n      sfm: ${sfm}\n      components:\n        - slot: A\n          type: ${cpm}\n        - slot: 1\n          type: ${card}\n${modules}`;
+  const direct = (...slots: number[]) =>
+    `          mda:\n${slots.map((slot) => `            - slot: ${slot}\n              type: s36-100gb-qsfp28\n`).join("")}`;
+  const xiom = (slots: number[], mdaSlots: number[] = [1]) => {
+    const mdas = mdaSlots
+      .map((slot) => `                - slot: ${slot}\n                  type: ms2-400gb-qsfpdd+2-100gb-qsfp28\n`)
+      .join("");
+    return `          xiom:\n${slots.map((slot) => `            - slot: ${slot}\n              type: iom-s-3.0t\n              mda:\n${mdas}`).join("")}`;
+  };
+  const sr2s = (modules: string) => topology("sr-2s", "sfm-2s", "cpm-2s", "xcm-2s", modules);
+  const sr7s = (modules: string) => topology("sr-7s", "sfm-s", "cpm2-s", "xcm-7s", modules);
+  const sr14s = (modules: string) => topology("sr-14s", "sfm-s", "cpm2-s", "xcm-14s", modules);
+
+  const expectValid = (yaml: string) => assert.deepEqual(validateTopologyYaml(yaml, hardware).issues, []);
+  const expectRejected = (yaml: string, message: string) => {
+    const { valid, issues } = validateTopologyYaml(yaml, hardware);
+    assert.equal(valid, false);
+    assert.ok(issues.some((issue) => issue.source === "schema"), `schema should reject: ${JSON.stringify(issues)}`);
+    assert.ok(
+      issues.some((issue) => issue.source === "hardware" && issue.message.includes(message)),
+      `expected "${message}" in ${JSON.stringify(issues)}`
+    );
+  };
+
+  it("limits an XIOM to two MDAs", () => {
+    expectValid(sr7s(xiom([1], [1, 2])));
+    expectRejected(sr7s(xiom([1], [1, 2, 3])), "must use MDA slot(s) 1, 2");
+    expectRejected(sr7s(xiom([1], [3])), "must use MDA slot(s) 1, 2");
+  });
+
+  for (const [name, build] of [["SR-2s", sr2s], ["SR-7s", sr7s]] as const) {
+    it(`gives ${name} one XCM slot for an XMA or an XIOM`, () => {
+      expectValid(build(direct(1)));
+      expectValid(build(xiom([1])));
+      expectRejected(build(direct(1) + xiom([1])), "XCM slot 1 holds either a direct MDA or an XIOM, not both");
+      expectRejected(build(direct(1) + xiom([2])), "XIOM must use XCM slot(s) 1");
+      expectRejected(build(direct(1, 2)), "must use MDA slot(s) 1");
+      expectRejected(build(direct(2)), "must use MDA slot(s) 1");
+      expectRejected(build(xiom([1, 2])), "XIOM must use XCM slot(s) 1");
+      expectRejected(build(xiom([2])), "XIOM must use XCM slot(s) 1");
+    });
+  }
+
+  it("gives SR-14s two XCM slots that an XMA and an XIOM cannot share", () => {
+    expectValid(sr14s(direct(1) + xiom([2])));
+    expectValid(sr14s(direct(2) + xiom([1])));
+    expectValid(sr14s(direct(1, 2)));
+    expectValid(sr14s(xiom([1, 2])));
+    expectRejected(sr14s(direct(1) + xiom([1])), "XCM slot 1 holds either a direct MDA or an XIOM, not both");
+    expectRejected(sr14s(direct(3)), "must use MDA slot(s) 1, 2");
+    expectRejected(sr14s(xiom([3])), "XIOM must use XCM slot(s) 1, 2");
+  });
+
+  it("applies the XCM limits to every XCM generation and chassis type spelling", () => {
+    expectRejected(topology("sr-7s", "sfm2-s", "cpm2-s", "xcm2-7s", direct(1) + xiom([1])), "not both");
+    expectRejected(topology("SR-7s", "sfm-s", "cpm2-s", "xcm-7s", direct(1) + xiom([1])), "not both");
+  });
+
+  it("reports duplicate XIOM slots on chassis without a documented XCM slot count", () => {
+    const report = validateTopologyYaml(
+      topology("sr-2se", "sfm-2se", "cpm-2se", "xcm-2se", "          xiom:\n            - slot: 1\n              type: iom2-se-3.0t\n            - slot: 1\n              type: iom2-se-6.0t\n"),
+      hardware
+    );
+
+    assert.ok(report.issues.some((issue) => issue.message === "duplicate XIOM slot 1"));
+  });
+});

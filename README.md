@@ -42,7 +42,9 @@ uv run srsim-hw-schema validate-topology \
 Topology validation checks `topology.nodes.*` entries with
 `kind: nokia_srsim` and validates their node-level `sfm` and `components` list
 against the schema. Containerlab only accepts `sfm` on the node, so setting it
-on a component is reported as an error.
+on a component is reported as an error. It also checks the slot limits from the
+SR OS interface configuration guide: an XIOM holds up to two MDAs, and each XCM
+slot on SR-2s, SR-7s (one slot) and SR-14s (two slots) holds an XMA or an XIOM.
 It is strict by default so missing required fields, such as `sfm` for an
 `xcm-7s` XIOM tuple, are reported. Use `--no-strict` to only check explicit
 values that are present in the YAML.

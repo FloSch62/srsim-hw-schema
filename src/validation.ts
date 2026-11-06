@@ -11,8 +11,10 @@ import {
   directMdaSlotOptions,
   deploymentMode,
   isEmptyValue,
+  schemaNumericSlotOptions,
   sfmOptions,
   splitValues,
+  xcmModuleSlotCount,
   xiomMdaSlotOptions
 } from "./matrix";
 import type {
@@ -275,6 +277,40 @@ function validateNestedMdaSlot(params: {
   return issues;
 }
 
+function validateXcmModuleSlots(params: {
+  location: string;
+  chassis: string;
+  mdas: unknown[];
+  xioms: unknown[];
+}): ValidationIssue[] {
+  const { location, chassis, mdas, xioms } = params;
+  const slotCount = xcmModuleSlotCount(chassis);
+  const slotText = (item: unknown) => String(asRecord(item)?.slot ?? "").trim();
+  const mdaSlots = new Set(mdas.map(slotText));
+  const seenSlots = new Set<string>();
+  const issues: ValidationIssue[] = [];
+
+  for (const slot of xioms.map(slotText).filter(Boolean)) {
+    const path = `${location}.xiom[${slot}]`;
+    if (seenSlots.has(slot)) {
+      issues.push({ source: "hardware", path, message: `duplicate XIOM slot ${slot}` });
+    }
+    seenSlots.add(slot);
+    if (slotCount === undefined) continue;
+
+    const slotNumber = numericSlot(slot);
+    if (slotNumber !== null && slotNumber > slotCount) {
+      const allowed = schemaNumericSlotOptions([], slotCount).join(", ");
+      issues.push({ source: "hardware", path, message: `XIOM must use XCM slot(s) ${allowed}` });
+    }
+    if (mdaSlots.has(slot)) {
+      issues.push({ source: "hardware", path, message: `XCM slot ${slot} holds either a direct MDA or an XIOM, not both` });
+    }
+  }
+
+  return issues;
+}
+
 function validateComponent(params: {
   schema: HardwareSchema;
   nodeName: string;
@@ -308,7 +344,7 @@ function validateComponent(params: {
     return validateCriteria({ schema, nodeName, location, modelName: chassis, criteria: base, strict });
   }
 
-  const issues: ValidationIssue[] = [];
+  const issues: ValidationIssue[] = [...validateXcmModuleSlots({ location, chassis, mdas, xioms })];
   const seenDirectMdaSlots = new Set<string>();
   for (const mda of mdas) {
     const mdaRecord = asRecord(mda);

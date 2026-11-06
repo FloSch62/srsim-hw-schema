@@ -16,6 +16,7 @@ import {
   defaultSfmForEntry,
   deploymentMode,
   directMdaSlotOptions,
+  freeXcmModuleSlots,
   directMdaOptions,
   fixedDistributedCpmTypeIsImplied,
   getEntry,
@@ -24,6 +25,7 @@ import {
   schemaNumericSlotOptions,
   sfmOptions,
   upsertComponentBySlot,
+  xcmModuleSlotCount,
   xiomMdaOptions,
   xiomOptions
 } from "./matrix";
@@ -285,6 +287,25 @@ describe("SR-SIM matrix helpers", () => {
     const ixrR4 = getEntry(matrix, "ixr-r4");
     assert.deepEqual(directMdaSlotOptions(ixrR4, { slot: 1, type: "iom-ixr-r4" }, "", 2, 1, "m20-1g-csfp"), [1, 2, 3]);
     assert.deepEqual(directMdaSlotOptions(ixrR4, { slot: 1, type: "iom-ixr-r4" }, "", 2, 1, "m10-1g-sfp+2-10g-sfp+"), [5]);
+  });
+
+  it("limits XMA and XIOM slots to the XCM slots of the chassis", () => {
+    const matrix = buildMatrix(hardware);
+    const sr7s = getEntry(matrix, "sr-7s");
+    const sr14s = getEntry(matrix, "sr-14s");
+    const sr2se = getEntry(matrix, "sr-2se");
+
+    assert.equal(xcmModuleSlotCount("SR-7s"), 1);
+    assert.equal(xcmModuleSlotCount("sr-14s"), 2);
+    assert.equal(xcmModuleSlotCount("sr-2se"), undefined);
+
+    assert.deepEqual(directMdaSlotOptions(sr7s, { slot: 1, type: "xcm-7s" }, "sfm-s"), [1]);
+    assert.deepEqual(directMdaSlotOptions(sr14s, { slot: 1, type: "xcm-14s" }, "sfm-s"), [1, 2]);
+    assert.deepEqual(directMdaSlotOptions(sr2se, { slot: 1, type: "xcm-2se" }, "sfm-2se"), [1, 2]);
+
+    assert.deepEqual(freeXcmModuleSlots(sr7s, [1], [{ slot: 1 }]), []);
+    assert.deepEqual(freeXcmModuleSlots(sr14s, [1, 2], [{ slot: 1 }]), [2]);
+    assert.deepEqual(freeXcmModuleSlots(sr2se, [1, 2], [{ slot: 1 }]), [1, 2]);
   });
 
   it("converts matrix rows into editor components", () => {
