@@ -30,6 +30,13 @@ const mdaSlotRestrictions = new Map<string, number[]>([
   ["ixr-r6:a32-chds1v2", [5, 6]],
   ["ixr-r6:m20-1g-csfp", [3, 4]]
 ]);
+// Slots an XCM has for its XMA or XIOM modules, from the SR OS interface configuration
+// guide. `mda N` and `xiom xN` occupy the same physical slot N.
+const xcmModuleSlots = new Map<string, number>([
+  ["sr-2s", 1],
+  ["sr-7s", 1],
+  ["sr-14s", 2]
+]);
 
 export type DeploymentMode = "standalone" | "integrated_redundant" | "distributed";
 export type MatrixRowAction = "add" | "replace";
@@ -463,6 +470,20 @@ export function restrictedMdaSlots(chassis: string | undefined, mdaType: string)
   return mdaSlotRestrictions.get(`${clabChassisToken(chassis)}:${canonicalToken(mdaType)}`) ?? [];
 }
 
+export function xcmModuleSlotCount(chassis: string | undefined): number | undefined {
+  return xcmModuleSlots.get(clabChassisToken(chassis));
+}
+
+export function freeXcmModuleSlots(
+  entry: MatrixEntry | undefined,
+  slotOptions: number[],
+  otherModules: Array<{ slot?: string | number }> = []
+): number[] {
+  return xcmModuleSlotCount(entry?.chassis) === undefined
+    ? slotOptions
+    : availableNumericSlotOptions(slotOptions, otherModules);
+}
+
 function mdaSlotOptionsFromRows(
   entry: MatrixEntry | undefined,
   rows: MatrixRow[],
@@ -494,7 +515,7 @@ export function directMdaSlotOptions(
 ): number[] {
   const base = { slot: component.slot, type: component.type };
   const rows = optionRows(entry, base, sfm, "mda").filter((row) => !(row.values.xiom ?? []).length);
-  return mdaSlotOptionsFromRows(entry, rows, fallbackSlotCount, minimumSlot, mdaType);
+  return mdaSlotOptionsFromRows(entry, rows, xcmModuleSlotCount(entry?.chassis) ?? fallbackSlotCount, minimumSlot, mdaType);
 }
 
 export function xiomMdaSlotOptions(
