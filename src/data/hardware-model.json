@@ -2306,7 +2306,10 @@
             ]
         },
         "cpm2-x20": {
-            "kind": "cpm"
+            "kind": "cpm",
+            "sfm": [
+                "sfm2-x20s"
+            ]
         },
         "cpm5": {
             "kind": "cpm"
@@ -3196,6 +3199,12 @@
         "s36-400gb-qsfpdd": {
             "kind": "xma"
         },
+        "x12-400g-qsfpdd": {
+            "kind": "mda"
+        },
+        "x2-100g-tun": {
+            "kind": "mda"
+        },
         "x2-s36-400g-qsfp112-3.0t": {
             "kind": "iom",
             "slots": [
@@ -3227,6 +3236,21 @@
                     "srsim": 1
                 }
             ]
+        },
+        "x24-100g-qsfp28": {
+            "kind": "mda"
+        },
+        "x4-100g-cfp2": {
+            "kind": "mda"
+        },
+        "x40-10g-sfp": {
+            "kind": "mda"
+        },
+        "x6-200g-cfp2-dco": {
+            "kind": "mda"
+        },
+        "x6-400g-cfp8": {
+            "kind": "mda"
         },
         "xcm-14s": {
             "kind": "xcm",
@@ -3406,14 +3430,24 @@
                         "mda"
                     ],
                     "id": "mda-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "x2-100g-tun",
+                        "x4-100g-cfp2",
+                        "x40-10g-sfp"
+                    ]
                 },
                 {
                     "accepts": [
                         "mda"
                     ],
                     "id": "mda-2",
-                    "srsim": 2
+                    "srsim": 2,
+                    "types": [
+                        "x2-100g-tun",
+                        "x4-100g-cfp2",
+                        "x40-10g-sfp"
+                    ]
                 }
             ]
         },
@@ -3483,20 +3517,35 @@
         },
         "xcm2-x20": {
             "kind": "xcm",
+            "sfm": [
+                "sfm2-x20s"
+            ],
             "slots": [
                 {
                     "accepts": [
                         "mda"
                     ],
                     "id": "mda-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "x12-400g-qsfpdd",
+                        "x24-100g-qsfp28",
+                        "x6-200g-cfp2-dco",
+                        "x6-400g-cfp8"
+                    ]
                 },
                 {
                     "accepts": [
                         "mda"
                     ],
                     "id": "mda-2",
-                    "srsim": 2
+                    "srsim": 2,
+                    "types": [
+                        "x12-400g-qsfpdd",
+                        "x24-100g-qsfp28",
+                        "x6-200g-cfp2-dco",
+                        "x6-400g-cfp8"
+                    ]
                 }
             ]
         },

@@ -323,6 +323,17 @@
     "issues": [{"code": "slot-type", "path": "2.mda[1]"}, {"code": "slot-type", "path": "3.mda[1]"}, {"code": "slot-type", "path": "4.mda[2]"}]
   },
   {
+    "name": "XRS-20: FP4 XCM2-X20 and CPM2-X20 need SFM2-X20S; each XCM takes its own XMA generation",
+    "chassis": "xrs-20",
+    "sfm": "sfm-x20-b",
+    "components": [
+      {"slot": "A", "type": "cpm2-x20"},
+      {"slot": 1, "type": "xcm-x20", "mda": [{"slot": 1, "type": "x40-10g-sfp"}, {"slot": 2, "type": "x24-100g-qsfp28"}]},
+      {"slot": 2, "type": "xcm2-x20", "mda": [{"slot": 1, "type": "x24-100g-qsfp28"}]}
+    ],
+    "issues": [{"code": "slot-type", "path": "1.mda[2]"}, {"code": "sfm", "path": "A"}, {"code": "sfm", "path": "2"}]
+  },
+  {
     "name": "Chassis without a model are not checked",
     "chassis": "vsr-i",
     "components": [{"slot": 99, "type": "iom5-e"}],

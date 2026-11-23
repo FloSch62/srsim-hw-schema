@@ -358,12 +358,20 @@ def sr_a_family(model: Model) -> None:
 
 
 def xrs_family(model: Model) -> None:
-    """7950 XRS-20/20e: ten XCM slots with two XMA slots each, and redundant CPMs."""
+    """7950 XRS-20/20e: ten XCM slots with two XMA slots each, and redundant CPMs. The FP3 XCM-X20 and the FP4
+    XCM2-X20 can share a chassis but take only XMAs of their own generation; FP4 needs fabric-speed-c, which
+    only the FP4 SFM2-X20S runs."""
+    fp4 = ("sfm2-x20s",)
+    model.add_part(Part("cpm-x20", "cpm"))
+    # SR-SIM runs the CPM2-X20 with SFM2-X20S only.
+    model.add_part(Part("cpm2-x20", "cpm", sfm=fp4))
+    fp3_xmas = ("x2-100g-tun", "x4-100g-cfp2", "x40-10g-sfp")
+    fp4_xmas = ("x12-400g-qsfpdd", "x24-100g-qsfp28", "x6-200g-cfp2-dco", "x6-400g-cfp8")
+    for type_ in (*fp3_xmas, *fp4_xmas):
+        model.add_part(Part(type_, "mda"))
+    model.add_part(mda_card("xcm-x20", "xcm", {1: "", 2: ""}, types=fp3_xmas))
+    model.add_part(mda_card("xcm2-x20", "xcm", {1: "", 2: ""}, fp4, fp4_xmas))
     cpms = ("cpm-x20", "cpm2-x20")
-    for type_ in cpms:
-        model.add_part(Part(type_, "cpm"))
-    for type_ in ("xcm-x20", "xcm2-x20"):
-        model.add_part(mda_card(type_, "xcm", {1: "", 2: ""}))
     for chassis_id in ("xrs-20", "xrs-20e"):
         model.chassis[chassis_id] = Chassis(chassis_id, slots=(*xcm_slots(10), *cpm_slots(cpms, 2)))
 
