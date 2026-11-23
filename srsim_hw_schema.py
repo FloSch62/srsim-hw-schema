@@ -73,7 +73,7 @@ MDA_SLOT_RESTRICTIONS: dict[tuple[str, str], list[int]] = {
 # https://documentation.nokia.com/sr/26-10/7750-sr/books/interface-configuration/configuration-overview.html
 # "mda N" and "xiom xN" occupy the same physical XCM slot N.
 XIOM_MDA_SLOTS = [1, 2]
-XCM_MODULE_SLOTS = {"sr-2s": 1, "sr-7s": 1, "sr-14s": 2}
+XCM_MODULE_SLOTS = {"sr-1s": 1, "sr-2s": 1, "sr-7s": 1, "sr-14s": 2}
 EDA_COMPONENT_KIND_ORDER = {
     "controlCard": 0,
     "lineCard": 1,
@@ -1371,6 +1371,10 @@ def card_compatibility(chassis_entry: dict[str, Any]) -> dict[str, dict[str, Any
                 mode = deployment_mode("", chassis_entry)
                 if mode in {"standalone", "integrated_redundant"} and row_mdas and "xiom" not in row:
                     merge_values(entry["direct_mda"], row_mdas)
+                if mode in {"standalone", "integrated_redundant"} and "xiom" in row:
+                    merge_values(entry["xiom"], row["xiom"])
+                    for xiom in row["xiom"]:
+                        merge_values(entry["xiom_mda"].setdefault(xiom, []), row_mdas)
 
             for card in line_cards:
                 entry = compatibility.setdefault(
@@ -1500,8 +1504,12 @@ def build_chassis_component_definition(chassis: str, chassis_entry: dict[str, An
             rules.append({"properties": {"type": {"enum": cpms}}})
 
         standalone_mdas: list[str] = []
+        standalone_xioms: dict[str, Any] = {"xiom": [], "xiom_mda": {}}
         for entry in card_compatibility(chassis_entry).values():
             merge_values(standalone_mdas, entry["direct_mda"])
+            merge_values(standalone_xioms["xiom"], entry["xiom"])
+            for xiom, mdas in entry["xiom_mda"].items():
+                merge_values(standalone_xioms["xiom_mda"].setdefault(xiom, []), mdas)
         if standalone_mdas:
             rules.append(
                 {
@@ -1514,7 +1522,11 @@ def build_chassis_component_definition(chassis: str, chassis_entry: dict[str, An
                     }
                 }
             )
-        rules.append(disallow_property("xiom"))
+        # Containerlab derives the card from the node type, so XIOMs are checked without a component type too.
+        if standalone_xioms["xiom"]:
+            rules.append({"properties": {"xiom": {"items": xiom_schema_for_card(standalone_xioms, chassis)}}})
+        else:
+            rules.append(disallow_property("xiom"))
     elif cpms:
         rules.append(
             {
@@ -2240,8 +2252,6 @@ def validate_component_list_shape(
             slot = slot_value(component)
             if slot and slot.upper() != "A":
                 errors.append(f"{component_name(node_name, slot)}: standalone component slot must be omitted or A")
-            if isinstance(component, dict) and component.get("xiom"):
-                errors.append(f"{component_name(node_name, slot)}: standalone component must not set xiom")
         return errors
 
     if mode == "integrated_redundant":

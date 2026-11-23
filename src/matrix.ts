@@ -33,6 +33,7 @@ const mdaSlotRestrictions = new Map<string, number[]>([
 // Slots an XCM has for its XMA or XIOM modules, from the SR OS interface configuration
 // guide. `mda N` and `xiom xN` occupy the same physical slot N.
 const xcmModuleSlots = new Map<string, number>([
+  ["sr-1s", 1],
   ["sr-2s", 1],
   ["sr-7s", 1],
   ["sr-14s", 2]

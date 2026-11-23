@@ -140,6 +140,27 @@ describe("topology validation", () => {
     assert.equal(integratedCardTypeIsImplied(getEntry(buildMatrix(hardware), "sar-mx"), { slot: "A", type: "iom-sar-1x" }), false);
   });
 
+  it("accepts the SR-1s with its integrated IOM-s and MDA-s instead of an XMA-s", () => {
+    const entry = getEntry(buildMatrix(hardware), "sr-1s");
+    const component = {
+      slot: "A",
+      type: "cpm-1s",
+      xiom: [{ slot: 1, type: "iom-s-3.0t", mda: [{ slot: 1, type: "ms16-100gb-sfpdd+4-100gb-qsfp28" }] }]
+    };
+    const yaml = buildTopologyYaml({ labName: "srsimtest", nodeName: "sros1", chassis: "sr-1s", sfm: "", components: [component] }, {
+      shouldWriteComponentType: (candidate) => !integratedCardTypeIsImplied(entry, candidate)
+    });
+
+    assert.equal(yaml.includes("type: iom-s-3.0t"), true);
+    assert.deepEqual(validateTopologyYaml(yaml, hardware).issues, []);
+
+    const bothInOneSlot = buildTopologyYaml(
+      { labName: "srsimtest", nodeName: "sros1", chassis: "sr-1s", sfm: "", components: [{ ...component, mda: [{ slot: 1, type: "s36-100gb-qsfp28" }] }] },
+      { shouldWriteComponentType: () => false }
+    );
+    assert.equal(validateTopologyYaml(bothInOneSlot, hardware).valid, false);
+  });
+
   it("can include integrated default slot and CPM type in generated YAML", () => {
     const entry = getEntry(buildMatrix(hardware), "sar-mx");
     const config = {

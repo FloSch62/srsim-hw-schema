@@ -501,13 +501,9 @@ function validateComponentListShape(params: {
       issues.push({ source: "hardware", message: `${nodeName}: standalone SR-SIM chassis ${chassis} accepts at most one component override` });
     }
     for (const component of components) {
-      const record = asRecord(component);
       const slot = slotValue(component);
       if (slot && slot.toUpperCase() !== "A") {
         issues.push({ source: "hardware", path: componentName(nodeName, slot), message: "standalone component slot must be omitted or A" });
-      }
-      if (record?.xiom) {
-        issues.push({ source: "hardware", path: componentName(nodeName, slot), message: "standalone component must not set xiom" });
       }
     }
     return issues;

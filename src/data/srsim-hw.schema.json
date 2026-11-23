@@ -5344,10 +5344,59 @@
                     }
                 },
                 {
-                    "not": {
-                        "required": [
-                            "xiom"
-                        ]
+                    "properties": {
+                        "xiom": {
+                            "items": {
+                                "allOf": [
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "iom-s-3.0t"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "mda": {
+                                                    "items": {
+                                                        "properties": {
+                                                            "type": {
+                                                                "enum": [
+                                                                    "ms16-100gb-sfpdd+4-100gb-qsfp28",
+                                                                    "ms16-sdd+4-qsfp28-b",
+                                                                    "ms18-100gb-qsfp28",
+                                                                    "ms2-100g-qsfp28+2-800g-qsfpdd",
+                                                                    "ms2-400gb-qsfpdd+2-100gb-qsfp28",
+                                                                    "ms24-10/100gb-sfpdd",
+                                                                    "ms24-100g-sfp112",
+                                                                    "ms3-200gb-cfp2-dco",
+                                                                    "ms4-400gb-qsfpdd+4-100gb-qsfp28",
+                                                                    "ms6-200gb-cfp2-dco",
+                                                                    "ms8-100g-sfp112+2-800g-qsfpdd",
+                                                                    "ms8-100gb-sfpdd+2-100gb-qsfp28",
+                                                                    "ms8-sdd+2-qsfp28-b"
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                ],
+                                "properties": {
+                                    "type": {
+                                        "enum": [
+                                            "iom-s-3.0t"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 {
@@ -5362,15 +5411,6 @@
                         ]
                     },
                     "then": {
-                        "allOf": [
-                            {
-                                "not": {
-                                    "required": [
-                                        "xiom"
-                                    ]
-                                }
-                            }
-                        ],
                         "properties": {
                             "mda": {
                                 "items": {
@@ -5385,8 +5425,122 @@
                                         }
                                     }
                                 }
+                            },
+                            "xiom": {
+                                "items": {
+                                    "allOf": [
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "iom-s-3.0t"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "mda": {
+                                                        "items": {
+                                                            "properties": {
+                                                                "type": {
+                                                                    "enum": [
+                                                                        "ms16-100gb-sfpdd+4-100gb-qsfp28",
+                                                                        "ms16-sdd+4-qsfp28-b",
+                                                                        "ms18-100gb-qsfp28",
+                                                                        "ms2-100g-qsfp28+2-800g-qsfpdd",
+                                                                        "ms2-400gb-qsfpdd+2-100gb-qsfp28",
+                                                                        "ms24-10/100gb-sfpdd",
+                                                                        "ms24-100g-sfp112",
+                                                                        "ms3-200gb-cfp2-dco",
+                                                                        "ms4-400gb-qsfpdd+4-100gb-qsfp28",
+                                                                        "ms6-200gb-cfp2-dco",
+                                                                        "ms8-100g-sfp112+2-800g-qsfpdd",
+                                                                        "ms8-100gb-sfpdd+2-100gb-qsfp28",
+                                                                        "ms8-sdd+2-qsfp28-b"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "properties": {
+                                        "type": {
+                                            "enum": [
+                                                "iom-s-3.0t"
+                                            ]
+                                        }
+                                    }
+                                }
                             }
                         }
+                    }
+                },
+                {
+                    "properties": {
+                        "mda": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 1
+                        },
+                        "xiom": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 1
+                        }
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
                     }
                 }
             ]
