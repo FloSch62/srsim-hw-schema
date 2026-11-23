@@ -24,6 +24,7 @@ import {
   srosReleaseFromSource,
   schemaNumericSlotOptions,
   sfmOptions,
+  slotCountLabel,
   upsertComponentBySlot,
   withReplacedModules,
   xiomMdaOptions,
@@ -266,6 +267,11 @@ describe("SR-SIM matrix helpers", () => {
     assert.deepEqual(componentCardSlotOptions(entry), [1, 2, 3, 4, 5, 6]);
     assert.deepEqual(schemaNumericSlotOptions([], 2), [1, 2]);
     assert.deepEqual(schemaNumericSlotOptions([{ slot: 5 }], 2), [1, 2, 3, 4, 5]);
+  });
+
+  it("formats section counts as used out of maximum", () => {
+    assert.equal(slotCountLabel(1, 2), "(1 / max 2)");
+    assert.equal(slotCountLabel(0, 7), "(0 / max 7)");
   });
 
   it("builds bounded MDA slot option lists from matrix rows and footnotes", () => {

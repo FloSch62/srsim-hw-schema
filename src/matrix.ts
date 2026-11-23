@@ -546,6 +546,11 @@ function matrixCardSlotOptions(entry: MatrixEntry | undefined, minimumSlot = 1):
   return numberRange(maxSlot, minimumSlot);
 }
 
+/** Section-title count, e.g. "(1 / max 2)". */
+export function slotCountLabel(used: number, max: number): string {
+  return `(${used} / max ${max})`;
+}
+
 export function componentCpmSlotOptions(entry: MatrixEntry | undefined, schemaSlots: string[] = ["A", "B"]): string[] {
   const modelled = cpmSlots(entry?.chassis ?? "");
   if (modelled.length) return modelled;

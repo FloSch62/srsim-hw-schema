@@ -52,6 +52,7 @@ import {
   nextCpmSlot,
   nextNumericSlot,
   schemaNumericSlotOptions,
+  slotCountLabel,
   sfmOptions,
   xiomMdaSlotOptions,
   withReplacedModules,
@@ -649,6 +650,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
             ) : (
             <ComponentSection
               title="Control modules"
+              count={{ used: cpms.length, max: cpmSlotOptions.length }}
               items={cpms}
               addLabel="Add CPM"
               addDisabled={!availableCpmSlots.length || !carrierCpmOptions(config.sfm).length}
@@ -1193,6 +1195,7 @@ function IntegratedComponentSection({
 
 function ComponentSection({
   title,
+  count,
   items,
   addLabel,
   addDisabled,
@@ -1200,6 +1203,8 @@ function ComponentSection({
   renderItem
 }: {
   title: string;
+  /** Configured and maximum number of components, shown after the title. */
+  count?: { used: number; max: number };
   items: IndexedComponent[];
   addLabel: string;
   addDisabled?: boolean;
@@ -1210,7 +1215,14 @@ function ComponentSection({
     <Stack spacing={1.25}>
       <Divider />
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-        <Typography variant="subtitle1">{title}</Typography>
+        <Typography variant="subtitle1">
+          {title}
+          {count ? (
+            <Box component="span" sx={{ color: "text.secondary", ml: 1 }}>
+              {slotCountLabel(count.used, count.max)}
+            </Box>
+          ) : null}
+        </Typography>
         <Button size="small" startIcon={<AddIcon />} onClick={onAdd} disabled={addDisabled}>
           {addLabel}
         </Button>
