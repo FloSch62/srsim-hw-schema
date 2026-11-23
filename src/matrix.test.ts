@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import hardwareData from "../srsim-supported-hardware.json";
 import {
   buildMatrix,
+  componentCardSlotCount,
   componentCardSlotOptions,
   componentCompatibleWithSfm,
   componentFromMatrixRow,
@@ -267,6 +268,14 @@ describe("SR-SIM matrix helpers", () => {
     assert.deepEqual(componentCardSlotOptions(entry), [1, 2, 3, 4, 5, 6]);
     assert.deepEqual(schemaNumericSlotOptions([], 2), [1, 2]);
     assert.deepEqual(schemaNumericSlotOptions([{ slot: 5 }], 2), [1, 2, 3, 4, 5]);
+  });
+
+  it("counts line-card slots from the chassis, not from configured cards", () => {
+    const entry = getEntry(buildMatrix(hardware), "sr-7s");
+
+    assert.equal(componentCardSlotCount(entry), 6);
+    assert.equal(componentCardSlotOptions(entry, [{ slot: 9 }]).length, 9);
+    assert.equal(componentCardSlotCount(undefined), 1);
   });
 
   it("formats section counts as used out of maximum", () => {

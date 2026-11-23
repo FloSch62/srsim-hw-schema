@@ -35,6 +35,7 @@ import {
 } from "../edaComponents";
 import {
   availableNumericSlotOptions,
+  componentCardSlotCount,
   componentCardSlotOptions,
   componentCpmSlotOptions,
   componentTypeOptions,
@@ -690,6 +691,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
 
             <ComponentSection
               title="Line cards"
+              count={{ used: cards.length, max: componentCardSlotCount(selectedEntry, slotRules.componentIntegerMinimum) }}
               items={cards}
               addLabel="Add card"
               addDisabled={!availableCardSlots.length || !componentTypeOptions(selectedEntry, {}, config.sfm).length}

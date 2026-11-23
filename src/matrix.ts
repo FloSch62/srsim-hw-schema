@@ -571,6 +571,11 @@ export function componentCardSlotOptions(
   return numberRange(maxSlot, minimumSlot);
 }
 
+/** Line-card slots the chassis provides, ignoring slots of already configured cards. */
+export function componentCardSlotCount(entry: MatrixEntry | undefined, minimumSlot = 1): number {
+  return componentCardSlotOptions(entry, [], minimumSlot).length;
+}
+
 export function schemaNumericSlotOptions(
   items: Array<{ slot?: string | number }> = [],
   minimumVisibleSlots = 1,
