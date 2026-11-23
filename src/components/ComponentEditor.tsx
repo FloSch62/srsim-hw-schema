@@ -103,10 +103,18 @@ type SlotOption = string | number;
 const nestedComponentGridColumns = { xs: "1fr", sm: "120px minmax(0, 1fr) auto" } as const;
 const nestedSlotCount = 2;
 
+// Labels describe how SR-SIM runs the chassis (Nokia's integrated vs. distributed model),
+// not the hardware: fixed FP5 platforms such as the SR-1x still need several containers.
 function deploymentModeLabel(mode: DeploymentMode): string {
-  if (mode === "distributed") return "Distributed";
-  if (mode === "integrated_redundant") return "Redundant integrated";
-  return "Integrated";
+  if (mode === "distributed") return "Multi-container";
+  if (mode === "integrated_redundant") return "Single container (redundant)";
+  return "Single container";
+}
+
+function deploymentModeDescription(mode: DeploymentMode): string {
+  if (mode === "distributed") return "SR-SIM runs one container per CPM and per line card.";
+  if (mode === "integrated_redundant") return "SR-SIM runs one combined container, or two for CPM redundancy.";
+  return "SR-SIM runs the whole router in one container.";
 }
 
 function withoutEmptyNested(component: SrsimComponent): SrsimComponent {
@@ -425,7 +433,9 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
           <Box>
             <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
               <Typography variant="h6">Hardware</Typography>
-              <Chip size="small" variant="outlined" label={deploymentModeLabel(selectedDeploymentMode)} />
+              <Tooltip title={deploymentModeDescription(selectedDeploymentMode)}>
+                <Chip size="small" variant="outlined" label={deploymentModeLabel(selectedDeploymentMode)} />
+              </Tooltip>
             </Stack>
             <Typography variant="body2" color="text.secondary">
               {selectedEntry?.models.join(", ") || "No chassis selected"}
