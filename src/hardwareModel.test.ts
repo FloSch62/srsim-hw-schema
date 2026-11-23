@@ -18,6 +18,7 @@ import {
 interface HardwareCase {
   name: string;
   chassis: string;
+  sfm?: string;
   components: unknown[];
   issues: Array<{ code: string; path: string }>;
 }
@@ -26,7 +27,10 @@ const cases = JSON.parse(readFileSync(new URL("../tests/hardware-cases.json", im
 
 for (const hardwareCase of cases) {
   test(`hardware case: ${hardwareCase.name}`, () => {
-    const issues = hardwareIssues(hardwareCase.chassis, hardwareCase.components).map(({ code, path }) => ({ code, path }));
+    const issues = hardwareIssues(hardwareCase.chassis, hardwareCase.components, hardwareCase.sfm).map(({ code, path }) => ({
+      code,
+      path
+    }));
     assert.deepEqual(issues, hardwareCase.issues);
   });
 }

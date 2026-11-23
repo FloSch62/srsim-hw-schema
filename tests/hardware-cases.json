@@ -255,6 +255,47 @@
     "issues": [{"code": "slot-type", "path": "1"}]
   },
   {
+    "name": "SR-7s FP5: CPM-s and XCM-7s are FP4-only",
+    "chassis": "sr-7s",
+    "sfm": "sfm2-s",
+    "components": [{"slot": "A", "type": "cpm-s"}, {"slot": 1, "type": "xcm-7s"}],
+    "issues": [{"code": "sfm", "path": "A"}, {"code": "sfm", "path": "1"}]
+  },
+  {
+    "name": "SR-14s FP4: CPM2-s is FP5-only",
+    "chassis": "sr-14s",
+    "sfm": "sfm-s",
+    "components": [{"slot": "A", "type": "cpm2-s"}, {"slot": 1, "type": "xcm-14s"}],
+    "issues": [{"code": "sfm", "path": "A"}]
+  },
+  {
+    "name": "SR-14s FP5: XCM-14s-b and XCM2-14s mix",
+    "chassis": "sr-14s",
+    "sfm": "sfm2-s",
+    "components": [{"slot": "A", "type": "cpm2-s"}, {"slot": 1, "type": "xcm-14s-b", "mda": [{"slot": 1, "type": "s36-400gb-qsfpdd"}]}, {"slot": 2, "type": "xcm2-14s", "mda": [{"slot": 1, "type": "x2-s36-800g-qsfpdd-18.0t"}]}],
+    "issues": []
+  },
+  {
+    "name": "SR-7s FP5: XCM-7s-b keeps FP4 XMA-s",
+    "chassis": "sr-7s",
+    "sfm": "sfm2-s",
+    "components": [{"slot": "A", "type": "cpm2-s"}, {"slot": 1, "type": "xcm-7s-b", "mda": [{"slot": 1, "type": "s36-100gb-qsfp28"}]}],
+    "issues": []
+  },
+  {
+    "name": "SR-7s: XCM2-7s holds XMA2-s or IOM2-se, not IOM-s",
+    "chassis": "sr-7s",
+    "sfm": "sfm2-s",
+    "components": [{"slot": "A", "type": "cpm2-s"}, {"slot": 1, "type": "xcm2-7s", "xiom": [{"slot": 1, "type": "iom-s-3.0t"}]}],
+    "issues": [{"code": "slot-type", "path": "1.xiom[1]"}]
+  },
+  {
+    "name": "SR-2se: XCMc-2se takes only one- and two-complex XMA2-s",
+    "chassis": "sr-2se",
+    "components": [{"slot": "A"}, {"slot": 1, "type": "xcmc-2se", "mda": [{"slot": 1, "type": "x2-s36-800g-qsfpdd-18.0t"}]}],
+    "issues": [{"code": "slot-type", "path": "1.mda[1]"}]
+  },
+  {
     "name": "Chassis without a model are not checked",
     "chassis": "vsr-i",
     "components": [{"slot": 99, "type": "iom5-e"}],

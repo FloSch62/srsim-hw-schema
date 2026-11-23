@@ -13,6 +13,7 @@ interface ModelPart {
   kind: string;
   slots?: ModelSlot[];
   occupies?: string[];
+  sfm?: string[];
   label?: string;
   description?: string;
 }
@@ -221,7 +222,17 @@ function cpmIssues(chassisId: string, chassis: ModelChassis, cpms: Item[], used:
 }
 
 /** Problems that make a component list impossible in hardware; [] for chassis without a model. */
-export function hardwareIssues(chassisId: string, components: unknown[]): HardwareIssue[] {
+function sfmIssues(all: Item[], sfm: string): HardwareIssue[] {
+  return all.flatMap((item) => {
+    const type = String(item.type ?? "");
+    const allowed = parts[type]?.sfm ?? [];
+    return sfm && allowed.length && !allowed.includes(sfm)
+      ? [{ code: "sfm", path: slotText(item.slot), message: `${type} works only with ${allowed.join(", ")}, not ${sfm}` }]
+      : [];
+  });
+}
+
+export function hardwareIssues(chassisId: string, components: unknown[], sfm = ""): HardwareIssue[] {
   const chassis = chassisModels[chassisId.trim().toLowerCase()];
   if (!chassis) return [];
   const all = items(components);
@@ -280,6 +291,7 @@ export function hardwareIssues(chassisId: string, components: unknown[]): Hardwa
   }
 
   issues.push(...cpmIssues(chassisId, chassis, cpms, used));
+  issues.push(...sfmIssues(all, sfm));
   for (const group of chassis.exclusive ?? []) {
     const mixed = group.filter((type) => lineTypes.has(type)).sort();
     if (mixed.length > 1) {

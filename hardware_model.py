@@ -34,6 +34,8 @@ class Part:
     slots: tuple[Slot, ...] = ()
     # Other slots of the parent that this part blocks (a dual-slot CMA).
     occupies: tuple[str, ...] = ()
+    # SFMs the part works with, when the chassis generation limits it (FP4 vs FP5 SR-s systems).
+    sfm: tuple[str, ...] = ()
     label: str = ""
     description: str = ""
 
@@ -76,12 +78,15 @@ class Model:
 # -- builders -------------------------------------------------------------------------
 
 
-def module_carrier(type_: str, kind: str, modules: int) -> Part:
-    """An XCM (or integrated card) with module slots, each holding one XMA or one IOM."""
+def module_carrier(
+    type_: str, kind: str, modules: int, types: tuple[str, ...] = (), sfm: tuple[str, ...] = ()
+) -> Part:
+    """An XCM (or integrated card) with module slots, each holding one XMA or one IOM of the given types."""
     return Part(
         type=type_,
         kind=kind,
-        slots=tuple(Slot(f"module-{n}", ("xma", "iom"), srsim=n) for n in range(1, modules + 1)),
+        slots=tuple(Slot(f"module-{n}", ("xma", "iom"), srsim=n, types=types) for n in range(1, modules + 1)),
+        sfm=sfm,
     )
 
 
@@ -168,30 +173,36 @@ def fixed_platform(model: Model, chassis_id: str, cpm: str, card: str, mda: str)
 
 
 def sr_s_family(model: Model) -> None:
-    for type_ in ("cpm-s", "cpm2-s", "cpm-2s", "cpm-2se"):
+    xma_s = ("s18-100gb-qsfp28", "s36-100gb-qsfp28", "s36-100gb-qsfp28-3.6t", "s36-400gb-qsfpdd")
+    iom_s = ("iom-s-1.5t", "iom-s-3.0t")
+    xma2_s_small = ("x2-s36-400g-qsfp112-3.0t", "x2-s36-800g-qsfpdd-6.0t")
+    xma2_s_large = ("x2-s36-800g-qsfpdd-12.0t", "x2-s36-800g-qsfpdd-18.0t")
+    xma2_s = (*xma2_s_small, *xma2_s_large)
+    iom2_se = ("iom2-se-3.0t", "iom2-se-6.0t")
+    # An SR-7s/14s runs as FP4 (S4 mode, SFM-s) or FP5 (S5 mode, SFM2-s); each XCM and CPM fits one
+    # of them. FP5 takes FP4 XMA-s and IOM-s in an XCM-s-b next to FP5 modules in an XCM2-s.
+    fp4, fp5 = ("sfm-s",), ("sfm2-s",)
+    model.add_part(Part("cpm-s", "cpm", sfm=fp4))
+    model.add_part(Part("cpm2-s", "cpm", sfm=fp5))
+    for type_ in ("cpm-2s", "cpm-2se"):
         model.add_part(Part(type_, "cpm"))
-    for type_ in ("xcm-7s", "xcm-7s-b", "xcm2-7s"):
-        model.add_part(module_carrier(type_, "xcm", 1))
-    for type_ in ("xcm-14s", "xcm-14s-b", "xcm2-14s"):
-        model.add_part(module_carrier(type_, "xcm", 2))
-    model.add_part(module_carrier("xcm-2s", "xcm", 1))
-    for type_ in ("xcm-2se", "xcmc-2se"):
-        model.add_part(module_carrier(type_, "xcm", 1))
-    for type_ in (
-        "s18-100gb-qsfp28",
-        "s36-100gb-qsfp28",
-        "s36-100gb-qsfp28-3.6t",
-        "s36-400gb-qsfpdd",
-        "x2-s36-800g-qsfpdd-12.0t",
-        "x2-s36-800g-qsfpdd-18.0t",
-    ):
+    for type_, modules in (("xcm-7s", 1), ("xcm-14s", 2)):
+        model.add_part(module_carrier(type_, "xcm", modules, (*xma_s, *iom_s), fp4))
+    for type_, modules in (("xcm-7s-b", 1), ("xcm-14s-b", 2)):
+        model.add_part(module_carrier(type_, "xcm", modules, (*xma_s, *iom_s), fp5))
+    for type_, modules in (("xcm2-7s", 1), ("xcm2-14s", 2)):
+        model.add_part(module_carrier(type_, "xcm", modules, (*xma2_s, *iom2_se), fp5))
+    model.add_part(module_carrier("xcm-2s", "xcm", 1, (*xma_s, *iom_s)))
+    model.add_part(module_carrier("xcm-2se", "xcm", 1, (*xma2_s, *iom2_se)))
+    model.add_part(module_carrier("xcmc-2se", "xcm", 1, (*xma2_s_small, *iom2_se)))
+    for type_ in (*xma_s, *xma2_s_large):
         model.add_part(Part(type_, "xma"))
     # One- and two-complex XMA2-s are provisioned as an XIOM whose single MDA is set automatically.
     model.add_part(mda_card("x2-s36-400g-qsfp112-3.0t", "iom", {1: "m36-400g-qsfp112"}))
     model.add_part(mda_card("x2-s36-800g-qsfpdd-6.0t", "iom", {1: "m36-800g-qsfpdd"}))
-    for type_ in ("iom-s-1.5t", "iom-s-3.0t"):
+    for type_ in iom_s:
         model.add_part(iom(type_, 2))
-    for type_ in ("iom2-se-3.0t", "iom2-se-6.0t"):
+    for type_ in iom2_se:
         model.add_part(iom(type_, 2))
 
     model.add_part(cma("cma-7s", "CMA-7s Single", "One CPM-s", "cpm-s", 1))
@@ -511,6 +522,8 @@ def model_json(model: Model) -> dict[str, Any]:
             data["slots"] = [_slot_json(slot) for slot in part.slots]
         if part.occupies:
             data["occupies"] = list(part.occupies)
+        if part.sfm:
+            data["sfm"] = list(part.sfm)
         if part.label:
             data["label"] = part.label
         if part.description:
@@ -676,7 +689,16 @@ def _cpm_issues(model: Model, chassis: Chassis, cpms: list[dict[str, Any]], used
     return [Issue("cpm-carrier", ",".join(_slot(c.get("slot")) for c in cpms), f"no CPM adapter fits these CPMs ({options})")]
 
 
-def hardware_issues(model: Model, chassis_id: str, components: list[Any]) -> list[Issue]:
+def _sfm_issues(model: Model, items: list[dict[str, Any]], sfm: str) -> list[Issue]:
+    issues = []
+    for item in items:
+        part = model.parts.get(str(item.get("type") or ""))
+        if sfm and part and part.sfm and sfm not in part.sfm:
+            issues.append(Issue("sfm", _slot(item.get("slot")), f"{part.type} works only with {', '.join(part.sfm)}, not {sfm}"))
+    return issues
+
+
+def hardware_issues(model: Model, chassis_id: str, components: list[Any], sfm: str = "") -> list[Issue]:
     """Problems that make a component list impossible in hardware; [] for unmodelled chassis."""
     chassis = model.chassis.get(chassis_id.strip().lower())
     if chassis is None:
@@ -732,6 +754,7 @@ def hardware_issues(model: Model, chassis_id: str, components: list[Any]) -> lis
         issues.extend(_chassis_mda_issues(chassis, part.type, card, slot_text))
 
     issues.extend(_cpm_issues(model, chassis, cpms, used))
+    issues.extend(_sfm_issues(model, items, sfm))
     for group in chassis.exclusive:
         mixed = sorted(line_types & set(group))
         if len(mixed) > 1:

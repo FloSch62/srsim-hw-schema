@@ -7,6 +7,8 @@ import srsim_hw_schema as srsim
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = hardware_model.build_model()
+# Appendix pairings that the hardware rules out: CPM2-s runs only in an FP5 (SFM2-s) system.
+APPENDIX_ERRORS = {("cpm2-s", "sfm-s")}
 
 
 def placeable_cpms(chassis: hardware_model.Chassis) -> set[str]:
@@ -30,7 +32,7 @@ class HardwareModelTest(unittest.TestCase):
     def test_shared_cases(self) -> None:
         for case in json.loads((ROOT / "tests/hardware-cases.json").read_text()):
             with self.subTest(case["name"]):
-                issues = hardware_model.hardware_issues(MODEL, case["chassis"], case["components"])
+                issues = hardware_model.hardware_issues(MODEL, case["chassis"], case["components"], case.get("sfm", ""))
                 self.assertEqual([{"code": i.code, "path": i.path} for i in issues], case["issues"])
 
     def test_every_appendix_part_maps_onto_the_model(self) -> None:
@@ -50,6 +52,9 @@ class HardwareModelTest(unittest.TestCase):
                         self.assertIn(slot.fixed, {*cpms, *cards}, slot.id)
                 for card, offered in compatibility.items():
                     part = MODEL.parts[card]
+                    if part.sfm:
+                        wrong = {sfm for sfm in offered["sfm"] if (card, sfm) in APPENDIX_ERRORS}
+                        self.assertLessEqual(set(offered["sfm"]) - wrong, set(part.sfm), f"{card}: SFM")
                     for module in offered["direct_mda"]:
                         self.assertTrue(placeable(part, module), f"{card}: {module}")
                     for xiom, mdas in offered["xiom_mda"].items():

@@ -438,7 +438,7 @@ function validateComponentListShape(params: {
   const { schema, nodeName, chassis, sfm, components } = params;
   const matrixEntry = buildMatrix(schema).find((entry) => entry.chassis === clabChassisToken(chassis));
   const mode = deploymentMode(matrixEntry);
-  const issues: ValidationIssue[] = hardwareIssues(clabChassisToken(chassis), components).map((issue) => {
+  const issues: ValidationIssue[] = hardwareIssues(clabChassisToken(chassis), components, sfm).map((issue) => {
     const [slot, ...rest] = issue.path.split(".");
     const path = slot ? [componentName(nodeName, slot), ...rest].join(".") : undefined;
     return { source: "hardware", ...(path ? { path } : {}), message: path ? issue.message : `${nodeName}: ${issue.message}` };

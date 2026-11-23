@@ -2188,7 +2188,10 @@
             "kind": "cpm"
         },
         "cpm-s": {
-            "kind": "cpm"
+            "kind": "cpm",
+            "sfm": [
+                "sfm-s"
+            ]
         },
         "cpm-sar-hm": {
             "kind": "cpm",
@@ -2297,7 +2300,10 @@
             "kind": "cpm"
         },
         "cpm2-s": {
-            "kind": "cpm"
+            "kind": "cpm",
+            "sfm": [
+                "sfm2-s"
+            ]
         },
         "cpm2-x20": {
             "kind": "cpm"
@@ -3051,6 +3057,9 @@
         },
         "xcm-14s": {
             "kind": "xcm",
+            "sfm": [
+                "sfm-s"
+            ],
             "slots": [
                 {
                     "accepts": [
@@ -3058,7 +3067,15 @@
                         "iom"
                     ],
                     "id": "module-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "s18-100gb-qsfp28",
+                        "s36-100gb-qsfp28",
+                        "s36-100gb-qsfp28-3.6t",
+                        "s36-400gb-qsfpdd",
+                        "iom-s-1.5t",
+                        "iom-s-3.0t"
+                    ]
                 },
                 {
                     "accepts": [
@@ -3066,12 +3083,23 @@
                         "iom"
                     ],
                     "id": "module-2",
-                    "srsim": 2
+                    "srsim": 2,
+                    "types": [
+                        "s18-100gb-qsfp28",
+                        "s36-100gb-qsfp28",
+                        "s36-100gb-qsfp28-3.6t",
+                        "s36-400gb-qsfpdd",
+                        "iom-s-1.5t",
+                        "iom-s-3.0t"
+                    ]
                 }
             ]
         },
         "xcm-14s-b": {
             "kind": "xcm",
+            "sfm": [
+                "sfm2-s"
+            ],
             "slots": [
                 {
                     "accepts": [
@@ -3079,7 +3107,15 @@
                         "iom"
                     ],
                     "id": "module-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "s18-100gb-qsfp28",
+                        "s36-100gb-qsfp28",
+                        "s36-100gb-qsfp28-3.6t",
+                        "s36-400gb-qsfpdd",
+                        "iom-s-1.5t",
+                        "iom-s-3.0t"
+                    ]
                 },
                 {
                     "accepts": [
@@ -3087,7 +3123,15 @@
                         "iom"
                     ],
                     "id": "module-2",
-                    "srsim": 2
+                    "srsim": 2,
+                    "types": [
+                        "s18-100gb-qsfp28",
+                        "s36-100gb-qsfp28",
+                        "s36-100gb-qsfp28-3.6t",
+                        "s36-400gb-qsfpdd",
+                        "iom-s-1.5t",
+                        "iom-s-3.0t"
+                    ]
                 }
             ]
         },
@@ -3100,7 +3144,15 @@
                         "iom"
                     ],
                     "id": "module-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "s18-100gb-qsfp28",
+                        "s36-100gb-qsfp28",
+                        "s36-100gb-qsfp28-3.6t",
+                        "s36-400gb-qsfpdd",
+                        "iom-s-1.5t",
+                        "iom-s-3.0t"
+                    ]
                 }
             ]
         },
@@ -3113,12 +3165,23 @@
                         "iom"
                     ],
                     "id": "module-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "x2-s36-400g-qsfp112-3.0t",
+                        "x2-s36-800g-qsfpdd-6.0t",
+                        "x2-s36-800g-qsfpdd-12.0t",
+                        "x2-s36-800g-qsfpdd-18.0t",
+                        "iom2-se-3.0t",
+                        "iom2-se-6.0t"
+                    ]
                 }
             ]
         },
         "xcm-7s": {
             "kind": "xcm",
+            "sfm": [
+                "sfm-s"
+            ],
             "slots": [
                 {
                     "accepts": [
@@ -3126,12 +3189,23 @@
                         "iom"
                     ],
                     "id": "module-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "s18-100gb-qsfp28",
+                        "s36-100gb-qsfp28",
+                        "s36-100gb-qsfp28-3.6t",
+                        "s36-400gb-qsfpdd",
+                        "iom-s-1.5t",
+                        "iom-s-3.0t"
+                    ]
                 }
             ]
         },
         "xcm-7s-b": {
             "kind": "xcm",
+            "sfm": [
+                "sfm2-s"
+            ],
             "slots": [
                 {
                     "accepts": [
@@ -3139,7 +3213,15 @@
                         "iom"
                     ],
                     "id": "module-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "s18-100gb-qsfp28",
+                        "s36-100gb-qsfp28",
+                        "s36-100gb-qsfp28-3.6t",
+                        "s36-400gb-qsfpdd",
+                        "iom-s-1.5t",
+                        "iom-s-3.0t"
+                    ]
                 }
             ]
         },
@@ -3164,6 +3246,9 @@
         },
         "xcm2-14s": {
             "kind": "xcm",
+            "sfm": [
+                "sfm2-s"
+            ],
             "slots": [
                 {
                     "accepts": [
@@ -3171,7 +3256,15 @@
                         "iom"
                     ],
                     "id": "module-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "x2-s36-400g-qsfp112-3.0t",
+                        "x2-s36-800g-qsfpdd-6.0t",
+                        "x2-s36-800g-qsfpdd-12.0t",
+                        "x2-s36-800g-qsfpdd-18.0t",
+                        "iom2-se-3.0t",
+                        "iom2-se-6.0t"
+                    ]
                 },
                 {
                     "accepts": [
@@ -3179,12 +3272,23 @@
                         "iom"
                     ],
                     "id": "module-2",
-                    "srsim": 2
+                    "srsim": 2,
+                    "types": [
+                        "x2-s36-400g-qsfp112-3.0t",
+                        "x2-s36-800g-qsfpdd-6.0t",
+                        "x2-s36-800g-qsfpdd-12.0t",
+                        "x2-s36-800g-qsfpdd-18.0t",
+                        "iom2-se-3.0t",
+                        "iom2-se-6.0t"
+                    ]
                 }
             ]
         },
         "xcm2-7s": {
             "kind": "xcm",
+            "sfm": [
+                "sfm2-s"
+            ],
             "slots": [
                 {
                     "accepts": [
@@ -3192,7 +3296,15 @@
                         "iom"
                     ],
                     "id": "module-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "x2-s36-400g-qsfp112-3.0t",
+                        "x2-s36-800g-qsfpdd-6.0t",
+                        "x2-s36-800g-qsfpdd-12.0t",
+                        "x2-s36-800g-qsfpdd-18.0t",
+                        "iom2-se-3.0t",
+                        "iom2-se-6.0t"
+                    ]
                 }
             ]
         },
@@ -3224,7 +3336,13 @@
                         "iom"
                     ],
                     "id": "module-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "x2-s36-400g-qsfp112-3.0t",
+                        "x2-s36-800g-qsfpdd-6.0t",
+                        "iom2-se-3.0t",
+                        "iom2-se-6.0t"
+                    ]
                 }
             ]
         }

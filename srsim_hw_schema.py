@@ -2178,7 +2178,7 @@ def validate_component_list_shape(
     mode = deployment_mode(chassis, matrix_entry)
     errors = [
         hardware_issue_text(node_name, issue)
-        for issue in hardware_model.hardware_issues(HARDWARE, clab_chassis_token(chassis), components)
+        for issue in hardware_model.hardware_issues(HARDWARE, clab_chassis_token(chassis), components, sfm)
     ]
 
     def slot_value(component: Any) -> str:

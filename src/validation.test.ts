@@ -26,7 +26,7 @@ const validConfig = {
   chassis: "sr-7s",
   sfm: "sfm-s",
   components: [
-    { slot: "A", type: "cpm2-s" },
+    { slot: "A", type: "cpm-s" },
     {
       slot: 1,
       type: "xcm-7s",
@@ -317,7 +317,7 @@ describe("topology validation", () => {
 
   it("accepts SFM at node level, the only place containerlab allows it", () => {
     const report = validateTopologyYaml(
-      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n        - slot: 2\n          type: xcm-7s\n          xiom:\n            - slot: 1\n              type: iom-s-3.0t\n              mda:\n                - slot: 1\n                  type: ms2-400gb-qsfpdd+2-100gb-qsfp28\n",
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n        - slot: 2\n          type: xcm-7s\n          xiom:\n            - slot: 1\n              type: iom-s-3.0t\n              mda:\n                - slot: 1\n                  type: ms2-400gb-qsfpdd+2-100gb-qsfp28\n",
       hardware
     );
 
@@ -372,7 +372,7 @@ describe("topology validation", () => {
 
   it("accepts an uppercase chassis type because containerlab lowercases it", () => {
     const report = validateTopologyYaml(
-      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: SR-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n",
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: SR-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n",
       hardware
     );
 
@@ -506,8 +506,8 @@ describe("XIOM and XCM slot limits", () => {
     return `          xiom:\n${slots.map((slot) => `            - slot: ${slot}\n              type: iom-s-3.0t\n              mda:\n${mdas}`).join("")}`;
   };
   const sr2s = (modules: string) => topology("sr-2s", "sfm-2s", "cpm-2s", "xcm-2s", modules);
-  const sr7s = (modules: string) => topology("sr-7s", "sfm-s", "cpm2-s", "xcm-7s", modules);
-  const sr14s = (modules: string) => topology("sr-14s", "sfm-s", "cpm2-s", "xcm-14s", modules);
+  const sr7s = (modules: string) => topology("sr-7s", "sfm-s", "cpm-s", "xcm-7s", modules);
+  const sr14s = (modules: string) => topology("sr-14s", "sfm-s", "cpm-s", "xcm-14s", modules);
 
   const expectValid = (yaml: string) => assert.deepEqual(validateTopologyYaml(yaml, hardware).issues, []);
   const expectRejected = (yaml: string, message: string) => {
@@ -551,7 +551,7 @@ describe("XIOM and XCM slot limits", () => {
 
   it("applies the XCM limits to every XCM generation and chassis type spelling", () => {
     expectRejected(topology("sr-7s", "sfm2-s", "cpm2-s", "xcm2-7s", direct(1) + xiom([1])), "not both");
-    expectRejected(topology("SR-7s", "sfm-s", "cpm2-s", "xcm-7s", direct(1) + xiom([1])), "not both");
+    expectRejected(topology("SR-7s", "sfm-s", "cpm-s", "xcm-7s", direct(1) + xiom([1])), "not both");
   });
 
   it("reports duplicate XIOM slots on chassis without a documented XCM slot count", () => {
