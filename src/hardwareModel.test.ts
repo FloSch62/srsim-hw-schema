@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
+  builtInMdas,
   cardSlots,
   chassisVariants,
   cpmCarriers,
@@ -11,6 +12,7 @@ import {
   hardwareIssues,
   integratedCard,
   iomMdaSlots,
+  isBuiltInComponent,
   lineCardSlots,
   mdaSlotsFor,
   moduleSlots,
@@ -78,6 +80,17 @@ test("SR-7s CPM adapters say which CPMs they hold and which slots they take", ()
   assert.equal(fittingCarrier("sr-7s", cpms)?.type, "cma-7s-d");
   assert.equal(fittingCarrier("sr-7s", [...cpms, { slot: 6, type: "xcm-7s" }]), undefined);
   assert.equal(fittingCarrier("sr-7s", [{ slot: "A", type: "cpm2-s" }])?.type, "cma2-7s");
+});
+
+test("built-in parts come from fixed slots", () => {
+  assert.equal(isBuiltInComponent("sr-1x-48d", "A"), true);
+  assert.equal(isBuiltInComponent("sr-1x-48d", 1), true);
+  assert.equal(isBuiltInComponent("sr-1s", "A"), true);
+  assert.equal(isBuiltInComponent("sr-7s", 1), false);
+  assert.equal(isBuiltInComponent("ixr-6", "A"), false);
+  assert.deepEqual(builtInMdas("i48-800g-qsfpdd-1x"), [{ slot: 1, type: "m48-800g-qsfpdd-1x" }]);
+  assert.deepEqual(builtInMdas("iom-ixr-r4"), [{ slot: 5, type: "m10-1g-sfp+2-10g-sfp+" }]);
+  assert.deepEqual(builtInMdas("iom4-e"), []);
 });
 
 test("products that SR-SIM runs as one chassis type are told apart by their parts", () => {

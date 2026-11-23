@@ -119,15 +119,24 @@ export function variantSlotType(chassis: string, slot: unknown, variant: Chassis
   return types?.find((type) => variant.parts.includes(type));
 }
 
+export function partKind(type: string | undefined): string {
+  return parts[type ?? ""]?.kind ?? "";
+}
+
+/** Whether the chassis has the component in this slot built in: a fixed slot, or a single-container chassis. */
+export function isBuiltInComponent(chassis: string, slot: unknown): boolean {
+  const model = chassisModels[chassis];
+  if (!model) return false;
+  if (model.integrated) return true;
+  const value = slotText(slot).toUpperCase();
+  return model.slots.some((candidate) => Boolean(candidate.fixed) && String(candidate.srsim).toUpperCase() === value);
+}
+
 /** The built-in MDAs of a card, by SR-SIM slot; [] when it has none or the model does not know it. */
 export function builtInMdas(cardType: string | undefined): Array<{ slot: number; type: string }> {
   return (parts[cardType ?? ""]?.slots ?? []).flatMap((slot) =>
     slot.fixed && typeof slot.srsim === "number" ? [{ slot: slot.srsim, type: slot.fixed }] : []
   );
-}
-
-export function partKind(type: string | undefined): string {
-  return parts[type ?? ""]?.kind ?? "";
 }
 
 /** Whether the card is an XCM, which holds XMAs or IOMs instead of plain MDAs. */

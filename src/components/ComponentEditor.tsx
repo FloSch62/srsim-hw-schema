@@ -76,7 +76,10 @@ import {
   builtInMdas,
   chassisVariants,
   cpmCarriers,
+  emptySlots,
   fittingCarrier,
+  integratedCard,
+  isBuiltInComponent,
   pinnedOptions,
   variantOf,
   variantSlotType
@@ -240,7 +243,9 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
 
   const nextDirectMdaFor = (component: SrsimComponent): SrsimMda | null => {
     const mdas = component.mda ?? [];
-    for (const type of directMdaOptions(selectedEntry, component, config.sfm)) {
+    // Built-in MDAs come with their card, so they are never added by hand.
+    const builtIn = builtInMdas(component.type || integratedCard(config.chassis)).map((mda) => mda.type);
+    for (const type of directMdaOptions(selectedEntry, component, config.sfm).filter((option) => !builtIn.includes(option))) {
       const slot = availableNumericSlotOptions(directMdaSlotsFor(component, type), mdas)[0];
       if (slot) return { slot, type };
     }
@@ -249,7 +254,8 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
 
   const nextXiomMdaFor = (component: SrsimComponent, xiom: SrsimXiom): SrsimMda | null => {
     const mdas = xiom.mda ?? [];
-    for (const type of xiomMdaOptions(selectedEntry, component, xiom, config.sfm)) {
+    const builtIn = builtInMdas(xiom.type).map((mda) => mda.type);
+    for (const type of xiomMdaOptions(selectedEntry, component, xiom, config.sfm).filter((option) => !builtIn.includes(option))) {
       const slot = availableNumericSlotOptions(xiomMdaSlotsFor(component, xiom, type), mdas)[0];
       if (slot) return { slot, type };
     }
@@ -303,6 +309,13 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
 
     const directOptions = directMdaOptions(selectedEntry, base, sfm);
     const directMdas = (component.mda ?? []).filter((mda) => mda.type && directOptions.includes(mda.type));
+    // A line card always carries its built-in MDAs, e.g. after switching IMMs.
+    // Single-container chassis are left alone: containerlab fills in their default MDA itself.
+    if (distributed && !isCpmSlot(component.slot)) {
+      for (const mda of builtInMdas(type)) {
+        if (!directMdas.some((existing) => Number(existing.slot) === mda.slot)) directMdas.push(mda);
+      }
+    }
     if (directMdas.length) next.mda = directMdas;
 
     const validXioms = (component.xiom ?? []).flatMap((xiom) => {
@@ -585,6 +598,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
 
         {!distributed ? (
           <IntegratedComponentSection
+            chassis={config.chassis}
             component={integratedComponent}
             mdaOptions={directMdaOptions(selectedEntry, integratedComponent, config.sfm)}
             mdaSlotOptions={directMdaSlotsFor(integratedComponent)}
@@ -699,6 +713,15 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 label="CPM"
                 component={component}
                 onRemove={() => removeComponent(index)}
+                removeBlockedReason={
+                  isBuiltInComponent(config.chassis, component.slot)
+                    ? "Built into the chassis"
+                    : selectedVariant?.parts.includes(component.type ?? "")
+                      ? `Built into the ${selectedVariant.name}`
+                      : cpms.length <= 1
+                      ? "At least one CPM is required"
+                      : undefined
+                }
               />
               <Box sx={{ display: "grid", gridTemplateColumns: "120px minmax(0, 1fr)", gap: 1.5, mt: 1.5 }}>
                 <SlotSelect
@@ -735,6 +758,13 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 label="Line card"
                 component={component}
                 onRemove={() => removeComponent(index)}
+                removeBlockedReason={
+                  isBuiltInComponent(config.chassis, component.slot)
+                    ? "Built into the chassis"
+                    : selectedVariant?.parts.includes(component.type ?? "")
+                      ? `Built into the ${selectedVariant.name}`
+                      : undefined
+                }
               />
               <Box sx={{ display: "grid", gridTemplateColumns: "120px minmax(0, 1fr)", gap: 1.5, mt: 1.5 }}>
                 <SlotSelect
@@ -765,6 +795,8 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 <NestedMdaSection
                   title="MDAs"
                   mdas={component.mda ?? []}
+                  builtIn={builtInMdas(component.type)}
+                  slotsWithoutMda={emptySlots(component.type)}
                   options={directMdaOptions(selectedEntry, component, config.sfm)}
                   slotOptions={directMdaSlotsFor(component)}
                   slotOptionsByMda={(component.mda ?? []).map((mda) => directMdaSlotsFor(component, mda.type))}
@@ -799,11 +831,14 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
 function ComponentHeader({
   label,
   component,
-  onRemove
+  onRemove,
+  removeBlockedReason
 }: {
   label: string;
   component: SrsimComponent;
   onRemove: () => void;
+  /** Why this component cannot be removed; the button is disabled when set. */
+  removeBlockedReason?: string;
 }) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
@@ -818,12 +853,21 @@ function ComponentHeader({
           </Typography>
         ) : null}
       </Stack>
-      <Tooltip title="Remove component">
-        <IconButton size="small" color="error" onClick={onRemove}>
+      <RemoveButton title="Remove component" blockedReason={removeBlockedReason} onClick={onRemove} />
+    </Box>
+  );
+}
+
+/** Delete button that stays visible but disabled, with the reason as tooltip, when removal is not allowed. */
+function RemoveButton({ title, blockedReason, onClick }: { title: string; blockedReason?: string; onClick: () => void }) {
+  return (
+    <Tooltip title={blockedReason ?? title}>
+      <Box component="span" sx={{ justifySelf: { xs: "end", sm: "auto" } }}>
+        <IconButton size="small" color="error" onClick={onClick} disabled={Boolean(blockedReason)} aria-label={title}>
           <DeleteOutlineIcon fontSize="small" />
         </IconButton>
-      </Tooltip>
-    </Box>
+      </Box>
+    </Tooltip>
   );
 }
 
@@ -1116,6 +1160,7 @@ function EdaPowerSection({
 }
 
 function IntegratedComponentSection({
+  chassis,
   component,
   mdaOptions: mdaTypeOptions,
   mdaSlotOptions,
@@ -1126,6 +1171,7 @@ function IntegratedComponentSection({
   onRemoveMda,
   modules
 }: {
+  chassis: string;
   component: SrsimComponent;
   mdaOptions: string[];
   mdaSlotOptions: number[];
@@ -1159,6 +1205,8 @@ function IntegratedComponentSection({
           <NestedMdaSection
             title="MDAs"
             mdas={component.mda ?? []}
+            builtIn={builtInMdas(component.type || integratedCard(chassis))}
+            slotsWithoutMda={emptySlots(component.type || integratedCard(chassis))}
             options={mdaTypeOptions}
             slotOptions={mdaSlotOptions}
             slotOptionsByMda={slotOptionsByMda}
@@ -1269,7 +1317,9 @@ function NestedMdaSection({
   addDisabled,
   onAdd,
   onUpdate,
-  onRemove
+  onRemove,
+  builtIn = [],
+  slotsWithoutMda = []
 }: {
   title: string;
   mdas: SrsimMda[];
@@ -1280,7 +1330,12 @@ function NestedMdaSection({
   onAdd: () => void;
   onUpdate: (index: number, updates: Partial<SrsimMda>) => void;
   onRemove: (index: number) => void;
+  /** The card's built-in MDAs; they keep their type and cannot be removed. */
+  builtIn?: Array<{ slot: number; type: string }>;
+  /** Slot numbers the card has but cannot fill; shown as locked rows so the numbering has no gaps. */
+  slotsWithoutMda?: number[];
 }) {
+  const isBuiltInMda = (mda: SrsimMda) => builtIn.some((fixed) => fixed.slot === Number(mda.slot) && fixed.type === mda.type);
   return (
     <Stack spacing={1} sx={{ mt: 1.5 }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
@@ -1289,36 +1344,53 @@ function NestedMdaSection({
           Add
         </Button>
       </Box>
-      {mdas.map((mda, index) => (
-        <Box
-          key={index}
-          sx={{
-            display: "grid",
-            gridTemplateColumns: nestedComponentGridColumns,
-            gap: 1,
-            alignItems: "center"
-          }}
-        >
-          <SlotSelect
-            label="Slot"
-            value={mda.slot}
-            options={slotOptionsByMda?.[index] ?? slotOptions}
-            onChange={(slot) => onUpdate(index, { slot })}
-          />
-          <FieldAutocomplete
-            label="Type"
-            value={mda.type ?? ""}
-            options={options}
-            groupBy={generationGroup}
-            groupOrder={generationGroupOrder}
-            onChange={(type) => onUpdate(index, { type })}
-            allowFreeText={false}
-          />
-          <IconButton size="small" color="error" onClick={() => onRemove(index)} sx={{ justifySelf: { xs: "end", sm: "auto" } }}>
-            <DeleteOutlineIcon fontSize="small" />
-          </IconButton>
-        </Box>
-      ))}
+      {[
+        ...mdas.map((mda, index) => ({ slot: Number(mda.slot), mda, index })),
+        ...slotsWithoutMda.map((slot) => ({ slot, mda: undefined, index: -1 }))
+      ]
+        .sort((a, b) => a.slot - b.slot)
+        .map(({ slot, mda, index }) => (
+          <Box
+            key={mda ? index : `empty-${slot}`}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: nestedComponentGridColumns,
+              gap: 1,
+              alignItems: "center"
+            }}
+          >
+            {mda ? (
+              <>
+                <SlotSelect
+                  label="Slot"
+                  value={mda.slot}
+                  options={isBuiltInMda(mda) ? [slot] : (slotOptionsByMda?.[index] ?? slotOptions)}
+                  onChange={(next) => onUpdate(index, { slot: next })}
+                />
+                <FieldAutocomplete
+                  label="Type"
+                  value={mda.type ?? ""}
+                  options={isBuiltInMda(mda) ? [mda.type ?? ""] : options.filter((option) => !builtIn.some((fixed) => fixed.type === option))}
+                  groupBy={generationGroup}
+                  groupOrder={generationGroupOrder}
+                  onChange={(type) => onUpdate(index, { type })}
+                  allowFreeText={false}
+                />
+                <RemoveButton
+                  title="Remove MDA"
+                  blockedReason={isBuiltInMda(mda) ? "Built into its card" : undefined}
+                  onClick={() => onRemove(index)}
+                />
+              </>
+            ) : (
+              <>
+                <SlotSelect label="Slot" value={slot} options={[slot]} onChange={() => undefined} />
+                <TextField size="small" label="Type" value="No MDA" disabled />
+                <RemoveButton title="Remove MDA" blockedReason="This slot takes no MDA" onClick={() => undefined} />
+              </>
+            )}
+          </Box>
+        ))}
     </Stack>
   );
 }
@@ -1383,9 +1455,11 @@ function XcmModuleSection({
         onChange={(type) => update(module, { type, mda: module.kind === "iom" ? [] : module.mda })}
         allowFreeText={false}
       />
-      <IconButton size="small" color="error" onClick={() => remove(module)} sx={{ justifySelf: { xs: "end", sm: "auto" } }}>
-        <DeleteOutlineIcon fontSize="small" />
-      </IconButton>
+      <RemoveButton
+        title={module.kind === "xma" ? "Remove XMA" : "Remove IOM"}
+        blockedReason={variant?.parts.includes(module.type) ? `Built into the ${variant.name}` : undefined}
+        onClick={() => remove(module)}
+      />
     </Box>
   );
 
@@ -1444,6 +1518,7 @@ function XcmModuleSection({
                 <NestedMdaSection
                   title="MDAs"
                   mdas={module.mda}
+                  builtIn={builtInMdas(iom.type)}
                   options={xiomMdaOptions(entry, component, iom, sfm)}
                   slotOptions={mdaSlotsFor(iom)}
                   slotOptionsByMda={module.mda.map((mda) => mdaSlotsFor(iom, mda.type))}
