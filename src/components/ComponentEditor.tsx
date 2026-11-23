@@ -72,12 +72,21 @@ import type {
   SrsimXiom
 } from "../types";
 
-import { cpmCarriers, fittingCarrier } from "../hardwareModel";
-import type { CpmCarrier } from "../hardwareModel";
+import {
+  builtInMdas,
+  chassisVariants,
+  cpmCarriers,
+  fittingCarrier,
+  pinnedOptions,
+  variantOf,
+  variantSlotType
+} from "../hardwareModel";
+import type { ChassisVariant, CpmCarrier } from "../hardwareModel";
 import { chassisGroup, chassisGroupOrder, generationGroup, generationGroupOrder, productHelp } from "../productNames";
 import {
   componentWithXcmModules,
   hasXcmModules,
+  variantModule,
   xcmIomOptions,
   xcmModuleSlotOptions,
   xcmModulesFromComponent,
@@ -100,6 +109,13 @@ interface IndexedComponent {
 }
 
 type SlotOption = string | number;
+
+/** A chassis dropdown entry: a chassis type, or one physical product of it. */
+interface ChassisChoice {
+  key: string;
+  chassis: string;
+  variant?: ChassisVariant;
+}
 const nestedComponentGridColumns = { xs: "1fr", sm: "120px minmax(0, 1fr) auto" } as const;
 const nestedSlotCount = 2;
 
@@ -129,13 +145,35 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   const selectedEntry = getEntry(matrix, config.chassis);
   const selectedDeploymentMode = deploymentMode(selectedEntry);
   const distributed = selectedDeploymentMode === "distributed";
-  const chassisOptions = useMemo(() => matrix.map((entry) => entry.chassis), [matrix]);
+  // One chassis entry per physical product: SR-SIM runs some products as one chassis type.
+  const chassisChoices = useMemo(
+    () =>
+      matrix.flatMap((entry): ChassisChoice[] => {
+        const variants = chassisVariants(entry.chassis);
+        return variants.length
+          ? variants.map((variant) => ({ key: `${entry.chassis}:${variant.name}`, chassis: entry.chassis, variant }))
+          : [{ key: entry.chassis, chassis: entry.chassis }];
+      }),
+    [matrix]
+  );
+  const chassisChoice = (key: string) => chassisChoices.find((choice) => choice.key === key);
   const chassisDeploymentLabels = useMemo(
     () => Object.fromEntries(matrix.map((entry) => [entry.chassis, deploymentModeLabel(deploymentMode(entry))])),
     [matrix]
   );
-  const sharedSfmOptions = sfmOptions(selectedEntry, []);
-  const defaultSfm = defaultSfmForEntry(selectedEntry);
+  const integratedComponent = config.components[0] ?? { mda: [] };
+  const variants = chassisVariants(config.chassis);
+  // The product is fixed hardware: once chosen it stays, even when its module is removed.
+  // Unchosen, it follows the installed parts, else it is the variant without limits, else the first.
+  const selectedVariant =
+    variants.find((variant) => variant.name === config.hardwareVariant) ??
+    variantOf(config.chassis, config.components) ??
+    variants.find((variant) => !variant.parts.length && !variant.sfm?.length) ??
+    variants[0];
+  const variantFitsSfm = (sfm: string) => !selectedVariant?.sfm?.length || selectedVariant.sfm.includes(sfm);
+  const sharedSfmOptions = sfmOptions(selectedEntry, []).filter(variantFitsSfm);
+  const entryDefaultSfm = defaultSfmForEntry(selectedEntry);
+  const defaultSfm = variantFitsSfm(entryDefaultSfm) ? entryDefaultSfm : "";
   const sfmAvailable = Boolean(defaultSfm || sharedSfmOptions.length);
 
   const indexed = config.components.map((component, index) => ({ component, index }));
@@ -162,7 +200,10 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   };
   const selectedCarrier = carrierFor(config.sfm);
   const carrierCpmOptions = (sfm: string, carrier = carrierFor(sfm)) =>
-    cpmOptions(selectedEntry, sfm).filter((type) => !carrier || carrier.cpmTypes.includes(type));
+    pinnedOptions(
+      selectedVariant,
+      cpmOptions(selectedEntry, sfm).filter((type) => !carrier || carrier.cpmTypes.includes(type))
+    );
 
   const cpmSlotOptions = selectedCarrier
     ? selectedCarrier.cpmSlots
@@ -176,7 +217,6 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   const usedCardSlots = new Set(cards.map(({ component }) => String(component.slot ?? "")));
   const availableCpmSlots = cpmSlotOptions.filter((slot) => !usedCpmSlots.has(String(slot).toUpperCase()));
   const availableCardSlots = cardSlotOptions.filter((slot) => !usedCardSlots.has(String(slot)));
-  const integratedComponent = config.components[0] ?? { mda: [] };
 
   const updateConfig = (updates: Partial<SrsimConfig>) => onChange({ ...config, ...updates });
 
@@ -208,14 +248,29 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     return null;
   };
 
-  const setChassis = (chassis: string) => {
+  const setChassis = (key: string) => {
+    const choice = chassisChoice(key);
+    if (!choice) return;
+    const { chassis, variant } = choice;
     const entry = getEntry(matrix, chassis);
-    const components = defaultComponentsForEntry(entry);
+    const entrySfm = defaultSfmForEntry(entry);
+    const components = defaultComponentsForEntry(entry).map((component) => {
+      if (!variant) return component;
+      const pinned = variantSlotType(chassis, component.slot, variant);
+      if (pinned && pinned !== component.type) {
+        // Only the default card's built-in MDA is implied; a pinned one is written out.
+        const mda = isCpmSlot(component.slot) ? [] : builtInMdas(pinned);
+        return { slot: component.slot, type: pinned, ...(mda.length ? { mda } : {}) };
+      }
+      const module = variantModule(variant);
+      return module && hasXcmModules(entry, component) ? componentWithXcmModules(entry, component, [module], entrySfm) : component;
+    });
     updateConfig({
       chassis,
       components,
-      sfm: defaultSfmForEntry(entry),
+      sfm: variant?.sfm?.length && !variant.sfm.includes(entrySfm) ? variant.sfm[0] : entrySfm,
       cma: undefined,
+      hardwareVariant: variant?.name,
       edaComponents: []
     });
   };
@@ -261,7 +316,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
       .map((component) => normalizeComponent(component, sfm, carrier))
       .filter((item) => item.mda?.length || item.xiom?.length || item.type);
 
-  const setComponents = (components: SrsimComponent[]) => {
+  const setComponents = (components: SrsimComponent[], extra: Partial<SrsimConfig> = {}) => {
     let nextSfm = config.sfm;
     let cleanComponents = normalizeComponents(components, nextSfm);
     const compatibleSfms = sfmOptions(selectedEntry, cleanComponents);
@@ -270,13 +325,14 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
       cleanComponents = normalizeComponents(components, nextSfm);
     }
     updateConfig({
+      ...extra,
       components: cleanComponents,
       sfm: nextSfm
     });
   };
 
-  const setIntegratedComponent = (component: SrsimComponent) => {
-    setComponents([withoutEmptyNested(component)].filter((item) => item.mda?.length || item.type));
+  const setIntegratedComponent = (component: SrsimComponent, extra: Partial<SrsimConfig> = {}) => {
+    setComponents([withoutEmptyNested(component)].filter((item) => item.mda?.length || item.type), extra);
   };
 
   const applyCarrier = (type: string) => {
@@ -290,13 +346,13 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     });
   };
 
-  const applySfm = (sfm: string) => {
+  const applySfm = (sfm: string, extra: Partial<SrsimConfig> = {}) => {
     const nextSfm = sfm || defaultSfm || sharedSfmOptions[0] || "";
     const components = normalizeComponents(config.components, nextSfm).map((after) => {
       const before = config.components.find((component) => String(component.slot) === String(after.slot));
       return before ? withReplacedModules(selectedEntry, before, after, nextSfm) : after;
     });
-    updateConfig({ sfm: nextSfm, components });
+    updateConfig({ sfm: nextSfm, components, ...extra });
   };
 
   const updateComponent = (index: number, updates: Partial<SrsimComponent>) => {
@@ -327,6 +383,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
       components,
       sfm: defaultSfm,
       cma: undefined,
+      hardwareVariant: undefined,
       edaComponents: []
     });
   };
@@ -465,15 +522,24 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
 
         <FieldAutocomplete
           label="Chassis type"
-          value={config.chassis}
-          options={chassisOptions}
-          groupBy={chassisGroup}
+          value={selectedVariant ? `${config.chassis}:${selectedVariant.name}` : config.chassis}
+          options={chassisChoices.map((choice) => choice.key)}
+          optionLabels={Object.fromEntries(
+            chassisChoices.flatMap((choice) =>
+              choice.variant ? [[choice.key, choice.variant.name]] : []
+            )
+          )}
+          optionDescription={(key) => {
+            const choice = chassisChoice(key);
+            return choice?.variant ? choice.variant.description : productHelp(choice?.chassis ?? key);
+          }}
+          groupBy={(key) => chassisGroup(chassisChoice(key)?.chassis ?? key)}
           groupOrder={chassisGroupOrder}
-          optionAdornment={(chassis) => (
+          optionAdornment={(key) => (
             <Chip
               size="small"
               variant="outlined"
-              label={chassisDeploymentLabels[chassis] ?? deploymentModeLabel(selectedDeploymentMode)}
+              label={chassisDeploymentLabels[chassisChoice(key)?.chassis ?? key] ?? deploymentModeLabel(selectedDeploymentMode)}
               sx={{ flex: "0 0 auto", pointerEvents: "none" }}
             />
           )}
@@ -532,6 +598,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                   onChange={(modules) =>
                     setIntegratedComponent(componentWithXcmModules(selectedEntry, integratedComponent, modules, config.sfm))
                   }
+                  variant={selectedVariant}
                 />
               ) : undefined
             }
@@ -669,7 +736,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 <FieldAutocomplete
                   label="Type"
                   value={component.type ?? ""}
-                  options={componentTypeOptions(selectedEntry, { slot: component.slot }, config.sfm)}
+                  options={pinnedOptions(selectedVariant, componentTypeOptions(selectedEntry, { slot: component.slot }, config.sfm))}
                   onChange={(type) => updateComponent(index, { type })}
                   allowFreeText={false}
                 />
@@ -1253,7 +1320,8 @@ function XcmModuleSection({
   sfm,
   mdaSlotsFor,
   nextMdaFor,
-  onChange
+  onChange,
+  variant
 }: {
   entry: MatrixEntry | undefined;
   component: SrsimComponent;
@@ -1261,12 +1329,14 @@ function XcmModuleSection({
   mdaSlotsFor: (iom: SrsimXiom, mdaType?: string) => number[];
   nextMdaFor: (iom: SrsimXiom) => SrsimMda | null;
   onChange: (modules: XcmModule[]) => void;
+  /** Selected hardware variant; limits the modules to what that variant installs. */
+  variant?: ChassisVariant;
 }) {
   const modules = xcmModulesFromComponent(component);
   const slots = xcmModuleSlotOptions(entry, component);
   const optionsByKind: Record<XcmModuleKind, string[]> = {
-    xma: xcmXmaOptions(entry, component, sfm),
-    iom: xcmIomOptions(entry, component, sfm)
+    xma: xcmXmaOptions(entry, component, sfm).filter((type) => !variant?.parts.length || variant.parts.includes(type)),
+    iom: xcmIomOptions(entry, component, sfm).filter((type) => !variant?.parts.length || variant.parts.includes(type))
   };
   const freeSlots = (own?: number) => slots.filter((slot) => slot === own || !modules.some((module) => module.slot === slot));
   const update = (target: XcmModule, updates: Partial<XcmModule>) =>
@@ -1337,17 +1407,21 @@ function XcmModuleSection({
   return (
     <>
       <FormHelperText sx={{ mt: 1.5 }}>
-        {optionsByKind.iom.length
+        {optionsByKind.xma.length && optionsByKind.iom.length
           ? `${slotText} either an XMA or an IOM with MDAs.`
-          : `${slotText} an XMA.`}
+          : optionsByKind.iom.length
+            ? `${slotText} an IOM with MDAs.`
+            : `${slotText} an XMA.`}
       </FormHelperText>
 
-      <Stack spacing={1} sx={{ mt: 1.5 }}>
-        {header("xma", "XMA", "Add XMA")}
-        {modules.filter((module) => module.kind === "xma").map((module) => (
-          <Box key={module.slot}>{moduleRow(module)}</Box>
-        ))}
-      </Stack>
+      {optionsByKind.xma.length ? (
+        <Stack spacing={1} sx={{ mt: 1.5 }}>
+          {header("xma", "XMA", "Add XMA")}
+          {modules.filter((module) => module.kind === "xma").map((module) => (
+            <Box key={module.slot}>{moduleRow(module)}</Box>
+          ))}
+        </Stack>
+      ) : null}
 
       {optionsByKind.iom.length ? (
         <Stack spacing={1} sx={{ mt: 1.5 }}>

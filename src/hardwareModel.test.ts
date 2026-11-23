@@ -4,6 +4,7 @@ import test from "node:test";
 
 import {
   cardSlots,
+  chassisVariants,
   cpmCarriers,
   cpmSlots,
   fittingCarrier,
@@ -12,7 +13,10 @@ import {
   iomMdaSlots,
   lineCardSlots,
   mdaSlotsFor,
-  moduleSlots
+  moduleSlots,
+  pinnedOptions,
+  variantOf,
+  variantSlotType
 } from "./hardwareModel";
 
 interface HardwareCase {
@@ -74,4 +78,20 @@ test("SR-7s CPM adapters say which CPMs they hold and which slots they take", ()
   assert.equal(fittingCarrier("sr-7s", cpms)?.type, "cma-7s-d");
   assert.equal(fittingCarrier("sr-7s", [...cpms, { slot: 6, type: "xcm-7s" }]), undefined);
   assert.equal(fittingCarrier("sr-7s", [{ slot: "A", type: "cpm2-s" }])?.type, "cma2-7s");
+});
+
+test("products that SR-SIM runs as one chassis type are told apart by their parts", () => {
+  const name = (chassis: string, components: unknown[]) => variantOf(chassis, components)?.name;
+  assert.deepEqual(chassisVariants("sr-1s").map((variant) => variant.name), ["SR-1s Fixed 2.4T", "SR-1s Fixed 4.8T", "SR-1s Modular 3.0T"]);
+  assert.equal(name("sr-1s", [{ slot: "A", mda: [{ slot: 1, type: "s36-100gb-qsfp28-3.6t" }] }]), "SR-1s Fixed 4.8T");
+  assert.equal(name("sr-1s", [{ slot: "A", xiom: [{ slot: 1, type: "iom-s-3.0t" }] }]), "SR-1s Modular 3.0T");
+  assert.equal(name("ixr-x", [{ slot: "A", type: "cpm-ixr-x" }, { slot: 1, type: "imm32-qsfp28+4-qsfpdd" }]), "IXR-X1");
+  assert.equal(name("ixr-e", [{ slot: "A", type: "cpm-ixr-e-gnss" }, { slot: 1, type: "imm14-10g-sfp++4-1g-tx" }]), "IXR-e Small GNSS");
+  assert.equal(name("ixr-e", [{ slot: 1, type: "imm14-10g-sfp++4-1g-tx" }]), "IXR-e Small");
+  assert.equal(name("sr-12", [{ slot: "A", type: "cpm5" }]), undefined);
+  const [big] = chassisVariants("ixr-e");
+  assert.equal(variantSlotType("ixr-e", "A", big), "cpm-ixr-e");
+  assert.equal(variantSlotType("ixr-e", 1, big), "imm24-sfp++8-sfp28+2-qsfp28");
+  assert.deepEqual(pinnedOptions(big, ["cpm-ixr-e", "cpm-ixr-e-gnss"]), ["cpm-ixr-e"]);
+  assert.deepEqual(pinnedOptions(big, ["cpm5"]), ["cpm5"]);
 });

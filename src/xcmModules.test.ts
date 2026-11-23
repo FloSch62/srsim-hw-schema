@@ -3,10 +3,12 @@ import { describe, it } from "node:test";
 
 import hardwareData from "../srsim-supported-hardware.json";
 import { buildMatrix, getEntry } from "./matrix";
+import { chassisVariants } from "./hardwareModel";
 import type { HardwareSchema } from "./types";
 import {
   componentWithXcmModules,
   hasXcmModules,
+  variantModule,
   xcmIomOptions,
   xcmModuleSlotOptions,
   xcmModulesFromComponent,
@@ -85,6 +87,13 @@ describe("XCM modules", () => {
       { slot: 2, kind: "xma" as const, type: "x2-s36-800g-qsfpdd-18.0t", mda: [] }
     ];
     assert.deepEqual(xcmModulesFromComponent(componentWithXcmModules(sr14s, card, modules, "sfm2-s")), modules);
+  });
+
+  it("starts a product with the module it pins", () => {
+    const [twoComplex, , modular] = chassisVariants("sr-1s");
+    assert.deepEqual(variantModule(twoComplex), { slot: 1, kind: "xma", type: "s36-100gb-qsfp28", mda: [] });
+    assert.deepEqual(variantModule(modular), { slot: 1, kind: "iom", type: "iom-s-3.0t", mda: [] });
+    assert.equal(variantModule(chassisVariants("ixr-x")[0]), undefined);
   });
 
   it("numbers module slots from the XCM", () => {

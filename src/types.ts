@@ -56,6 +56,11 @@ export interface SrsimConfig {
   components: SrsimComponent[];
   /** Chosen CPM adapter (CMA); editor state only, SR-SIM has no CMA. Unset: derived from the CPMs. */
   cma?: string;
+  /**
+   * Chosen physical chassis variant (editor state only, never written to YAML). Unset means
+   * "read it from the installed module", e.g. after a chassis change or a reset.
+   */
+  hardwareVariant?: string;
   edaNamespace: string;
   edaNodeProfile: string;
   edaVersion: string;

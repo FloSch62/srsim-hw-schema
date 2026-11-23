@@ -3,8 +3,9 @@
 // and four/six-complex XMA2-s as `card > mda`, but one/two-complex XMA2-s as
 // `card > xiom > mda` with an automatic virtual MDA. These helpers hide that split:
 // the editor works with modules, the YAML keeps the SR OS hierarchy.
-import { cardSlots, integratedCard, isXcm, isXiomXma, moduleSlots } from "./hardwareModel";
+import { cardSlots, integratedCard, iomMdaSlots, isXcm, isXiomXma, moduleSlots, partKind } from "./hardwareModel";
 import { directMdaOptions, xiomMdaOptions, xiomOptions } from "./matrix";
+import type { ChassisVariant } from "./hardwareModel";
 import type { MatrixEntry, SrsimComponent, SrsimMda } from "./types";
 
 export type XcmModuleKind = "xma" | "iom";
@@ -42,6 +43,14 @@ export function xcmXmaOptions(entry: MatrixEntry | undefined, component: SrsimCo
 /** IOMs the card accepts; XMAs provisioned as XIOM are not IOMs. */
 export function xcmIomOptions(entry: MatrixEntry | undefined, component: SrsimComponent, sfm: string): string[] {
   return xiomOptions(entry, cardOnly(component), sfm).filter((type) => !isXiomXma(type));
+}
+
+/** The module a newly selected variant starts with; undefined when the variant fixes no module. */
+export function variantModule(variant: ChassisVariant): XcmModule | undefined {
+  const type = variant.parts.find((part) => ["xma", "iom"].includes(partKind(part)));
+  if (!type) return undefined;
+  const kind = iomMdaSlots(type).length && !isXiomXma(type) ? "iom" : "xma";
+  return { slot: 1, kind, type, mda: [] };
 }
 
 export function xcmModuleSlotOptions(entry: MatrixEntry | undefined, component: SrsimComponent): number[] {

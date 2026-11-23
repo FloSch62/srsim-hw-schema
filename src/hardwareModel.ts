@@ -27,10 +27,21 @@ interface ModelPart {
   products?: CardProduct[];
 }
 
+/** A physical product that SR-SIM runs as one chassis type, e.g. the IXR-X1 and IXR-Xs as ixr-x. */
+export interface ChassisVariant {
+  name: string;
+  description: string;
+  /** The CPM, line card or module types it pins wherever the chassis offers a choice. */
+  parts: string[];
+  /** SFMs the variant runs with; absent when any fits. */
+  sfm?: string[];
+}
+
 interface ModelChassis {
   slots: ModelSlot[];
   exclusive?: string[][];
   integrated?: string;
+  variants?: ChassisVariant[];
   /** MDA types a card takes in this chassis, where the chassis has its own physical versions of its MDAs. */
   card_mdas?: Record<string, string[]>;
 }
@@ -74,6 +85,49 @@ export function integratedCard(chassis: string | undefined): string {
 export function moduleSlots(cardType: string | undefined): number[] {
   const slots = parts[cardType ?? ""]?.slots ?? [];
   return slots.some((slot) => slot.accepts.includes("iom")) ? slots.map((slot) => Number(slot.srsim)) : [];
+}
+
+export function chassisVariants(chassis: string): ChassisVariant[] {
+  return chassisModels[chassis]?.variants ?? [];
+}
+
+const nestedTypes = (item: Item): string[] => [
+  slotText(item.type),
+  ...items(item.mda).flatMap(nestedTypes),
+  ...items(item.xiom).flatMap(nestedTypes)
+];
+
+/** The first variant whose parts cover every pinned type in the components; undefined when none is pinned. */
+export function variantOf(chassis: string, components: unknown[]): ChassisVariant | undefined {
+  const variants = chassisVariants(chassis);
+  const pinned = new Set(variants.flatMap((variant) => variant.parts));
+  const installed = items(components).flatMap(nestedTypes).filter((type) => pinned.has(type));
+  if (!installed.length) return undefined;
+  return variants.find((variant) => installed.every((type) => variant.parts.includes(type)));
+}
+
+/** The options the variant pins, or all options when it pins none of them. */
+export function pinnedOptions(variant: ChassisVariant | undefined, options: string[]): string[] {
+  const pinned = options.filter((option) => variant?.parts.includes(option));
+  return pinned.length ? pinned : options;
+}
+
+/** The type a chassis slot holds in this variant, when the variant pins one of the slot's types. */
+export function variantSlotType(chassis: string, slot: unknown, variant: ChassisVariant): string | undefined {
+  const value = slotText(slot).toUpperCase();
+  const types = chassisModels[chassis]?.slots.find((candidate) => String(candidate.srsim).toUpperCase() === value)?.types;
+  return types?.find((type) => variant.parts.includes(type));
+}
+
+/** The built-in MDAs of a card, by SR-SIM slot; [] when it has none or the model does not know it. */
+export function builtInMdas(cardType: string | undefined): Array<{ slot: number; type: string }> {
+  return (parts[cardType ?? ""]?.slots ?? []).flatMap((slot) =>
+    slot.fixed && typeof slot.srsim === "number" ? [{ slot: slot.srsim, type: slot.fixed }] : []
+  );
+}
+
+export function partKind(type: string | undefined): string {
+  return parts[type ?? ""]?.kind ?? "";
 }
 
 /** Whether the card is an XCM, which holds XMAs or IOMs instead of plain MDAs. */
