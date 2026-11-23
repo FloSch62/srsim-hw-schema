@@ -105,7 +105,10 @@ describe("SR-SIM matrix helpers", () => {
       ),
       false
     );
-    assert.equal(componentCompatibleWithSfm(entry, { slot: "A", type: "cpm2-s" }, "sfm-s"), true);
+    // The appendix lists cpm2-s with sfm-s; the hardware model rules it out.
+    assert.equal(componentCompatibleWithSfm(entry, { slot: "A", type: "cpm2-s" }, "sfm-s"), false);
+    assert.deepEqual(cpmOptions(entry, "sfm-s"), ["cpm-s"]);
+    assert.deepEqual(sfmOptions(entry, [{ slot: "A", type: "cpm2-s" }]), ["sfm2-s"]);
   });
 
   it("models integrated chassis as direct MDA systems, not line-card systems", () => {

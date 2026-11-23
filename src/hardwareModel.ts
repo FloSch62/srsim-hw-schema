@@ -102,6 +102,12 @@ export function mdaSlotsFor(cardType: string | undefined, mdaType: string): numb
   );
 }
 
+/** Whether the part runs in a system with this SFM; parts without an SFM rule run with any. */
+export function fitsSfm(type: string | undefined, sfm: string): boolean {
+  const allowed = parts[type ?? ""]?.sfm ?? [];
+  return !sfm || !allowed.length || allowed.includes(sfm);
+}
+
 /** MDA slots of an IOM; [] when the model does not know the IOM. */
 export function iomMdaSlots(iomType: string | undefined): number[] {
   const part = parts[iomType ?? ""];
@@ -267,10 +273,9 @@ function cpmIssues(chassisId: string, chassis: ModelChassis, cpms: Item[], used:
 function sfmIssues(all: Item[], sfm: string): HardwareIssue[] {
   return all.flatMap((item) => {
     const type = String(item.type ?? "");
-    const allowed = parts[type]?.sfm ?? [];
-    return sfm && allowed.length && !allowed.includes(sfm)
-      ? [{ code: "sfm", path: slotText(item.slot), message: `${type} works only with ${allowed.join(", ")}, not ${sfm}` }]
-      : [];
+    return fitsSfm(type, sfm)
+      ? []
+      : [{ code: "sfm", path: slotText(item.slot), message: `${type} works only with ${parts[type].sfm?.join(", ")}, not ${sfm}` }];
   });
 }
 

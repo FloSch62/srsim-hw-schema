@@ -1,4 +1,4 @@
-import { cardSlots, cpmSlots, integratedCard, lineCardSlots, mdaSlotsFor, moduleSlots } from "./hardwareModel";
+import { cardSlots, cpmSlots, fitsSfm, integratedCard, lineCardSlots, mdaSlotsFor, moduleSlots } from "./hardwareModel";
 import type {
   HardwareModelEntry,
   HardwareSchema,
@@ -391,7 +391,7 @@ export function cpmOptions(entry: MatrixEntry | undefined, sfm: string): string[
     if (sfm && (row.values.sfm ?? []).length && !row.values.sfm.includes(sfm)) continue;
     values.push(...rowCpmCards(row, entry));
   }
-  return uniqueSorted(values);
+  return uniqueSorted(values).filter((type) => fitsSfm(type, sfm));
 }
 
 export function componentTypeOptions(entry: MatrixEntry | undefined, component: SrsimComponent, sfm: string): string[] {
@@ -414,7 +414,7 @@ export function sfmOptions(entry: MatrixEntry | undefined, components: SrsimComp
       (entry?.rows ?? [])
         .filter((row) => rowMatchesComponent(row, entry, component, "", "sfm"))
         .flatMap((row) => row.values.sfm ?? [])
-    );
+    ).filter((value) => fitsSfm(component.type, value));
     if (!values.length) continue;
     intersection = intersection === null ? values : intersection.filter((value) => values.includes(value));
   }
@@ -816,7 +816,7 @@ export function matchingRowsForSummary(entry: MatrixEntry | undefined, component
 
 export function componentCompatibleWithSfm(entry: MatrixEntry | undefined, component: SrsimComponent, sfm: string): boolean {
   if (!component.type || !sfm) return true;
-  return (entry?.rows ?? []).some((row) => rowMatchesComponent(row, entry, component, sfm));
+  return fitsSfm(component.type, sfm) && (entry?.rows ?? []).some((row) => rowMatchesComponent(row, entry, component, sfm));
 }
 
 type DefaultField = "sfm" | "xiom" | "mda";
