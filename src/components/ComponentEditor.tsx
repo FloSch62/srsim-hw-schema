@@ -41,7 +41,6 @@ import {
   componentTypeOptions,
   cpmOptions,
   defaultComponentsForEntry,
-  defaultImpliesFields,
   defaultSfmForEntry,
   directMdaSlotOptions,
   directMdaOptions,
@@ -477,12 +476,12 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
             notched={sfmAvailable ? undefined : true}
             displayEmpty={!sfmAvailable}
             value={sfmAvailable ? config.sfm || defaultSfm : ""}
-            renderValue={(sfm) => (!sfmAvailable ? "N/A" : sfm === defaultSfm ? `Default (${sfm})` : sfm)}
+            renderValue={(sfm) => (sfmAvailable ? sfm : "N/A")}
             onChange={(event) => applySfm(event.target.value)}
           >
             {defaultSfm ? (
               <MenuItem value={defaultSfm}>
-                <OptionText label={`Default (${defaultSfm})`} description={productHelp(defaultSfm)} />
+                <OptionText label={defaultSfm} description={productHelp(defaultSfm)} />
               </MenuItem>
             ) : null}
             {sharedSfmOptions
@@ -503,14 +502,6 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
             mdaSlotOptions={directMdaSlotsFor(integratedComponent)}
             slotOptionsByMda={(integratedComponent.mda ?? []).map((mda) => directMdaSlotsFor(integratedComponent, mda.type))}
             addMdaDisabled={!nextDirectMdaFor(integratedComponent)}
-            mdaDefaultSlots={(integratedComponent.mda ?? []).map((mda) =>
-              defaultImpliesFields(selectedEntry, { ...integratedComponent, mda: [mda] }, config.sfm, ["mda"]) ? [mda.slot ?? 1] : []
-            )}
-            mdaDefaultTypes={(integratedComponent.mda ?? []).map((mda) =>
-              directMdaOptions(selectedEntry, integratedComponent, config.sfm).filter((type) =>
-                defaultImpliesFields(selectedEntry, { ...integratedComponent, mda: [{ ...mda, type }] }, config.sfm, ["mda"])
-              )
-            )}
             onAddMda={addIntegratedMda}
             onUpdateMda={updateIntegratedMda}
             onRemoveMda={removeIntegratedMda}
@@ -609,18 +600,12 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                   label="Slot"
                   value={component.slot}
                   options={cpmSlotOptions}
-                  defaultOptions={cpmSlotOptions.filter((slot) =>
-                    defaultImpliesFields(selectedEntry, { ...component, slot }, config.sfm, [])
-                  )}
                   onChange={(slot) => updateComponent(index, { slot })}
                 />
                 <FieldAutocomplete
                   label="Type"
                   value={component.type ?? ""}
                   options={carrierCpmOptions(config.sfm)}
-                  defaultOptions={carrierCpmOptions(config.sfm).filter((type) =>
-                    defaultImpliesFields(selectedEntry, { ...component, type }, config.sfm, [])
-                  )}
                   onChange={(type) => updateComponent(index, { type })}
                   allowFreeText={false}
                 />
@@ -649,18 +634,12 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                   label="Slot"
                   value={component.slot}
                   options={cardSlotOptions}
-                  defaultOptions={cardSlotOptions.filter((slot) =>
-                    defaultImpliesFields(selectedEntry, { ...component, slot }, config.sfm, [])
-                  )}
                   onChange={(slot) => updateComponent(index, { slot })}
                 />
                 <FieldAutocomplete
                   label="Type"
                   value={component.type ?? ""}
                   options={componentTypeOptions(selectedEntry, { slot: component.slot }, config.sfm)}
-                  defaultOptions={componentTypeOptions(selectedEntry, { slot: component.slot }, config.sfm).filter((type) =>
-                    defaultImpliesFields(selectedEntry, { ...component, type }, config.sfm, [])
-                  )}
                   onChange={(type) => updateComponent(index, { type })}
                   allowFreeText={false}
                 />
@@ -683,14 +662,6 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                   slotOptions={directMdaSlotsFor(component)}
                   slotOptionsByMda={(component.mda ?? []).map((mda) => directMdaSlotsFor(component, mda.type))}
                   addDisabled={!nextDirectMdaFor(component)}
-                  defaultSlots={(component.mda ?? []).map((mda) =>
-                    defaultImpliesFields(selectedEntry, { ...component, mda: [mda] }, config.sfm, ["mda"]) ? [mda.slot ?? 1] : []
-                  )}
-                  defaultTypes={(component.mda ?? []).map((mda) =>
-                    directMdaOptions(selectedEntry, component, config.sfm).filter((type) =>
-                      defaultImpliesFields(selectedEntry, { ...component, mda: [{ ...mda, type }] }, config.sfm, ["mda"])
-                    )
-                  )}
                   onAdd={() => addMda(index)}
                   onUpdate={(mdaIndex, updates) => updateMda(index, mdaIndex, updates)}
                   onRemove={(mdaIndex) => removeMda(index, mdaIndex)}
@@ -1043,8 +1014,6 @@ function IntegratedComponentSection({
   mdaSlotOptions,
   slotOptionsByMda,
   addMdaDisabled,
-  mdaDefaultSlots,
-  mdaDefaultTypes,
   onAddMda,
   onUpdateMda,
   onRemoveMda
@@ -1054,8 +1023,6 @@ function IntegratedComponentSection({
   mdaSlotOptions: number[];
   slotOptionsByMda?: number[][];
   addMdaDisabled?: boolean;
-  mdaDefaultSlots?: SlotOption[][];
-  mdaDefaultTypes?: string[][];
   onAddMda: () => void;
   onUpdateMda: (index: number, updates: Partial<SrsimMda>) => void;
   onRemoveMda: (index: number) => void;
@@ -1085,8 +1052,6 @@ function IntegratedComponentSection({
           slotOptions={mdaSlotOptions}
           slotOptionsByMda={slotOptionsByMda}
           addDisabled={addMdaDisabled}
-          defaultSlots={mdaDefaultSlots}
-          defaultTypes={mdaDefaultTypes}
           onAdd={onAddMda}
           onUpdate={onUpdateMda}
           onRemove={onRemoveMda}
@@ -1156,22 +1121,14 @@ function SlotSelect({
   label,
   value,
   options,
-  defaultOptions = [],
   onChange
 }: {
   label: string;
   value?: SlotOption;
   options: SlotOption[];
-  defaultOptions?: SlotOption[];
   onChange: (slot: SlotOption) => void;
 }) {
   const visibleOptions = withCurrentSlotOption(options, value);
-  const defaultSet = new Set(defaultOptions.map((option) => String(option)));
-  const optionLabel = (option: SlotOption) => defaultSet.has(String(option)) ? `${String(option)} (default)` : String(option);
-  const selectedLabel = (selected: unknown) => {
-    const text = String(selected);
-    return defaultSet.has(text) ? `${text} default` : text;
-  };
 
   return (
     <FormControl size="small" fullWidth>
@@ -1179,12 +1136,11 @@ function SlotSelect({
       <Select
         label={label}
         value={value === undefined || value === "" ? "" : String(value)}
-        renderValue={selectedLabel}
         onChange={(event: SelectChangeEvent) => onChange(slotFromSelectValue(event.target.value, visibleOptions))}
       >
         {visibleOptions.map((option) => (
           <MenuItem key={String(option)} value={String(option)}>
-            {optionLabel(option)}
+            {String(option)}
           </MenuItem>
         ))}
       </Select>
@@ -1199,8 +1155,6 @@ function NestedMdaSection({
   slotOptions,
   slotOptionsByMda,
   addDisabled,
-  defaultSlots,
-  defaultTypes,
   onAdd,
   onUpdate,
   onRemove
@@ -1211,8 +1165,6 @@ function NestedMdaSection({
   slotOptions: number[];
   slotOptionsByMda?: number[][];
   addDisabled?: boolean;
-  defaultSlots?: SlotOption[][];
-  defaultTypes?: string[][];
   onAdd: () => void;
   onUpdate: (index: number, updates: Partial<SrsimMda>) => void;
   onRemove: (index: number) => void;
@@ -1239,7 +1191,6 @@ function NestedMdaSection({
             label="Slot"
             value={mda.slot}
             options={slotOptionsByMda?.[index] ?? slotOptions}
-            defaultOptions={defaultSlots?.[index] ?? []}
             onChange={(slot) => onUpdate(index, { slot })}
           />
           <FieldAutocomplete
@@ -1248,7 +1199,6 @@ function NestedMdaSection({
             options={options}
             groupBy={generationGroup}
             groupOrder={generationGroupOrder}
-            defaultOptions={defaultTypes?.[index] ?? []}
             onChange={(type) => onUpdate(index, { type })}
             allowFreeText={false}
           />
@@ -1284,10 +1234,6 @@ function XcmModuleSection({
     iom: xcmIomOptions(entry, component, sfm)
   };
   const freeSlots = (own?: number) => slots.filter((slot) => slot === own || !modules.some((module) => module.slot === slot));
-  const isDefault = (module: XcmModule) => {
-    const derived = componentWithXcmModules(entry, component, [module], sfm);
-    return defaultImpliesFields(entry, derived, sfm, derived.mda ? ["mda"] : ["xiom", "mda"]);
-  };
   const update = (target: XcmModule, updates: Partial<XcmModule>) =>
     onChange(modules.map((module) => (module === target ? { ...module, ...updates } : module)));
   const remove = (target: XcmModule) => onChange(modules.filter((module) => module !== target));
@@ -1311,7 +1257,6 @@ function XcmModuleSection({
         label="Slot"
         value={module.slot}
         options={freeSlots(module.slot)}
-        defaultOptions={freeSlots(module.slot).filter((slot) => isDefault({ ...module, slot }))}
         onChange={(slot) => update(module, { slot: Number(slot) })}
       />
       <FieldAutocomplete
@@ -1320,7 +1265,6 @@ function XcmModuleSection({
         options={optionsByKind[module.kind]}
         groupBy={generationGroup}
         groupOrder={generationGroupOrder}
-        defaultOptions={optionsByKind[module.kind].filter((type) => isDefault({ ...module, type }))}
         onChange={(type) => update(module, { type, mda: module.kind === "iom" ? [] : module.mda })}
         allowFreeText={false}
       />

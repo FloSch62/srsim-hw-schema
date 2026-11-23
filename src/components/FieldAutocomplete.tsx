@@ -12,7 +12,6 @@ interface FieldAutocompleteProps {
   options: string[];
   optionLabels?: Record<string, string>;
   optionAdornment?: (option: string) => ReactNode;
-  defaultOptions?: string[];
   onChange: (value: string) => void;
   disabled?: boolean;
   helperText?: string;
@@ -31,7 +30,6 @@ export function FieldAutocomplete({
   options,
   optionLabels = {},
   optionAdornment,
-  defaultOptions = [],
   onChange,
   disabled,
   helperText,
@@ -41,11 +39,7 @@ export function FieldAutocomplete({
   groupOrder
 }: FieldAutocompleteProps) {
   const grouping = groupOptions(options, groupBy, groupOrder);
-  const defaultSet = new Set(defaultOptions);
-  const optionLabel = (option: string) => {
-    const label = optionLabels[option] ?? option;
-    return defaultSet.has(option) ? `Default (${label})` : label;
-  };
+  const optionLabel = (option: string) => optionLabels[option] ?? option;
 
   return (
     <Autocomplete
