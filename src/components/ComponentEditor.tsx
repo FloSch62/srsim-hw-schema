@@ -22,6 +22,7 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useMemo } from "react";
+import type { ReactNode } from "react";
 
 import {
   edaConnectorBreakoutLabel,
@@ -510,6 +511,20 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
             onAddMda={addIntegratedMda}
             onUpdateMda={updateIntegratedMda}
             onRemoveMda={removeIntegratedMda}
+            modules={
+              hasXcmModules(selectedEntry, integratedComponent) ? (
+                <XcmModuleSection
+                  entry={selectedEntry}
+                  component={integratedComponent}
+                  sfm={config.sfm}
+                  mdaSlotsFor={(iom, mdaType) => xiomMdaSlotsFor(integratedComponent, iom, mdaType)}
+                  nextMdaFor={(iom) => nextXiomMdaFor(integratedComponent, iom)}
+                  onChange={(modules) =>
+                    setIntegratedComponent(componentWithXcmModules(selectedEntry, integratedComponent, modules, config.sfm))
+                  }
+                />
+              ) : undefined
+            }
           />
         ) : (
           <>
@@ -1021,7 +1036,8 @@ function IntegratedComponentSection({
   addMdaDisabled,
   onAddMda,
   onUpdateMda,
-  onRemoveMda
+  onRemoveMda,
+  modules
 }: {
   component: SrsimComponent;
   mdaOptions: string[];
@@ -1031,6 +1047,8 @@ function IntegratedComponentSection({
   onAddMda: () => void;
   onUpdateMda: (index: number, updates: Partial<SrsimMda>) => void;
   onRemoveMda: (index: number) => void;
+  /** Module sections that replace the MDA list when the card takes XMAs or IOMs. */
+  modules?: ReactNode;
 }) {
   return (
     <Stack spacing={1.25}>
@@ -1050,17 +1068,19 @@ function IntegratedComponentSection({
             </Typography>
           ) : null}
         </Stack>
-        <NestedMdaSection
-          title="MDAs"
-          mdas={component.mda ?? []}
-          options={mdaTypeOptions}
-          slotOptions={mdaSlotOptions}
-          slotOptionsByMda={slotOptionsByMda}
-          addDisabled={addMdaDisabled}
-          onAdd={onAddMda}
-          onUpdate={onUpdateMda}
-          onRemove={onRemoveMda}
-        />
+        {modules ?? (
+          <NestedMdaSection
+            title="MDAs"
+            mdas={component.mda ?? []}
+            options={mdaTypeOptions}
+            slotOptions={mdaSlotOptions}
+            slotOptionsByMda={slotOptionsByMda}
+            addDisabled={addMdaDisabled}
+            onAdd={onAddMda}
+            onUpdate={onUpdateMda}
+            onRemove={onRemoveMda}
+          />
+        )}
       </Paper>
     </Stack>
   );
@@ -1247,7 +1267,7 @@ function XcmModuleSection({
     if (slot === undefined || !optionsByKind[kind].length) return;
     onChange([...modules, { slot, kind, type: optionsByKind[kind][0], mda: [] }]);
   };
-  const slotText = slots.length === 1 ? "one module slot, for" : `${slots.length} module slots, each for`;
+  const slotText = slots.length === 1 ? "One module slot, for" : `${slots.length} module slots, each for`;
 
   const moduleRow = (module: XcmModule) => (
     <Box
@@ -1308,8 +1328,8 @@ function XcmModuleSection({
     <>
       <FormHelperText sx={{ mt: 1.5 }}>
         {optionsByKind.iom.length
-          ? `This XCM has ${slotText} either an XMA or an IOM with MDAs.`
-          : `This XCM has ${slotText} an XMA.`}
+          ? `${slotText} either an XMA or an IOM with MDAs.`
+          : `${slotText} an XMA.`}
       </FormHelperText>
 
       <Stack spacing={1} sx={{ mt: 1.5 }}>
