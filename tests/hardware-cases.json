@@ -82,6 +82,36 @@
     "issues": [{"code": "mda-slot", "path": "1.xiom[1].mda[2]"}]
   },
   {
+    "name": "SR-1x-48D: built-in CPM, line card and MDA",
+    "chassis": "sr-1x-48d",
+    "components": [{"slot": "A", "type": "cpm-1x"}, {"slot": 1, "type": "i48-800g-qsfpdd-1x", "mda": [{"slot": 1, "type": "m48-800g-qsfpdd-1x"}]}],
+    "issues": []
+  },
+  {
+    "name": "SR-1se: the built-in MDA exists once, in slot 1",
+    "chassis": "sr-1se",
+    "components": [{"slot": "A"}, {"slot": 1, "type": "imm36-800g-qsfpdd", "mda": [{"slot": 1, "type": "ms36-800g-qsfpdd"}, {"slot": 2, "type": "ms36-800g-qsfpdd"}]}],
+    "issues": [{"code": "module-slot", "path": "1.mda[2]"}]
+  },
+  {
+    "name": "SR-1-24D: built-in parts cannot be swapped",
+    "chassis": "sr-1-24d",
+    "components": [{"slot": "A", "type": "cpm-1se"}, {"slot": 1, "type": "i48-400g-qsfpdd-1", "mda": [{"slot": 1, "type": "m48-400g-qsfpdd-1"}]}],
+    "issues": [{"code": "fixed", "path": "1"}, {"code": "fixed", "path": "A"}]
+  },
+  {
+    "name": "SR-1-92S: one CPM slot and one line-card slot",
+    "chassis": "sr-1-92s",
+    "components": [{"slot": "A"}, {"slot": "B"}, {"slot": 2, "type": "i80-200g-sfpdd+12-400g-qsfpdd-1"}],
+    "issues": [{"code": "no-such-slot", "path": "2"}, {"code": "no-such-slot", "path": "B"}]
+  },
+  {
+    "name": "SR-1se: a built-in line card is checked when its type is left out",
+    "chassis": "sr-1se",
+    "components": [{"slot": "A"}, {"slot": 1, "mda": [{"slot": 1, "type": "m48-800g-qsfpdd-1x"}]}],
+    "issues": [{"code": "fixed", "path": "1.mda[1]"}]
+  },
+  {
     "name": "Chassis without a model are not checked",
     "chassis": "sr-7",
     "components": [{"slot": 99, "type": "iom5-e"}],

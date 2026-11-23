@@ -107,6 +107,16 @@ def xcm_slots(count: int) -> tuple[Slot, ...]:
     return tuple(Slot(f"xcm-{n}", ("xcm",), srsim=n) for n in range(1, count + 1))
 
 
+def fixed_platform(model: Model, chassis_id: str, cpm: str, card: str, mda: str) -> None:
+    """A fixed chassis that SR-SIM runs as CPM slot A plus line card 1, both built in, with one built-in MDA."""
+    model.add_part(Part(cpm, "cpm"))
+    model.add_part(mda_card(card, "line-card", {1: mda}))
+    model.chassis[chassis_id] = Chassis(
+        chassis_id,
+        slots=(Slot("cpm-a", ("cpm",), srsim="A", fixed=cpm), Slot("card-1", ("line-card",), srsim=1, fixed=card)),
+    )
+
+
 # -- data -----------------------------------------------------------------------------
 
 
@@ -188,9 +198,23 @@ def sr_s_family(model: Model) -> None:
     )
 
 
+def sr_1_fp5_family(model: Model) -> None:
+    for chassis_id, card, mda in (
+        ("sr-1x-48d", "i48-800g-qsfpdd-1x", "m48-800g-qsfpdd-1x"),
+        ("sr-1x-92s", "i80-200g-sfpdd+12-800g-qsfpdd-1x", "m80-200g-sfpdd+12-800g-qsfpdd-1x"),
+        ("sr-1-48d", "i48-400g-qsfpdd-1", "m48-400g-qsfpdd-1"),
+        ("sr-1-24d", "i24-800g-qsfpdd-1", "m24-800g-qsfpdd-1"),
+        ("sr-1-46s", "i40-200g-sfpdd+6-800g-qsfpdd-1", "m40-200g-sfpdd+6-800g-qsfpdd-1"),
+        ("sr-1-92s", "i80-200g-sfpdd+12-400g-qsfpdd-1", "m80-200g-sfpdd+12-400g-qsfpdd-1"),
+    ):
+        fixed_platform(model, chassis_id, "cpm-1x", card, mda)
+    fixed_platform(model, "sr-1se", "cpm-1se", "imm36-800g-qsfpdd", "ms36-800g-qsfpdd")
+
+
 def build_model() -> Model:
     model = Model()
     sr_s_family(model)
+    sr_1_fp5_family(model)
     check_model(model)
     return model
 

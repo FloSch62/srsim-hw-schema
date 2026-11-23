@@ -1,5 +1,85 @@
 {
     "chassis": {
+        "sr-1-24d": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "fixed": "cpm-1x",
+                    "id": "cpm-a",
+                    "srsim": "A"
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "i24-800g-qsfpdd-1",
+                    "id": "card-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "sr-1-46s": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "fixed": "cpm-1x",
+                    "id": "cpm-a",
+                    "srsim": "A"
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "i40-200g-sfpdd+6-800g-qsfpdd-1",
+                    "id": "card-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "sr-1-48d": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "fixed": "cpm-1x",
+                    "id": "cpm-a",
+                    "srsim": "A"
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "i48-400g-qsfpdd-1",
+                    "id": "card-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "sr-1-92s": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "fixed": "cpm-1x",
+                    "id": "cpm-a",
+                    "srsim": "A"
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "i80-200g-sfpdd+12-400g-qsfpdd-1",
+                    "id": "card-1",
+                    "srsim": 1
+                }
+            ]
+        },
         "sr-14s": {
             "slots": [
                 {
@@ -93,6 +173,66 @@
                     "parts": [
                         "iom-s-3.0t"
                     ]
+                }
+            ]
+        },
+        "sr-1se": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "fixed": "cpm-1se",
+                    "id": "cpm-a",
+                    "srsim": "A"
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "imm36-800g-qsfpdd",
+                    "id": "card-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "sr-1x-48d": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "fixed": "cpm-1x",
+                    "id": "cpm-a",
+                    "srsim": "A"
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "i48-800g-qsfpdd-1x",
+                    "id": "card-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "sr-1x-92s": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "fixed": "cpm-1x",
+                    "id": "cpm-a",
+                    "srsim": "A"
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "i80-200g-sfpdd+12-800g-qsfpdd-1x",
+                    "id": "card-1",
+                    "srsim": 1
                 }
             ]
         },
@@ -373,6 +513,12 @@
                 }
             ]
         },
+        "cpm-1se": {
+            "kind": "cpm"
+        },
+        "cpm-1x": {
+            "kind": "cpm"
+        },
         "cpm-2s": {
             "kind": "cpm"
         },
@@ -384,6 +530,97 @@
         },
         "cpm2-s": {
             "kind": "cpm"
+        },
+        "i24-800g-qsfpdd-1": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m24-800g-qsfpdd-1",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "i40-200g-sfpdd+6-800g-qsfpdd-1": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m40-200g-sfpdd+6-800g-qsfpdd-1",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "i48-400g-qsfpdd-1": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m48-400g-qsfpdd-1",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "i48-800g-qsfpdd-1x": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m48-800g-qsfpdd-1x",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "i80-200g-sfpdd+12-400g-qsfpdd-1": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m80-200g-sfpdd+12-400g-qsfpdd-1",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "i80-200g-sfpdd+12-800g-qsfpdd-1x": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m80-200g-sfpdd+12-800g-qsfpdd-1x",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "imm36-800g-qsfpdd": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "ms36-800g-qsfpdd",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
         },
         "iom-s-1.5t": {
             "kind": "iom",

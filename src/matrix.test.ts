@@ -269,7 +269,7 @@ describe("SR-SIM matrix helpers", () => {
     const sr1x48d = getEntry(matrix, "sr-1x-48d");
     assert.deepEqual(
       directMdaSlotOptions(sr1x48d, { slot: 1, type: "i48-800g-qsfpdd-1x" }, ""),
-      [1, 2]
+      [1]
     );
     assert.deepEqual(availableNumericSlotOptions([1, 2], [{ slot: 1 }, { slot: 2 }]), []);
 

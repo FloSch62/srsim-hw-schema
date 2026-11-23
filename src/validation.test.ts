@@ -436,14 +436,14 @@ describe("topology validation", () => {
     assert.ok(report.issues.some((issue) => issue.message.includes("m20-1g-csfp must use MDA slot(s) 1, 2, 3")));
   });
 
-  it("rejects direct MDA slots outside the matrix slot options", () => {
+  it("rejects direct MDA slots that the card does not have", () => {
     const report = validateTopologyYaml(
       "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-1x-48d\n      components:\n        - slot: A\n        - slot: 1\n          type: i48-800g-qsfpdd-1x\n          mda:\n            - slot: 3\n              type: m48-800g-qsfpdd-1x\n",
       hardware
     );
 
     assert.equal(report.valid, false);
-    assert.ok(report.issues.some((issue) => issue.message.includes("m48-800g-qsfpdd-1x must use MDA slot(s) 1, 2")));
+    assert.ok(report.issues.some((issue) => issue.message.includes("i48-800g-qsfpdd-1x has MDA slot 1, not 3")));
   });
 
   it("rejects SR-1e direct MDA slots above the numbered default slots", () => {

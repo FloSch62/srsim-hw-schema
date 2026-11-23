@@ -35,4 +35,6 @@ test("slot lookups come from the model", () => {
   assert.deepEqual(mdaSlotsFor("x2-s36-400g-qsfp112-3.0t", "m36-800g-qsfpdd"), []);
   assert.deepEqual(integratedCard("sr-1s"), "cpm-1s");
   assert.deepEqual(integratedCard("sr-7s"), "");
+  assert.deepEqual(lineCardSlots("sr-1se"), [1]);
+  assert.deepEqual(mdaSlotsFor("imm36-800g-qsfpdd", "ms36-800g-qsfpdd"), [1]);
 });
