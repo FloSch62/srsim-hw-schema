@@ -76,6 +76,17 @@ export function moduleSlots(cardType: string | undefined): number[] {
   return slots.some((slot) => slot.accepts.includes("iom")) ? slots.map((slot) => Number(slot.srsim)) : [];
 }
 
+/** Whether the card is an XCM, which holds XMAs or IOMs instead of plain MDAs. */
+export function isXcm(cardType: string | undefined): boolean {
+  return parts[cardType ?? ""]?.kind === "xcm";
+}
+
+/** Whether SR-SIM provisions this XMA as an XIOM, i.e. an IOM whose MDA slots are all built in. */
+export function isXiomXma(type: string | undefined): boolean {
+  const part = parts[type ?? ""];
+  return part?.kind === "iom" && Boolean(part.slots?.length) && (part.slots ?? []).every((slot) => slot.fixed);
+}
+
 /** SR-SIM mda/xiom slots of a component card; [] when the model does not know the card. */
 export function cardSlots(cardType: string | undefined): number[] {
   const part = parts[cardType ?? ""];
