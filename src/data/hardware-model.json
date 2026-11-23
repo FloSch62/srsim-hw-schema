@@ -173,6 +173,545 @@
                 }
             ]
         },
+        "ixr-10": {
+            "slots": [
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-4",
+                    "srsim": 4
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-5",
+                    "srsim": 5
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-6",
+                    "srsim": 6
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-7",
+                    "srsim": 7
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-8",
+                    "srsim": 8
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-ixr"
+                    ]
+                }
+            ]
+        },
+        "ixr-6": {
+            "slots": [
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-4",
+                    "srsim": 4
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-ixr"
+                    ]
+                }
+            ]
+        },
+        "ixr-e": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr-e",
+                        "cpm-ixr-e-gnss"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "card-1",
+                    "srsim": 1,
+                    "types": [
+                        "imm24-sfp++8-sfp28+2-qsfp28",
+                        "imm14-10g-sfp++4-1g-tx"
+                    ]
+                }
+            ],
+            "variants": [
+                {
+                    "description": "24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28",
+                    "name": "IXR-e Big",
+                    "parts": [
+                        "cpm-ixr-e",
+                        "imm24-sfp++8-sfp28+2-qsfp28"
+                    ]
+                },
+                {
+                    "description": "24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28; GNSS receiver",
+                    "name": "IXR-e Big GNSS",
+                    "parts": [
+                        "cpm-ixr-e-gnss",
+                        "imm24-sfp++8-sfp28+2-qsfp28"
+                    ]
+                },
+                {
+                    "description": "14x 10G SFP+ + 4x 1G RJ-45",
+                    "name": "IXR-e Small",
+                    "parts": [
+                        "cpm-ixr-e",
+                        "imm14-10g-sfp++4-1g-tx"
+                    ]
+                },
+                {
+                    "description": "14x 10G SFP+ + 4x 1G RJ-45; GNSS receiver",
+                    "name": "IXR-e Small GNSS",
+                    "parts": [
+                        "cpm-ixr-e-gnss",
+                        "imm14-10g-sfp++4-1g-tx"
+                    ]
+                }
+            ]
+        },
+        "ixr-e2": {
+            "integrated": "cpm-ixr-e2",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr-e2"
+                    ]
+                }
+            ]
+        },
+        "ixr-e2c": {
+            "integrated": "cpm-ixr-e2c",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr-e2c"
+                    ]
+                }
+            ]
+        },
+        "ixr-e2n": {
+            "integrated": "cpm-ixr-e2n",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr-e2n"
+                    ]
+                }
+            ]
+        },
+        "ixr-e2n-s": {
+            "integrated": "imm4-sfp+4-sfp+-s",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "imm4-sfp+4-sfp+-s",
+                        "cpm-ixr-e2n-s"
+                    ]
+                }
+            ]
+        },
+        "ixr-e2sc": {
+            "integrated": "cpm-ixr-e2sc",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr-e2sc"
+                    ]
+                }
+            ]
+        },
+        "ixr-e3c": {
+            "integrated": "cpm-ixr-e3c",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr-e3c"
+                    ]
+                }
+            ]
+        },
+        "ixr-e3x": {
+            "integrated": "cpm-ixr-e3x",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr-e3x"
+                    ]
+                }
+            ]
+        },
+        "ixr-ec": {
+            "integrated": "cpm-ixr-ec",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr-ec"
+                    ]
+                }
+            ]
+        },
+        "ixr-r4": {
+            "slots": [
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "iom-ixr-r4",
+                    "id": "card-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr-r4"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-ixr-r4"
+                    ]
+                }
+            ]
+        },
+        "ixr-r6": {
+            "integrated": "cpiom-ixr-r6",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpiom-ixr-r6"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpiom-ixr-r6"
+                    ]
+                }
+            ]
+        },
+        "ixr-r6d": {
+            "card_mdas": {
+                "iom-ixr-r6d": [
+                    "m1-400g-qsfpdd+1-100g-qsfp28",
+                    "m10-50g-sfp56",
+                    "m18-25g-sfp28",
+                    "m2-100g-qsfp28+16-10g-sfp+",
+                    "m2-cfp2",
+                    "m20-10g-sfp+",
+                    "m32-1g-csfp",
+                    "m5-100g-qsfp28"
+                ]
+            },
+            "slots": [
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "iom-ixr-r6d",
+                    "id": "card-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr-r6d"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-ixr-r6d"
+                    ]
+                }
+            ]
+        },
+        "ixr-r6dl": {
+            "card_mdas": {
+                "iom-ixr-r6d": [
+                    "m1-400g-qsfpdd+1-100g-qsfp28",
+                    "m10-50g-sfp56",
+                    "m18-25g-sfp28",
+                    "m2-100g-qsfp28+16-10g-sfp+",
+                    "m2-cfp2",
+                    "m20-10g-sfp+",
+                    "m32-1g-csfp",
+                    "m5-100g-qsfp28",
+                    "m46-10g-sfp+",
+                    "m80-1g-csfp"
+                ]
+            },
+            "slots": [
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "iom-ixr-r6d",
+                    "id": "card-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-ixr-r6d"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-ixr-r6d"
+                    ]
+                }
+            ]
+        },
+        "ixr-s": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "fixed": "cpm-ixr-s",
+                    "id": "cpm-a",
+                    "srsim": "A"
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "imm48-sfp++6-qsfp28",
+                    "id": "card-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "ixr-x": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "fixed": "cpm-ixr-x",
+                    "id": "cpm-a",
+                    "srsim": "A"
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "card-1",
+                    "srsim": 1,
+                    "types": [
+                        "imm32-qsfp28+4-qsfpdd",
+                        "imm6-qsfpdd+48-sfp56"
+                    ]
+                }
+            ],
+            "variants": [
+                {
+                    "description": "32x 100G QSFP28 + 4x 400G QSFP-DD",
+                    "name": "IXR-X1",
+                    "parts": [
+                        "imm32-qsfp28+4-qsfpdd"
+                    ]
+                },
+                {
+                    "description": "48x 50G SFP56 + 6x 400G QSFP-DD",
+                    "name": "IXR-Xs",
+                    "parts": [
+                        "imm6-qsfpdd+48-sfp56"
+                    ]
+                }
+            ]
+        },
+        "ixr-x3": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "fixed": "cpm-ixr-x",
+                    "id": "cpm-a",
+                    "srsim": "A"
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "imm36-qsfpdd",
+                    "id": "card-1",
+                    "srsim": 1
+                }
+            ]
+        },
         "sar-1": {
             "integrated": "iom-sar",
             "slots": [
@@ -1255,6 +1794,9 @@
         }
     },
     "parts": {
+        "a32-chds1v2": {
+            "kind": "mda"
+        },
         "cma-14s": {
             "kind": "cma",
             "label": "CMA-14s (one or two CPM-s)",
@@ -1378,6 +1920,93 @@
                 }
             ]
         },
+        "cpiom-ixr-r6": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1,
+                    "types": [
+                        "m10-10g-sfp+",
+                        "m4-10g-sfp++1-100g-cfp2",
+                        "m6-10g-sfp++1-100g-qsfp28",
+                        "m6-10g-sfp++4-25g-sfp28"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-2",
+                    "srsim": 2,
+                    "types": [
+                        "m10-10g-sfp+",
+                        "m4-10g-sfp++1-100g-cfp2",
+                        "m6-10g-sfp++1-100g-qsfp28",
+                        "m6-10g-sfp++4-25g-sfp28"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-3",
+                    "srsim": 3,
+                    "types": [
+                        "m10-10g-sfp+",
+                        "m4-10g-sfp++1-100g-cfp2",
+                        "m6-10g-sfp++1-100g-qsfp28",
+                        "m6-10g-sfp++4-25g-sfp28",
+                        "m20-1g-csfp"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-4",
+                    "srsim": 4,
+                    "types": [
+                        "m10-10g-sfp+",
+                        "m4-10g-sfp++1-100g-cfp2",
+                        "m6-10g-sfp++1-100g-qsfp28",
+                        "m6-10g-sfp++4-25g-sfp28",
+                        "m20-1g-csfp"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-5",
+                    "srsim": 5,
+                    "types": [
+                        "m10-10g-sfp+",
+                        "m4-10g-sfp++1-100g-cfp2",
+                        "m6-10g-sfp++1-100g-qsfp28",
+                        "m6-10g-sfp++4-25g-sfp28",
+                        "a32-chds1v2"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-6",
+                    "srsim": 6,
+                    "types": [
+                        "m10-10g-sfp+",
+                        "m4-10g-sfp++1-100g-cfp2",
+                        "m6-10g-sfp++1-100g-qsfp28",
+                        "m6-10g-sfp++4-25g-sfp28",
+                        "a32-chds1v2"
+                    ]
+                }
+            ]
+        },
         "cpm-1": {
             "kind": "cpm",
             "slots": [
@@ -1426,6 +2055,131 @@
             "kind": "cpm"
         },
         "cpm-e": {
+            "kind": "cpm"
+        },
+        "cpm-ixr": {
+            "kind": "cpm"
+        },
+        "cpm-ixr-e": {
+            "kind": "cpm"
+        },
+        "cpm-ixr-e-gnss": {
+            "kind": "cpm"
+        },
+        "cpm-ixr-e2": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m2-qsfpdd+2-qsfp28+24-sfp28",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "cpm-ixr-e2c": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m12-sfp28+2-qsfp28",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "cpm-ixr-e2n": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m4-sfp+4-sfp+",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "cpm-ixr-e2n-s": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m4-sfp+4-sfp+-s",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "cpm-ixr-e2sc": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m16-sfp++4-sfp28",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "cpm-ixr-e3c": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m4-qsfp28+16-sfp28+8-sfp56",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "cpm-ixr-e3x": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m16-sfp112+15-sfp56+6-qsfpdd",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "cpm-ixr-ec": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m4-1g-tx+20-1g-sfp+6-10g-sfp+",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "cpm-ixr-r4": {
+            "kind": "cpm"
+        },
+        "cpm-ixr-r6d": {
+            "kind": "cpm"
+        },
+        "cpm-ixr-s": {
+            "kind": "cpm"
+        },
+        "cpm-ixr-x": {
             "kind": "cpm"
         },
         "cpm-s": {
@@ -1656,6 +2410,58 @@
                 }
             ]
         },
+        "imm14-10g-sfp++4-1g-tx": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m14-10g-sfp++4-1g-tx",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "imm24-sfp++8-sfp28+2-qsfp28": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m24-sfp++8-sfp28+2-qsfp28",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "imm32-qsfp28+4-qsfpdd": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m32-qsfp28+4-qsfpdd",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "imm36-100g-qsfp28": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m36-100g-qsfp28",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
         "imm36-800g-qsfpdd": {
             "kind": "line-card",
             "slots": [
@@ -1669,6 +2475,19 @@
                 }
             ]
         },
+        "imm36-qsfpdd": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m36-qsfpdd",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
         "imm4-100gb-cfp4": {
             "kind": "line-card",
             "slots": [
@@ -1677,6 +2496,19 @@
                         "mda"
                     ],
                     "fixed": "m4-100g-cfp4",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "imm4-sfp+4-sfp+-s": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m4-sfp+4-sfp+-s",
                     "id": "mda-1",
                     "srsim": 1
                 }
@@ -1713,6 +2545,45 @@
                     "fixed": "imm24-1gb-xp-sfp",
                     "id": "mda-2",
                     "srsim": 2
+                }
+            ]
+        },
+        "imm48-sfp++6-qsfp28": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m48-sfp++6-qsfp28",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "imm48-sfp+2-qsfp28": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m48-sfp+2-qsfp28",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "imm6-qsfpdd+48-sfp56": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m6-qsfpdd+48-sfp56",
+                    "id": "mda-1",
+                    "srsim": 1
                 }
             ]
         },
@@ -1779,6 +2650,121 @@
                     ],
                     "id": "mda-4",
                     "srsim": 4
+                }
+            ]
+        },
+        "iom-ixr-r4": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1,
+                    "types": [
+                        "m10-10g-sfp+",
+                        "m4-10g-sfp++1-100g-cfp2",
+                        "m6-10g-sfp++1-100g-qsfp28",
+                        "m6-10g-sfp++4-25g-sfp28",
+                        "m20-1g-csfp"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-2",
+                    "srsim": 2,
+                    "types": [
+                        "m10-10g-sfp+",
+                        "m4-10g-sfp++1-100g-cfp2",
+                        "m6-10g-sfp++1-100g-qsfp28",
+                        "m6-10g-sfp++4-25g-sfp28",
+                        "m20-1g-csfp"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-3",
+                    "srsim": 3,
+                    "types": [
+                        "m10-10g-sfp+",
+                        "m4-10g-sfp++1-100g-cfp2",
+                        "m6-10g-sfp++1-100g-qsfp28",
+                        "m6-10g-sfp++4-25g-sfp28",
+                        "m20-1g-csfp"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-4",
+                    "srsim": 4,
+                    "types": [
+                        "m10-10g-sfp+",
+                        "m4-10g-sfp++1-100g-cfp2",
+                        "m6-10g-sfp++1-100g-qsfp28",
+                        "m6-10g-sfp++4-25g-sfp28"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m10-1g-sfp+2-10g-sfp+",
+                    "id": "mda-5",
+                    "srsim": 5
+                }
+            ]
+        },
+        "iom-ixr-r6d": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-4",
+                    "srsim": 4
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-5",
+                    "srsim": 5
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-6",
+                    "srsim": 6
                 }
             ]
         },
@@ -1998,6 +2984,21 @@
                     "srsim": 2
                 }
             ]
+        },
+        "m10-10g-sfp+": {
+            "kind": "mda"
+        },
+        "m20-1g-csfp": {
+            "kind": "mda"
+        },
+        "m4-10g-sfp++1-100g-cfp2": {
+            "kind": "mda"
+        },
+        "m6-10g-sfp++1-100g-qsfp28": {
+            "kind": "mda"
+        },
+        "m6-10g-sfp++4-25g-sfp28": {
+            "kind": "mda"
         },
         "s18-100gb-qsfp28": {
             "kind": "xma"

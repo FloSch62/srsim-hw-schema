@@ -1,4 +1,4 @@
-import { cardSlots, integratedCard, lineCardSlots, mdaSlotsFor, moduleSlots } from "./hardwareModel";
+import { cardSlots, cpmSlots, integratedCard, lineCardSlots, mdaSlotsFor, moduleSlots } from "./hardwareModel";
 import type {
   HardwareModelEntry,
   HardwareSchema,
@@ -575,6 +575,8 @@ function matrixCardSlotOptions(entry: MatrixEntry | undefined, minimumSlot = 1):
 }
 
 export function componentCpmSlotOptions(entry: MatrixEntry | undefined, schemaSlots: string[] = ["A", "B"]): string[] {
+  const modelled = cpmSlots(entry?.chassis ?? "");
+  if (modelled.length) return modelled;
   const slots = (entry?.rows ?? [])
     .flatMap((row) => row.values.slot ?? [])
     .filter((slot) => /^[AB]$/i.test(slot))

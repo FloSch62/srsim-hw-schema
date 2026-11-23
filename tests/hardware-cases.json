@@ -219,8 +219,44 @@
     "issues": [{"code": "empty-slot", "path": "A.mda[4]"}]
   },
   {
+    "name": "IXR-6: four line-card slots",
+    "chassis": "ixr-6",
+    "components": [{"slot": "A", "type": "cpm-ixr"}, {"slot": "B", "type": "cpm-ixr"}, {"slot": 5, "type": "imm36-100g-qsfp28"}],
+    "issues": [{"code": "no-such-slot", "path": "5"}]
+  },
+  {
+    "name": "IXR-R4: m20-1g-csfp only in MDA slots 1-3, the integrated MDA in slot 5",
+    "chassis": "ixr-r4",
+    "components": [{"slot": "A", "type": "cpm-ixr-r4"}, {"slot": 1, "type": "iom-ixr-r4", "mda": [{"slot": 4, "type": "m20-1g-csfp"}, {"slot": 5, "type": "m10-1g-sfp+2-10g-sfp+"}]}],
+    "issues": [{"code": "slot-type", "path": "1.mda[4]"}]
+  },
+  {
+    "name": "IXR-R6: a32-chds1v2 only in MDA slots 5-6",
+    "chassis": "ixr-r6",
+    "components": [{"slot": "A", "type": "cpiom-ixr-r6", "mda": [{"slot": 1, "type": "a32-chds1v2"}, {"slot": 6, "type": "a32-chds1v2"}]}],
+    "issues": [{"code": "slot-type", "path": "A.mda[1]"}]
+  },
+  {
+    "name": "IXR-R6d: slim MDAs only, no 46-port SFP+",
+    "chassis": "ixr-r6d",
+    "components": [{"slot": "A", "type": "cpm-ixr-r6d"}, {"slot": 1, "type": "iom-ixr-r6d", "mda": [{"slot": 1, "type": "m18-25g-sfp28"}, {"slot": 2, "type": "m46-10g-sfp+"}]}],
+    "issues": [{"code": "chassis-mda", "path": "1.mda[2]"}]
+  },
+  {
+    "name": "IXR-R6dl: wide MDAs, including the 46-port SFP+",
+    "chassis": "ixr-r6dl",
+    "components": [{"slot": "A", "type": "cpm-ixr-r6d"}, {"slot": 1, "type": "iom-ixr-r6d", "mda": [{"slot": 1, "type": "m18-25g-sfp28"}, {"slot": 2, "type": "m46-10g-sfp+"}]}],
+    "issues": []
+  },
+  {
+    "name": "IXR-X: X1 and Xs line cards, not the X3 one",
+    "chassis": "ixr-x",
+    "components": [{"slot": "A", "type": "cpm-ixr-x"}, {"slot": 1, "type": "imm36-qsfpdd"}],
+    "issues": [{"code": "slot-type", "path": "1"}]
+  },
+  {
     "name": "Chassis without a model are not checked",
-    "chassis": "ixr-e2",
+    "chassis": "vsr-i",
     "components": [{"slot": 99, "type": "iom5-e"}],
     "issues": []
   }

@@ -20,6 +20,8 @@ interface ModelChassis {
   slots: ModelSlot[];
   exclusive?: string[][];
   integrated?: string;
+  /** MDA types a card takes in this chassis, where the chassis has its own physical versions of its MDAs. */
+  card_mdas?: Record<string, string[]>;
 }
 
 export interface HardwareIssue {
@@ -43,6 +45,13 @@ export function lineCardSlots(chassis: string): number[] {
   const model = chassisModels[chassis];
   if (!model || model.integrated) return [];
   return model.slots.flatMap((slot) => (typeof slot.srsim === "number" ? [slot.srsim] : []));
+}
+
+/** CPM slots of a multi-container chassis; [] when the chassis is not modelled or uses a CPM adapter. */
+export function cpmSlots(chassis: string): string[] {
+  const model = chassisModels[chassis];
+  if (!model || model.integrated) return [];
+  return model.slots.flatMap((slot) => (slot.accepts.includes("cpm") && slot.srsim !== undefined ? [String(slot.srsim)] : []));
 }
 
 /** The card SR-SIM runs as slot A of a single-container chassis; "" when there is none in the model. */
@@ -101,6 +110,10 @@ function placementIssue(owner: string, slots: ModelSlot[], slot: ModelSlot, type
     return { code: "built-in", path, message: `${type} is built into slot ${homes.join(", ")} of ${owner}, not slot ${slot.srsim}` };
   }
   if (slot.types?.length && !slot.types.includes(type)) {
+    const fits = slots.filter((other) => other.types?.includes(type)).map((other) => String(other.srsim));
+    if (fits.length) {
+      return { code: "slot-type", path, message: `${type} fits slot ${fits.join(", ")} of ${owner}, not slot ${slot.srsim}` };
+    }
     return { code: "slot-type", path, message: `slot ${slot.srsim} of ${owner} takes ${slot.types.join(", ")}, not ${type}` };
   }
   return null;
@@ -251,6 +264,13 @@ export function hardwareIssues(chassisId: string, components: unknown[]): Hardwa
       continue;
     }
     issues.push(...moduleIssues(part, partType, card, slotValue));
+    const allowed = chassis.card_mdas?.[partType];
+    for (const mda of allowed ? items(card.mda) : []) {
+      const type = String(mda.type ?? "");
+      if (type && !allowed?.includes(type)) {
+        issues.push({ code: "chassis-mda", path: `${slotValue}.mda[${slotText(mda.slot)}]`, message: `the ${chassisId.trim().toLowerCase()} has no ${type} for its ${partType}` });
+      }
+    }
   }
 
   issues.push(...cpmIssues(chassisId, chassis, cpms, used));

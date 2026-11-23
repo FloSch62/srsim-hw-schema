@@ -65,6 +65,8 @@ class HardwareModelTest(unittest.TestCase):
                     offered_types.update(offered["direct_mda"], offered["xiom"])
                 for variant in chassis.variants:
                     self.assertLessEqual(set(variant.parts), offered_types, variant.name)
+                for card, mdas in chassis.card_mdas:
+                    self.assertEqual(set(mdas), set(compatibility[card]["direct_mda"]), f"{card} MDAs")
 
     def test_model_references_resolve(self) -> None:
         bad = hardware_model.Model(parts=dict(MODEL.parts), chassis=dict(MODEL.chassis))

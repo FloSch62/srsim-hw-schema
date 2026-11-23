@@ -56,6 +56,9 @@ class Chassis:
     # Single-container chassis: the integrated card that SR-SIM writes as component slot A.
     integrated: str = ""
     variants: tuple[Variant, ...] = ()
+    # MDA types a card takes in this chassis, where the chassis has its own physical versions of the card's
+    # MDAs under the same SR-SIM names (the IXR-R6d's slim MDAs, the IXR-R6dl's wide ones).
+    card_mdas: tuple[tuple[str, tuple[str, ...]], ...] = ()
 
 
 @dataclass
@@ -126,13 +129,34 @@ def integrated_chassis(chassis_id: str, card: str) -> Chassis:
     )
 
 
-def fixed_platform(model: Model, chassis_id: str, cpm: str, card: str, mda: str) -> None:
-    """A fixed chassis that SR-SIM runs as CPM slot A plus line card 1, both built in, with one built-in MDA."""
-    model.add_part(mda_card(card, "line-card", {1: mda}))
+def fixed_chassis(
+    model: Model,
+    chassis_id: str,
+    cpms: tuple[str, ...],
+    cards: dict[str, str],
+    variants: tuple[Variant, ...] = (),
+) -> None:
+    """A fixed chassis that SR-SIM runs as CPM slot A plus line card 1, one of each given type, each card
+    with one built-in MDA; `variants` name the products when SR-SIM folds several into it."""
+    for card, mda in cards.items():
+        model.add_part(mda_card(card, "line-card", {1: mda}))
+
+    def one_of(types: tuple[str, ...]) -> dict[str, Any]:
+        return {"fixed": types[0]} if len(types) == 1 else {"types": types}
+
     model.chassis[chassis_id] = Chassis(
         chassis_id,
-        slots=(Slot("cpm-a", ("cpm",), srsim="A", fixed=cpm), Slot("card-1", ("line-card",), srsim=1, fixed=card)),
+        slots=(
+            Slot("cpm-a", ("cpm",), srsim="A", **one_of(cpms)),
+            Slot("card-1", ("line-card",), srsim=1, **one_of(tuple(cards))),
+        ),
+        variants=variants,
     )
+
+
+def fixed_platform(model: Model, chassis_id: str, cpm: str, card: str, mda: str) -> None:
+    """A fixed chassis that SR-SIM runs as CPM slot A plus line card 1, both built in, with one built-in MDA."""
+    fixed_chassis(model, chassis_id, (cpm,), {card: mda})
 
 
 # -- data -----------------------------------------------------------------------------
@@ -304,6 +328,119 @@ def sar_family(model: Model) -> None:
     model.chassis["sar-hmc"] = integrated_chassis("sar-hmc", "cpm-sar-hmc")
 
 
+def ixr_family(model: Model) -> None:
+    """7250 IXR: line-card slots 1-N and CPM slots A/B, fixed platforms, and single-container systems."""
+    # IXR-6 has four line-card slots and IXR-10 eight.
+    model.add_part(Part("cpm-ixr", "cpm"))
+    imms = {"imm36-100g-qsfp28": "m36-100g-qsfp28", "imm48-sfp+2-qsfp28": "m48-sfp+2-qsfp28"}
+    for card, mda in imms.items():
+        model.add_part(mda_card(card, "line-card", {1: mda}))
+    for chassis_id, slots in (("ixr-6", 4), ("ixr-10", 8)):
+        model.chassis[chassis_id] = iom_chassis(chassis_id, slots, "cpm-ixr")
+
+    # IXR-R4: four MDA slots, m20-1g-csfp only in 1-3, and the integrated MDA as mda/5.
+    r_mdas = ("m10-10g-sfp+", "m4-10g-sfp++1-100g-cfp2", "m6-10g-sfp++1-100g-qsfp28", "m6-10g-sfp++4-25g-sfp28")
+    model.add_part(Part("cpm-ixr-r4", "cpm"))
+    for type_ in (*r_mdas, "m20-1g-csfp", "a32-chds1v2"):
+        model.add_part(Part(type_, "mda"))
+    r4_slots = (
+        *(Slot(f"mda-{n}", ("mda",), srsim=n, types=(*r_mdas, "m20-1g-csfp")) for n in (1, 2, 3)),
+        Slot("mda-4", ("mda",), srsim=4, types=r_mdas),
+        Slot("mda-5", ("mda",), srsim=5, fixed="m10-1g-sfp+2-10g-sfp+"),
+    )
+    model.add_part(Part("iom-ixr-r4", "line-card", r4_slots))
+    model.chassis["ixr-r4"] = Chassis(
+        "ixr-r4", slots=(Slot("card-1", ("line-card",), srsim=1, fixed="iom-ixr-r4"), *cpm_slots(("cpm-ixr-r4",), 2))
+    )
+
+    # IXR-R6: one CPIOM per CPM slot, six MDA slots, m20-1g-csfp only in 3-4 and a32-chds1v2 only in 5-6.
+    r6_slots = (
+        *(Slot(f"mda-{n}", ("mda",), srsim=n, types=r_mdas) for n in (1, 2)),
+        *(Slot(f"mda-{n}", ("mda",), srsim=n, types=(*r_mdas, "m20-1g-csfp")) for n in (3, 4)),
+        *(Slot(f"mda-{n}", ("mda",), srsim=n, types=(*r_mdas, "a32-chds1v2")) for n in (5, 6)),
+    )
+    model.add_part(Part("cpiom-ixr-r6", "cpm", r6_slots))
+    model.chassis["ixr-r6"] = Chassis(
+        "ixr-r6", slots=cpm_slots(("cpiom-ixr-r6",), 2), integrated="cpiom-ixr-r6"
+    )
+
+    # The IXR-R6d and IXR-R6dl share the CPM and the IOM with six MDA slots. The R6d takes slim MDAs, the
+    # R6dl wide ones: physically different even under the same name, and the 46-port SFP+ and 80-port cSFP
+    # MDAs exist only wide.
+    model.add_part(Part("cpm-ixr-r6d", "cpm"))
+    model.add_part(iom_ixr_r6d := mda_card("iom-ixr-r6d", "line-card", dict.fromkeys(range(1, 7), "")))
+    slim = (
+        "m1-400g-qsfpdd+1-100g-qsfp28",
+        "m10-50g-sfp56",
+        "m18-25g-sfp28",
+        "m2-100g-qsfp28+16-10g-sfp+",
+        "m2-cfp2",
+        "m20-10g-sfp+",
+        "m32-1g-csfp",
+        "m5-100g-qsfp28",
+    )
+    wide = (*slim, "m46-10g-sfp+", "m80-1g-csfp")
+    for chassis_id, mdas in (("ixr-r6d", slim), ("ixr-r6dl", wide)):
+        model.chassis[chassis_id] = Chassis(
+            chassis_id,
+            slots=(Slot("card-1", ("line-card",), srsim=1, fixed=iom_ixr_r6d.type), *cpm_slots(("cpm-ixr-r6d",), 2)),
+            card_mdas=((iom_ixr_r6d.type, mdas),),
+        )
+
+    for cpm in ("cpm-ixr-x", "cpm-ixr-s", "cpm-ixr-e", "cpm-ixr-e-gnss"):
+        model.add_part(Part(cpm, "cpm"))
+    fixed_chassis(model, "ixr-x3", ("cpm-ixr-x",), {"imm36-qsfpdd": "m36-qsfpdd"})
+    fixed_chassis(model, "ixr-s", ("cpm-ixr-s",), {"imm48-sfp++6-qsfp28": "m48-sfp++6-qsfp28"})
+    # SR-SIM runs the IXR-X1 and IXR-Xs as one chassis type, and the four IXR-e models as another; the IMM
+    # (and the GNSS CPM) tells the products apart.
+    x1, xs = "imm32-qsfp28+4-qsfpdd", "imm6-qsfpdd+48-sfp56"
+    fixed_chassis(
+        model,
+        "ixr-x",
+        ("cpm-ixr-x",),
+        {x1: "m32-qsfp28+4-qsfpdd", xs: "m6-qsfpdd+48-sfp56"},
+        variants=(
+            Variant("IXR-X1", "32x 100G QSFP28 + 4x 400G QSFP-DD", (x1,)),
+            Variant("IXR-Xs", "48x 50G SFP56 + 6x 400G QSFP-DD", (xs,)),
+        ),
+    )
+    big, small = "imm24-sfp++8-sfp28+2-qsfp28", "imm14-10g-sfp++4-1g-tx"
+    big_ports, small_ports = "24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28", "14x 10G SFP+ + 4x 1G RJ-45"
+    fixed_chassis(
+        model,
+        "ixr-e",
+        ("cpm-ixr-e", "cpm-ixr-e-gnss"),
+        {big: "m24-sfp++8-sfp28+2-qsfp28", small: "m14-10g-sfp++4-1g-tx"},
+        variants=(
+            Variant("IXR-e Big", big_ports, ("cpm-ixr-e", big)),
+            Variant("IXR-e Big GNSS", f"{big_ports}; GNSS receiver", ("cpm-ixr-e-gnss", big)),
+            Variant("IXR-e Small", small_ports, ("cpm-ixr-e", small)),
+            Variant("IXR-e Small GNSS", f"{small_ports}; GNSS receiver", ("cpm-ixr-e-gnss", small)),
+        ),
+    )
+
+    # Single-container systems: the CPM carries the ports as one built-in MDA.
+    for chassis_id, card, mda in (
+        ("ixr-ec", "cpm-ixr-ec", "m4-1g-tx+20-1g-sfp+6-10g-sfp+"),
+        ("ixr-e2", "cpm-ixr-e2", "m2-qsfpdd+2-qsfp28+24-sfp28"),
+        ("ixr-e2c", "cpm-ixr-e2c", "m12-sfp28+2-qsfp28"),
+        ("ixr-e2n", "cpm-ixr-e2n", "m4-sfp+4-sfp+"),
+        ("ixr-e2sc", "cpm-ixr-e2sc", "m16-sfp++4-sfp28"),
+        ("ixr-e3c", "cpm-ixr-e3c", "m4-qsfp28+16-sfp28+8-sfp56"),
+        ("ixr-e3x", "cpm-ixr-e3x", "m16-sfp112+15-sfp56+6-qsfpdd"),
+    ):
+        model.add_part(mda_card(card, "cpm", {1: mda}))
+        model.chassis[chassis_id] = integrated_chassis(chassis_id, card)
+    # IXR-e2n-s: SR-SIM runs it as either type in slot A, both with the same built-in MDA.
+    for card in ("imm4-sfp+4-sfp+-s", "cpm-ixr-e2n-s"):
+        model.add_part(mda_card(card, "cpm", {1: "m4-sfp+4-sfp+-s"}))
+    model.chassis["ixr-e2n-s"] = Chassis(
+        "ixr-e2n-s",
+        slots=(Slot("integrated", ("cpm",), srsim="A", types=("imm4-sfp+4-sfp+-s", "cpm-ixr-e2n-s")),),
+        integrated="imm4-sfp+4-sfp+-s",
+    )
+
+
 def build_model() -> Model:
     model = Model()
     sr_s_family(model)
@@ -313,6 +450,7 @@ def build_model() -> Model:
     sr_a_family(model)
     xrs_family(model)
     sar_family(model)
+    ixr_family(model)
     check_model(model)
     return model
 
@@ -376,6 +514,8 @@ def model_json(model: Model) -> dict[str, Any]:
             data["exclusive"] = [list(group) for group in item.exclusive]
         if item.integrated:
             data["integrated"] = item.integrated
+        if item.card_mdas:
+            data["card_mdas"] = {card: list(mdas) for card, mdas in item.card_mdas}
         if item.variants:
             data["variants"] = [
                 {"name": v.name, "description": v.description, "parts": list(v.parts)}
@@ -415,6 +555,9 @@ def _placement_issue(owner: str, slots: tuple[Slot, ...], slot: Slot, type_: str
     if homes:
         return Issue("built-in", path, f"{type_} is built into slot {', '.join(homes)} of {owner}, not slot {slot.srsim}")
     if slot.types and type_ not in slot.types:
+        fits = [str(other.srsim) for other in slots if type_ in other.types]
+        if fits:
+            return Issue("slot-type", path, f"{type_} fits slot {', '.join(fits)} of {owner}, not slot {slot.srsim}")
         return Issue("slot-type", path, f"slot {slot.srsim} of {owner} takes {', '.join(slot.types)}, not {type_}")
     return None
 
@@ -458,6 +601,18 @@ def _module_issues(model: Model, part: Part, component: dict[str, Any], path: st
             mda_path = f"{path}.xiom[{_slot(xiom.get('slot'))}].mda"
             issues.extend(_nested_issues(iom_part, _items(xiom.get("mda")), mda_path, "mda-slot", "MDA"))
     return issues
+
+
+def _chassis_mda_issues(chassis: Chassis, card_type: str, component: dict[str, Any], path: str) -> list[Issue]:
+    """MDAs that this chassis's own version of the card cannot take (e.g. a wide MDA in an IXR-R6d)."""
+    allowed = dict(chassis.card_mdas).get(card_type)
+    if allowed is None:
+        return []
+    return [
+        Issue("chassis-mda", f"{path}.mda[{_slot(item.get('slot'))}]", f"the {chassis.id} has no {item.get('type')} for its {card_type}")
+        for item in _items(component.get("mda"))
+        if item.get("type") and item.get("type") not in allowed
+    ]
 
 
 def _carrier_fit(carrier: Part, cpms: list[dict[str, Any]], used: set[str]) -> str:
@@ -560,6 +715,7 @@ def hardware_issues(model: Model, chassis_id: str, components: list[Any]) -> lis
             issues.append(Issue("slot-kind", slot_text, f"slot {slot_text} takes {'/'.join(slot.accepts)}, not {part.type}"))
             continue
         issues.extend(_module_issues(model, part, card, slot_text))
+        issues.extend(_chassis_mda_issues(chassis, part.type, card, slot_text))
 
     issues.extend(_cpm_issues(model, chassis, cpms, used))
     for group in chassis.exclusive:

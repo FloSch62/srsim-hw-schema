@@ -433,7 +433,7 @@ describe("topology validation", () => {
     );
 
     assert.equal(report.valid, false);
-    assert.ok(report.issues.some((issue) => issue.message.includes("m20-1g-csfp must use MDA slot(s) 1, 2, 3")));
+    assert.ok(report.issues.some((issue) => issue.message.includes("m20-1g-csfp fits slot 1, 2, 3 of iom-ixr-r4, not slot 4")));
   });
 
   it("rejects direct MDA slots that the card does not have", () => {
