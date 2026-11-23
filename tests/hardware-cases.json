@@ -167,6 +167,22 @@
     "issues": [{"code": "no-such-slot", "path": "4"}]
   },
   {
+    "name": "SR-a4: a single IOM-a with four MDA-a slots",
+    "chassis": "sr-a4",
+    "components": [
+      {"slot": "A", "type": "cpm-a"},
+      {"slot": 1, "type": "iom-a", "mda": [{"slot": 1, "type": "ma44-1gb-csfp"}, {"slot": 4, "type": "maxp1-100gb-cfp"}]},
+      {"slot": 2, "type": "iom-a"}
+    ],
+    "issues": [{"code": "no-such-slot", "path": "2"}]
+  },
+  {
+    "name": "SR-a8: two IOM-a slots, not eight",
+    "chassis": "sr-a8",
+    "components": [{"slot": "A", "type": "cpm-a"}, {"slot": 2, "type": "iom-a"}, {"slot": 3, "type": "iom-a"}],
+    "issues": [{"code": "no-such-slot", "path": "3"}]
+  },
+  {
     "name": "Chassis without a model are not checked",
     "chassis": "ixr-e2",
     "components": [{"slot": 99, "type": "iom5-e"}],

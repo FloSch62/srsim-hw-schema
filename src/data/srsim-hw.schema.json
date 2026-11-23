@@ -10613,6 +10613,515 @@
                             }
                         }
                     }
+                },
+                {
+                    "properties": {
+                        "mda": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3,
+                                            4
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 4
+                        },
+                        "xiom": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3,
+                                            4
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 4
+                        }
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 4
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 4
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "slot": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "slot"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "slot": {
+                                "enum": [
+                                    1
+                                ]
+                            }
+                        }
+                    }
+                }
+            ],
+            "required": [
+                "slot"
+            ]
+        },
+        "srsim-component-sr-a8": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/srsim-component"
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "slot": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "slot"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "type": {
+                                "enum": [
+                                    "cpm-a"
+                                ]
+                            }
+                        }
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "slot": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "slot"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "type": {
+                                "enum": [
+                                    "iom-a"
+                                ]
+                            }
+                        }
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "cpm-a"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "mda"
+                                    ]
+                                }
+                            },
+                            {
+                                "not": {
+                                    "required": [
+                                        "xiom"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "iom-a"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "xiom"
+                                    ]
+                                }
+                            }
+                        ],
+                        "properties": {
+                            "mda": {
+                                "items": {
+                                    "properties": {
+                                        "type": {
+                                            "enum": [
+                                                "ma2-10gb-sfp+12-1gb-sfp",
+                                                "ma20-1gb-tx",
+                                                "ma4-10gb-sfp+",
+                                                "ma44-1gb-csfp",
+                                                "maxp1-100gb-cfp",
+                                                "maxp1-100gb-cfp2",
+                                                "maxp1-100gb-cfp4",
+                                                "maxp10-10/1gb-msec-sfp+",
+                                                "maxp10-10gb-sfp+"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "properties": {
+                        "mda": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3,
+                                            4
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 4
+                        },
+                        "xiom": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3,
+                                            4
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 4
+                        }
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 4
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 4
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "slot": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "slot"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "slot": {
+                                "enum": [
+                                    1,
+                                    2
+                                ]
+                            }
+                        }
+                    }
                 }
             ],
             "required": [
@@ -13855,10 +14364,7 @@
                     "if": {
                         "properties": {
                             "type": {
-                                "enum": [
-                                    "sr-a4",
-                                    "sr-a8"
-                                ]
+                                "const": "sr-a4"
                             }
                         },
                         "required": [
@@ -13905,6 +14411,65 @@
                                 ],
                                 "items": {
                                     "$ref": "#/definitions/srsim-component-sr-a4"
+                                },
+                                "minItems": 2,
+                                "type": "array",
+                                "uniqueItems": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "sr-a8"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "allOf": [
+                            {
+                                "not": {
+                                    "required": [
+                                        "sfm"
+                                    ]
+                                }
+                            }
+                        ],
+                        "properties": {
+                            "components": {
+                                "allOf": [
+                                    {
+                                        "contains": {
+                                            "properties": {
+                                                "slot": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "slot"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "contains": {
+                                            "properties": {
+                                                "slot": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "slot"
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "items": {
+                                    "$ref": "#/definitions/srsim-component-sr-a8"
                                 },
                                 "minItems": 2,
                                 "type": "array",
@@ -14222,7 +14787,7 @@
     "x-srsim-metadata": {
         "allow_unknown_values": false,
         "chassis": 50,
-        "component_definitions": 47,
+        "component_definitions": 48,
         "default_rows": 84,
         "generated_at": "2026-10-15T11:53:41.189216+00:00",
         "models": 52,

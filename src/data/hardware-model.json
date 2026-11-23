@@ -916,6 +916,75 @@
                     ]
                 }
             ]
+        },
+        "sr-a4": {
+            "slots": [
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-a"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-a"
+                    ]
+                }
+            ]
+        },
+        "sr-a8": {
+            "slots": [
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-a"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-a"
+                    ]
+                }
+            ]
         }
     },
     "parts": {
@@ -1084,6 +1153,9 @@
             "kind": "cpm"
         },
         "cpm-2se": {
+            "kind": "cpm"
+        },
+        "cpm-a": {
             "kind": "cpm"
         },
         "cpm-e": {
@@ -1265,6 +1337,39 @@
                     "fixed": "imm24-1gb-xp-sfp",
                     "id": "mda-2",
                     "srsim": 2
+                }
+            ]
+        },
+        "iom-a": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-4",
+                    "srsim": 4
                 }
             ]
         },

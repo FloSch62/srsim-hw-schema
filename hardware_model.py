@@ -263,12 +263,21 @@ def sr_e_family(model: Model) -> None:
         model.chassis[chassis_id] = iom_chassis(chassis_id, ioms, "cpm-e")
 
 
+def sr_a_family(model: Model) -> None:
+    """7750 SR-a4/a8: one or two IOM-a, each with four MDA-a slots."""
+    model.add_part(Part("cpm-a", "cpm"))
+    model.add_part(mda_card("iom-a", "line-card", dict.fromkeys(range(1, 5), "")))
+    model.chassis["sr-a4"] = iom_chassis("sr-a4", 1, "cpm-a")
+    model.chassis["sr-a8"] = iom_chassis("sr-a8", 2, "cpm-a")
+
+
 def build_model() -> Model:
     model = Model()
     sr_s_family(model)
     sr_1_fp5_family(model)
     sr_classic_family(model)
     sr_e_family(model)
+    sr_a_family(model)
     check_model(model)
     return model
 
