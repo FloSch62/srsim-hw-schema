@@ -18,6 +18,7 @@ import Typography from "@mui/material/Typography";
 import { useMemo, useState } from "react";
 
 import { componentFromMatrixRow, matrixSearchRows } from "../matrix";
+import { productHelp } from "../productNames";
 import type { MatrixRowAction } from "../matrix";
 import type { MatrixEntry, MatrixRow, SrsimComponent } from "../types";
 
@@ -33,9 +34,15 @@ function ValueChips({ values }: { values: string[] | undefined }) {
   }
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-      {values.map((value) => (
-        <Chip key={value} size="small" variant="outlined" label={value} />
-      ))}
+      {values.map((value) => {
+        const chip = <Chip key={value} size="small" variant="outlined" label={value} />;
+        const help = productHelp(value);
+        return help ? (
+          <Tooltip key={value} title={help} disableInteractive enterDelay={300}>
+            {chip}
+          </Tooltip>
+        ) : chip;
+      })}
     </Box>
   );
 }

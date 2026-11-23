@@ -119,6 +119,23 @@ full chassis/card/SFM/XIOM/MDA compatibility rules as JSON Schema, so
 schema-aware editors can validate incompatible tuples when they can resolve the
 sidecar.
 
+### Product names and help texts
+
+The `srsim-*-types` enums carry `enumDescriptions` and
+`markdownEnumDescriptions` (shown on hover and in completion by VS Code and
+yaml-language-server), for example `7750 SR-7s: 6 line-card slots, modular
+chassis; FP4/FP5 compatible; dual CPM support`. The text is the Nokia name
+(when it differs from the schema ID) plus `help_text_2` from
+`src/data/product-enhancements.json`, which only
+contains entries with sufficient evidence. IDs without a vetted entry get an
+empty description. Use `--product-names <file>` to pick another file, or
+`--product-names ''` to omit the descriptions. The web configurator shows the
+same text under each dropdown option and as a tooltip on matrix-row values.
+Chassis dropdowns are grouped by the `product_family` field (7750 SR-s, SR-x,
+SR, SR-e, SR-a, then 7450, 7705, 7250, 7950); MDA and XIOM dropdowns by
+forwarding generation (FP5/E5, FP4/E4, FP3),
+taken from the `forwarding_generation` field of the same file.
+
 By default, generated enums are strict. Use `--allow-unknown-values` only when
 you want the schema to keep known values as hints while allowing arbitrary
 strings.

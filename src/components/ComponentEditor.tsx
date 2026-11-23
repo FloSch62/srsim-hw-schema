@@ -72,7 +72,8 @@ import type {
 
 import { cpmCarriers, fittingCarrier, moduleSlots } from "../hardwareModel";
 import type { CpmCarrier } from "../hardwareModel";
-import { FieldAutocomplete } from "./FieldAutocomplete";
+import { chassisGroup, chassisGroupOrder, generationGroup, generationGroupOrder, productHelp } from "../productNames";
+import { FieldAutocomplete, OptionText } from "./FieldAutocomplete";
 
 interface ComponentEditorProps {
   matrix: MatrixEntry[];
@@ -511,6 +512,8 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
           label="Chassis type"
           value={config.chassis}
           options={chassisOptions}
+          groupBy={chassisGroup}
+          groupOrder={chassisGroupOrder}
           optionAdornment={(chassis) => (
             <Chip
               size="small"
@@ -528,14 +531,19 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
             labelId="sfm-select-label"
             label="SFM"
             value={config.sfm || defaultSfm}
+            renderValue={(sfm) => (sfm === defaultSfm ? `Default (${sfm})` : sfm)}
             onChange={(event) => applySfm(event.target.value)}
           >
-            {defaultSfm ? <MenuItem value={defaultSfm}>Default ({defaultSfm})</MenuItem> : null}
+            {defaultSfm ? (
+              <MenuItem value={defaultSfm}>
+                <OptionText label={`Default (${defaultSfm})`} description={productHelp(defaultSfm)} />
+              </MenuItem>
+            ) : null}
             {sharedSfmOptions
               .filter((sfm) => sfm !== defaultSfm)
               .map((sfm) => (
                 <MenuItem key={sfm} value={sfm}>
-                  {sfm}
+                  <OptionText label={sfm} description={productHelp(sfm)} />
                 </MenuItem>
               ))}
           </Select>
@@ -1322,6 +1330,8 @@ function NestedMdaSection({
             label="Type"
             value={mda.type ?? ""}
             options={options}
+            groupBy={generationGroup}
+            groupOrder={generationGroupOrder}
             defaultOptions={defaultTypes?.[index] ?? []}
             onChange={(type) => onUpdate(index, { type })}
             allowFreeText={false}
@@ -1406,6 +1416,8 @@ function NestedXiomSection({
               label="XIOM type"
               value={xiom.type ?? ""}
               options={xiomTypeOptions}
+              groupBy={generationGroup}
+              groupOrder={generationGroupOrder}
               defaultOptions={xiomDefaultTypes?.[xiomIndex] ?? []}
               onChange={(type) => onUpdate(xiomIndex, { type })}
               allowFreeText={false}
