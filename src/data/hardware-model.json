@@ -505,6 +505,37 @@
                 }
             ]
         },
+        "sr-1e": {
+            "slots": [
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-e"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-e"
+                    ]
+                }
+            ]
+        },
         "sr-1s": {
             "integrated": "cpm-1s",
             "slots": [
@@ -605,6 +636,44 @@
                 }
             ]
         },
+        "sr-2e": {
+            "slots": [
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-e"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-e"
+                    ]
+                }
+            ]
+        },
         "sr-2s": {
             "slots": [
                 {
@@ -683,6 +752,51 @@
                     "srsim": "B",
                     "types": [
                         "cpm-2se"
+                    ]
+                }
+            ]
+        },
+        "sr-3e": {
+            "slots": [
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "id": "iom-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-e"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-e"
                     ]
                 }
             ]
@@ -972,6 +1086,9 @@
         "cpm-2se": {
             "kind": "cpm"
         },
+        "cpm-e": {
+            "kind": "cpm"
+        },
         "cpm-s": {
             "kind": "cpm"
         },
@@ -1148,6 +1265,39 @@
                     "fixed": "imm24-1gb-xp-sfp",
                     "id": "mda-2",
                     "srsim": 2
+                }
+            ]
+        },
+        "iom-e": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-4",
+                    "srsim": 4
                 }
             ]
         },

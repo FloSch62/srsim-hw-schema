@@ -281,7 +281,7 @@ describe("SR-SIM matrix helpers", () => {
 
     const sr1e = getEntry(matrix, "sr-1e");
     assert.deepEqual(directMdaSlotOptions(sr1e, { slot: 1, type: "iom-e" }, ""), [1, 2, 3, 4]);
-    assert.deepEqual(directMdaSlotOptions(sr1e, { slot: 1, type: "iom-e" }, "", 2, 1, "isa2-aa"), [4]);
+    assert.deepEqual(directMdaSlotOptions(sr1e, { slot: 1, type: "iom-e" }, "", 2, 1, "isa2-aa"), [1, 2, 3, 4]);
 
     const ixrR4 = getEntry(matrix, "ixr-r4");
     assert.deepEqual(directMdaSlotOptions(ixrR4, { slot: 1, type: "iom-ixr-r4" }, "", 2, 1, "m20-1g-csfp"), [1, 2, 3]);

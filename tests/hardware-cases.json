@@ -151,6 +151,22 @@
     "issues": [{"code": "fixed", "path": "9.mda[1]"}, {"code": "module-slot", "path": "9.mda[2]"}, {"code": "no-such-slot", "path": "10"}]
   },
   {
+    "name": "SR-1e: one IOM-e with four MDA-e slots, CPM-e in A or B",
+    "chassis": "sr-1e",
+    "components": [
+      {"slot": "B", "type": "cpm-e"},
+      {"slot": 1, "type": "iom-e", "mda": [{"slot": 1, "type": "isa2-aa"}, {"slot": 4, "type": "me10-10gb-sfp+"}, {"slot": 5, "type": "me10-10gb-sfp+"}]},
+      {"slot": 2, "type": "iom-e"}
+    ],
+    "issues": [{"code": "module-slot", "path": "1.mda[5]"}, {"code": "no-such-slot", "path": "2"}]
+  },
+  {
+    "name": "SR-3e: three IOM-e slots",
+    "chassis": "sr-3e",
+    "components": [{"slot": "A", "type": "cpm-e"}, {"slot": 3, "type": "iom-e"}, {"slot": 4, "type": "iom-e"}],
+    "issues": [{"code": "no-such-slot", "path": "4"}]
+  },
+  {
     "name": "Chassis without a model are not checked",
     "chassis": "ixr-e2",
     "components": [{"slot": 99, "type": "iom5-e"}],

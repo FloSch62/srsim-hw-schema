@@ -111,6 +111,11 @@ def iom_slots(count: int) -> tuple[Slot, ...]:
     return tuple(Slot(f"iom-{n}", ("line-card",), srsim=n) for n in range(1, count + 1))
 
 
+def iom_chassis(chassis_id: str, ioms: int, cpm: str) -> Chassis:
+    """A chassis with numbered IOM/IMM slots and two CPM slots A and B."""
+    return Chassis(chassis_id, slots=(*iom_slots(ioms), *cpm_slots((cpm,), 2)))
+
+
 def integrated_chassis(chassis_id: str, card: str) -> Chassis:
     """A single-container chassis whose integrated card SR-SIM runs as component slot A."""
     return Chassis(
@@ -247,9 +252,15 @@ def sr_classic_family(model: Model) -> None:
         ("ess-12", 10),
         ("sr-12e", 9),
     ):
-        model.chassis[chassis_id] = Chassis(
-            chassis_id, slots=(*iom_slots(ioms), *cpm_slots(("cpm5",), 2))
-        )
+        model.chassis[chassis_id] = iom_chassis(chassis_id, ioms, "cpm5")
+
+
+def sr_e_family(model: Model) -> None:
+    """7750 SR-1e/2e/3e: one to three IOM-e, each with four MDA-e slots."""
+    model.add_part(Part("cpm-e", "cpm"))
+    model.add_part(mda_card("iom-e", "line-card", dict.fromkeys(range(1, 5), "")))
+    for ioms, chassis_id in enumerate(("sr-1e", "sr-2e", "sr-3e"), start=1):
+        model.chassis[chassis_id] = iom_chassis(chassis_id, ioms, "cpm-e")
 
 
 def build_model() -> Model:
@@ -257,6 +268,7 @@ def build_model() -> Model:
     sr_s_family(model)
     sr_1_fp5_family(model)
     sr_classic_family(model)
+    sr_e_family(model)
     check_model(model)
     return model
 
