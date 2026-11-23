@@ -112,6 +112,12 @@
     "issues": [{"code": "fixed", "path": "1.mda[1]"}]
   },
   {
+    "name": "DMS-1-24D: the MDA is fixed",
+    "chassis": "dms-1-24d",
+    "components": [{"slot": "A", "type": "cpm-1x"}, {"slot": 1, "type": "dms24-800g-qsfpdd-1", "mda": [{"slot": 1, "type": "m24-800g-qsfpdd-1"}]}],
+    "issues": [{"code": "fixed", "path": "1.mda[1]"}]
+  },
+  {
     "name": "Chassis without a model are not checked",
     "chassis": "sr-7",
     "components": [{"slot": 99, "type": "iom5-e"}],

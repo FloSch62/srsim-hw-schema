@@ -1,5 +1,25 @@
 {
     "chassis": {
+        "dms-1-24d": {
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "fixed": "cpm-1x",
+                    "id": "cpm-a",
+                    "srsim": "A"
+                },
+                {
+                    "accepts": [
+                        "line-card"
+                    ],
+                    "fixed": "dms24-800g-qsfpdd-1",
+                    "id": "card-1",
+                    "srsim": 1
+                }
+            ]
+        },
         "sr-1-24d": {
             "slots": [
                 {
@@ -530,6 +550,19 @@
         },
         "cpm2-s": {
             "kind": "cpm"
+        },
+        "dms24-800g-qsfpdd-1": {
+            "kind": "line-card",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "d24-800g-qsfpdd-1",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
         },
         "i24-800g-qsfpdd-1": {
             "kind": "line-card",
