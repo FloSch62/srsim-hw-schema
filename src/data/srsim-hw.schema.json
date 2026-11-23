@@ -15496,7 +15496,7 @@
             "type": "object"
         },
         "srsim-mda-types": {
-            "description": "SR-SIM MDA types generated from Nokia supported hardware tables.",
+            "description": "SR-SIM MDA types generated from Nokia supported hardware tables. On an XCM, XMA-s and four/six-complex XMA2-s (12.0T/18.0T) are provisioned directly as card > mda.",
             "enum": [
                 "a32-chds1v2",
                 "d24-800g-qsfpdd-1",
@@ -19074,7 +19074,7 @@
             "type": "object"
         },
         "srsim-xiom-types": {
-            "description": "SR-SIM XIOM types generated from Nokia supported hardware tables.",
+            "description": "SR-SIM XIOM types generated from Nokia supported hardware tables. Besides IOM-s/IOM2-se, this lists the one/two-complex XMA2-s (3.0T/6.0T), which SR OS provisions as card > xiom > mda with an automatically set MDA.",
             "enum": [
                 "iom-s-1.5t",
                 "iom-s-3.0t",

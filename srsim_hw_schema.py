@@ -1259,13 +1259,16 @@ def build_clab_definitions(
             product_names,
         ),
         "srsim-xiom-types": enum_schema(
-            "SR-SIM XIOM types generated from Nokia supported hardware tables.",
+            "SR-SIM XIOM types generated from Nokia supported hardware tables. Besides IOM-s/IOM2-se, "
+            "this lists the one/two-complex XMA2-s (3.0T/6.0T), which SR OS provisions as card > xiom > mda "
+            "with an automatically set MDA.",
             values["xiom"],
             allow_unknown,
             product_names,
         ),
         "srsim-mda-types": enum_schema(
-            "SR-SIM MDA types generated from Nokia supported hardware tables.",
+            "SR-SIM MDA types generated from Nokia supported hardware tables. On an XCM, XMA-s and "
+            "four/six-complex XMA2-s (12.0T/18.0T) are provisioned directly as card > mda.",
             values["mda"],
             allow_unknown,
             product_names,
