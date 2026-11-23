@@ -985,6 +985,198 @@
                     ]
                 }
             ]
+        },
+        "xrs-20": {
+            "slots": [
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-4",
+                    "srsim": 4
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-5",
+                    "srsim": 5
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-6",
+                    "srsim": 6
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-7",
+                    "srsim": 7
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-8",
+                    "srsim": 8
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-9",
+                    "srsim": 9
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-10",
+                    "srsim": 10
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-x20",
+                        "cpm2-x20"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-x20",
+                        "cpm2-x20"
+                    ]
+                }
+            ]
+        },
+        "xrs-20e": {
+            "slots": [
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-4",
+                    "srsim": 4
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-5",
+                    "srsim": 5
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-6",
+                    "srsim": 6
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-7",
+                    "srsim": 7
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-8",
+                    "srsim": 8
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-9",
+                    "srsim": 9
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-10",
+                    "srsim": 10
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-x20",
+                        "cpm2-x20"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-x20",
+                        "cpm2-x20"
+                    ]
+                }
+            ]
         }
     },
     "parts": {
@@ -1164,7 +1356,13 @@
         "cpm-s": {
             "kind": "cpm"
         },
+        "cpm-x20": {
+            "kind": "cpm"
+        },
         "cpm2-s": {
+            "kind": "cpm"
+        },
+        "cpm2-x20": {
             "kind": "cpm"
         },
         "cpm5": {
@@ -1696,6 +1894,25 @@
                 }
             ]
         },
+        "xcm-x20": {
+            "kind": "xcm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-2",
+                    "srsim": 2
+                }
+            ]
+        },
         "xcm2-14s": {
             "kind": "xcm",
             "slots": [
@@ -1727,6 +1944,25 @@
                     ],
                     "id": "module-1",
                     "srsim": 1
+                }
+            ]
+        },
+        "xcm2-x20": {
+            "kind": "xcm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-2",
+                    "srsim": 2
                 }
             ]
         },

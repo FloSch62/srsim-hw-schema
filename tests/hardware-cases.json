@@ -183,6 +183,16 @@
     "issues": [{"code": "no-such-slot", "path": "3"}]
   },
   {
+    "name": "XRS-20: ten XCM slots, two XMA slots per XCM",
+    "chassis": "xrs-20",
+    "components": [
+      {"slot": "A", "type": "cpm2-x20"},
+      {"slot": 10, "type": "xcm2-x20", "mda": [{"slot": 1, "type": "x24-100g-qsfp28"}, {"slot": 2, "type": "x12-400g-qsfpdd"}, {"slot": 3, "type": "x24-100g-qsfp28"}]},
+      {"slot": 11, "type": "xcm2-x20"}
+    ],
+    "issues": [{"code": "module-slot", "path": "10.mda[3]"}, {"code": "no-such-slot", "path": "11"}]
+  },
+  {
     "name": "Chassis without a model are not checked",
     "chassis": "ixr-e2",
     "components": [{"slot": 99, "type": "iom5-e"}],

@@ -271,6 +271,17 @@ def sr_a_family(model: Model) -> None:
     model.chassis["sr-a8"] = iom_chassis("sr-a8", 2, "cpm-a")
 
 
+def xrs_family(model: Model) -> None:
+    """7950 XRS-20/20e: ten XCM slots with two XMA slots each, and redundant CPMs."""
+    cpms = ("cpm-x20", "cpm2-x20")
+    for type_ in cpms:
+        model.add_part(Part(type_, "cpm"))
+    for type_ in ("xcm-x20", "xcm2-x20"):
+        model.add_part(mda_card(type_, "xcm", {1: "", 2: ""}))
+    for chassis_id in ("xrs-20", "xrs-20e"):
+        model.chassis[chassis_id] = Chassis(chassis_id, slots=(*xcm_slots(10), *cpm_slots(cpms, 2)))
+
+
 def build_model() -> Model:
     model = Model()
     sr_s_family(model)
@@ -278,6 +289,7 @@ def build_model() -> Model:
     sr_classic_family(model)
     sr_e_family(model)
     sr_a_family(model)
+    xrs_family(model)
     check_model(model)
     return model
 
