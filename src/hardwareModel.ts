@@ -60,7 +60,14 @@ export function moduleSlots(cardType: string | undefined): number[] {
 export function cardSlots(cardType: string | undefined): number[] {
   const part = parts[cardType ?? ""];
   if (!part || part.kind === "cma") return [];
-  return (part.slots ?? []).flatMap((slot) => (typeof slot.srsim === "number" ? [slot.srsim] : []));
+  return (part.slots ?? []).flatMap((slot) => (typeof slot.srsim === "number" && slot.accepts.length ? [slot.srsim] : []));
+}
+
+/** Slot numbers a card has but cannot fill, e.g. the SAR-Hmc's MDA slot 4. */
+export function emptySlots(cardType: string | undefined): number[] {
+  return (parts[cardType ?? ""]?.slots ?? []).flatMap((slot) =>
+    typeof slot.srsim === "number" && !slot.accepts.length ? [slot.srsim] : []
+  );
 }
 
 /** The slots of a known card that can hold mdaType (built-in parts only fit their own slot). */
@@ -69,7 +76,9 @@ export function mdaSlotsFor(cardType: string | undefined, mdaType: string): numb
   if (!part || part.kind === "cma") return [];
   const slots = part.slots ?? [];
   return slots.flatMap((slot) =>
-    typeof slot.srsim === "number" && !placementIssue(cardType ?? "", slots, slot, mdaType, "") ? [slot.srsim] : []
+    typeof slot.srsim === "number" && slot.accepts.length && !placementIssue(cardType ?? "", slots, slot, mdaType, "")
+      ? [slot.srsim]
+      : []
   );
 }
 
@@ -99,7 +108,8 @@ function placementIssue(owner: string, slots: ModelSlot[], slot: ModelSlot, type
 
 /** Items placed in the slots of a card: each needs an existing slot that can hold its type. */
 function nestedIssues(part: ModelPart, partType: string, nested: Item[], path: string, code: string, what: string): HardwareIssue[] {
-  const slots = part.slots ?? [];
+  const slots = (part.slots ?? []).filter((slot) => slot.accepts.length);
+  const empty = srsimSlots((part.slots ?? []).filter((slot) => !slot.accepts.length));
   const names = srsimSlots(slots);
   const issues: HardwareIssue[] = [];
   for (const item of nested) {
@@ -107,6 +117,10 @@ function nestedIssues(part: ModelPart, partType: string, nested: Item[], path: s
     if (!slotValue) continue;
     const slot = slots.find((candidate) => String(candidate.srsim) === slotValue);
     const itemPath = `${path}[${slotValue}]`;
+    if (empty.includes(slotValue)) {
+      issues.push({ code: "empty-slot", path: itemPath, message: `slot ${slotValue} of ${partType} takes no ${what}` });
+      continue;
+    }
     if (!slot) {
       issues.push({
         code,

@@ -193,6 +193,32 @@
     "issues": [{"code": "module-slot", "path": "10.mda[3]"}, {"code": "no-such-slot", "path": "11"}]
   },
   {
+    "name": "SAR-Mx: one pluggable MDA slot; the built-in MDA stays in slot 2",
+    "chassis": "sar-mx",
+    "components": [
+      {"slot": "A", "type": "iom-sar-1x", "mda": [{"slot": 1, "type": "m4-1g-rj+6-10g-sfp++2-25g-sfp28"}, {"slot": 2, "type": "m8-1g-sfp"}, {"slot": 3, "type": "isa-ms-v"}]}
+    ],
+    "issues": [{"code": "built-in", "path": "A.mda[1]"}, {"code": "fixed", "path": "A.mda[2]"}]
+  },
+  {
+    "name": "SAR-Hx: a pluggable MDA and the built-in ones",
+    "chassis": "sar-hx",
+    "components": [{"mda": [{"slot": 1, "type": "m8-t1e1-rj48"}, {"slot": 2, "type": "m4-1g-rj+6-10g-sfp++2-25g-sfp28"}, {"slot": 4, "type": "isa-ms-v"}]}],
+    "issues": []
+  },
+  {
+    "name": "SAR-1: every MDA slot is built in",
+    "chassis": "sar-1",
+    "components": [{"slot": "A", "type": "cpm-sar-hm", "mda": [{"slot": 1, "type": "isa-ms-v"}, {"slot": 4, "type": "isa-ms-v"}]}],
+    "issues": [{"code": "slot-type", "path": "A"}, {"code": "fixed", "path": "A.mda[1]"}, {"code": "module-slot", "path": "A.mda[4]"}]
+  },
+  {
+    "name": "SAR-Hmc: MDA slot 4 stays empty",
+    "chassis": "sar-hmc",
+    "components": [{"slot": "A", "mda": [{"slot": 4, "type": "i1-wlan"}, {"slot": 6, "type": "isa-ms-v"}]}],
+    "issues": [{"code": "empty-slot", "path": "A.mda[4]"}]
+  },
+  {
     "name": "Chassis without a model are not checked",
     "chassis": "ixr-e2",
     "components": [{"slot": 99, "type": "iom5-e"}],

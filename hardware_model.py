@@ -81,12 +81,15 @@ def module_carrier(type_: str, kind: str, modules: int) -> Part:
     )
 
 
-def mda_card(type_: str, kind: str, mdas: dict[int, str]) -> Part:
-    """A card with MDA slots, keyed by SR-SIM slot: the built-in MDA type, or "" for a pluggable slot."""
+def mda_card(type_: str, kind: str, mdas: dict[int, str | None]) -> Part:
+    """A card with MDA slots, keyed by SR-SIM slot: the built-in MDA type, "" for a pluggable slot, or None for
+    a slot number the card has but cannot fill."""
     return Part(
         type=type_,
         kind=kind,
-        slots=tuple(Slot(f"mda-{n}", ("mda",), srsim=n, fixed=fixed) for n, fixed in mdas.items()),
+        slots=tuple(
+            Slot(f"mda-{n}", () if fixed is None else ("mda",), srsim=n, fixed=fixed or "") for n, fixed in mdas.items()
+        ),
     )
 
 
@@ -282,6 +285,25 @@ def xrs_family(model: Model) -> None:
         model.chassis[chassis_id] = Chassis(chassis_id, slots=(*xcm_slots(10), *cpm_slots(cpms, 2)))
 
 
+def sar_family(model: Model) -> None:
+    """7705 SAR: single-container chassis with numbered MDA slots, mostly holding built-in MDAs."""
+    isa = "isa-ms-v"
+    model.add_part(mda_card("iom-sar", "cpm", {1: "m10-sfp++6-sfp", 2: isa, 3: isa}))
+    model.chassis["sar-1"] = integrated_chassis("sar-1", "iom-sar")
+    # SAR-Hx and SAR-Mx: one pluggable MDA slot next to the built-in ports.
+    model.add_part(mda_card("iom-sar-1x", "cpm", {1: "", 2: "m4-1g-rj+6-10g-sfp++2-25g-sfp28", 3: isa, 4: isa}))
+    for chassis_id in ("sar-hx", "sar-mx"):
+        model.chassis[chassis_id] = integrated_chassis(chassis_id, "iom-sar-1x")
+    # SAR-Hm and SAR-Hmc have no MDA slots to fill; the default layout places each integrated MDA.
+    hm = {1: "i2-cellular", 2: "i6-10/100eth-tx", 3: "i2-sdi", 4: "i1-wlan", 5: isa, 6: isa}
+    model.add_part(mda_card("cpm-sar-hm", "cpm", hm))
+    model.chassis["sar-hm"] = integrated_chassis("sar-hm", "cpm-sar-hm")
+    # The SAR-Hmc has no WLAN, so its MDA slot 4 stays empty.
+    hmc: dict[int, str | None] = {1: "i2-cellular", 2: "i3-10/100eth-tx", 3: "i2-sdi", 4: None, 5: isa, 6: isa}
+    model.add_part(mda_card("cpm-sar-hmc", "cpm", hmc))
+    model.chassis["sar-hmc"] = integrated_chassis("sar-hmc", "cpm-sar-hmc")
+
+
 def build_model() -> Model:
     model = Model()
     sr_s_family(model)
@@ -290,6 +312,7 @@ def build_model() -> Model:
     sr_e_family(model)
     sr_a_family(model)
     xrs_family(model)
+    sar_family(model)
     check_model(model)
     return model
 
@@ -398,7 +421,8 @@ def _placement_issue(owner: str, slots: tuple[Slot, ...], slot: Slot, type_: str
 
 def _nested_issues(part: Part, items: list[dict[str, Any]], path: str, code: str, what: str) -> list[Issue]:
     """Items placed in the slots of part: each needs an existing slot that can hold its type."""
-    slots = {str(slot.srsim): slot for slot in part.slots}
+    slots = {str(slot.srsim): slot for slot in part.slots if slot.accepts}
+    empty = {str(slot.srsim) for slot in part.slots if not slot.accepts}
     issues: list[Issue] = []
     for item in items:
         slot_text = _slot(item.get("slot"))
@@ -406,6 +430,9 @@ def _nested_issues(part: Part, items: list[dict[str, Any]], path: str, code: str
             continue
         slot = slots.get(slot_text)
         item_path = f"{path}[{slot_text}]"
+        if slot_text in empty:
+            issues.append(Issue("empty-slot", item_path, f"slot {slot_text} of {part.type} takes no {what}"))
+            continue
         if slot is None:
             plural = "s" if len(slots) > 1 else ""
             issues.append(Issue(code, item_path, f"{part.type} has {what} slot{plural} {', '.join(sorted(slots))}, not {slot_text}"))
@@ -564,7 +591,7 @@ def card_slots(model: Model, card_type: str) -> list[int]:
     part = model.parts.get(card_type)
     if part is None or part.kind == "cma":
         return []
-    return [slot.srsim for slot in part.slots if isinstance(slot.srsim, int)]
+    return [slot.srsim for slot in part.slots if isinstance(slot.srsim, int) and slot.accepts]
 
 
 def mda_slots_for(model: Model, card_type: str, mda_type: str) -> list[int]:
@@ -575,5 +602,5 @@ def mda_slots_for(model: Model, card_type: str, mda_type: str) -> list[int]:
     return [
         slot.srsim
         for slot in part.slots
-        if isinstance(slot.srsim, int) and _placement_issue(part.type, part.slots, slot, mda_type, "") is None
+        if isinstance(slot.srsim, int) and slot.accepts and _placement_issue(part.type, part.slots, slot, mda_type, "") is None
     ]

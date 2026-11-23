@@ -173,6 +173,81 @@
                 }
             ]
         },
+        "sar-1": {
+            "integrated": "iom-sar",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "iom-sar"
+                    ]
+                }
+            ]
+        },
+        "sar-hm": {
+            "integrated": "cpm-sar-hm",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-sar-hm"
+                    ]
+                }
+            ]
+        },
+        "sar-hmc": {
+            "integrated": "cpm-sar-hmc",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-sar-hmc"
+                    ]
+                }
+            ]
+        },
+        "sar-hx": {
+            "integrated": "iom-sar-1x",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "iom-sar-1x"
+                    ]
+                }
+            ]
+        },
+        "sar-mx": {
+            "integrated": "iom-sar-1x",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "iom-sar-1x"
+                    ]
+                }
+            ]
+        },
         "sr-1": {
             "integrated": "cpm-1",
             "slots": [
@@ -1356,6 +1431,109 @@
         "cpm-s": {
             "kind": "cpm"
         },
+        "cpm-sar-hm": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "i2-cellular",
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "i6-10/100eth-tx",
+                    "id": "mda-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "i2-sdi",
+                    "id": "mda-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "i1-wlan",
+                    "id": "mda-4",
+                    "srsim": 4
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "isa-ms-v",
+                    "id": "mda-5",
+                    "srsim": 5
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "isa-ms-v",
+                    "id": "mda-6",
+                    "srsim": 6
+                }
+            ]
+        },
+        "cpm-sar-hmc": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "i2-cellular",
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "i3-10/100eth-tx",
+                    "id": "mda-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "i2-sdi",
+                    "id": "mda-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [],
+                    "id": "mda-4",
+                    "srsim": 4
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "isa-ms-v",
+                    "id": "mda-5",
+                    "srsim": 5
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "isa-ms-v",
+                    "id": "mda-6",
+                    "srsim": 6
+                }
+            ]
+        },
         "cpm-x20": {
             "kind": "cpm"
         },
@@ -1639,6 +1817,71 @@
                     ],
                     "id": "mda-2",
                     "srsim": 2
+                }
+            ]
+        },
+        "iom-sar": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m10-sfp++6-sfp",
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "isa-ms-v",
+                    "id": "mda-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "isa-ms-v",
+                    "id": "mda-3",
+                    "srsim": 3
+                }
+            ]
+        },
+        "iom-sar-1x": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m4-1g-rj+6-10g-sfp++2-25g-sfp28",
+                    "id": "mda-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "isa-ms-v",
+                    "id": "mda-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "isa-ms-v",
+                    "id": "mda-4",
+                    "srsim": 4
                 }
             ]
         },

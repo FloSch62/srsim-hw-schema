@@ -3282,6 +3282,51 @@
                     "properties": {
                         "mda": {
                             "items": {
+                                "allOf": [
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "isa-ms-v"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        2,
+                                                        3
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "m10-sfp++6-sfp"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        1
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                ],
                                 "properties": {
                                     "type": {
                                         "enum": [
@@ -3325,6 +3370,51 @@
                         "properties": {
                             "mda": {
                                 "items": {
+                                    "allOf": [
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "isa-ms-v"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            2,
+                                                            3
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "m10-sfp++6-sfp"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            1
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "properties": {
                                         "type": {
                                             "enum": [
@@ -3336,6 +3426,140 @@
                                 }
                             }
                         }
+                    }
+                },
+                {
+                    "properties": {
+                        "mda": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 3
+                        },
+                        "xiom": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 3
+                        }
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
                     }
                 }
             ]
@@ -3387,6 +3611,114 @@
                     "properties": {
                         "mda": {
                             "items": {
+                                "allOf": [
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "i1-wlan"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        4
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "i2-cellular"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        1
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "i2-sdi"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        3
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "i6-10/100eth-tx"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        2
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "isa-ms-v"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                ],
                                 "properties": {
                                     "type": {
                                         "enum": [
@@ -3433,6 +3765,114 @@
                         "properties": {
                             "mda": {
                                 "items": {
+                                    "allOf": [
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "i1-wlan"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            4
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "i2-cellular"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            1
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "i2-sdi"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            3
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "i6-10/100eth-tx"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            2
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "isa-ms-v"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            5,
+                                                            6
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "properties": {
                                         "type": {
                                             "enum": [
@@ -3447,6 +3887,248 @@
                                 }
                             }
                         }
+                    }
+                },
+                {
+                    "properties": {
+                        "mda": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3,
+                                            4,
+                                            5,
+                                            6
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 6
+                        },
+                        "xiom": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3,
+                                            4,
+                                            5,
+                                            6
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 6
+                        }
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 4
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 4
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 5
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 5
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 6
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 6
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
                     }
                 }
             ]
@@ -3498,6 +4180,93 @@
                     "properties": {
                         "mda": {
                             "items": {
+                                "allOf": [
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "i2-cellular"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        1
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "i2-sdi"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        3
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "i3-10/100eth-tx"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        2
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "isa-ms-v"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                ],
                                 "properties": {
                                     "type": {
                                         "enum": [
@@ -3543,6 +4312,93 @@
                         "properties": {
                             "mda": {
                                 "items": {
+                                    "allOf": [
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "i2-cellular"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            1
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "i2-sdi"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            3
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "i3-10/100eth-tx"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            2
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "isa-ms-v"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            5,
+                                                            6
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "properties": {
                                         "type": {
                                             "enum": [
@@ -3556,6 +4412,212 @@
                                 }
                             }
                         }
+                    }
+                },
+                {
+                    "properties": {
+                        "mda": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3,
+                                            5,
+                                            6
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 5
+                        },
+                        "xiom": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3,
+                                            5,
+                                            6
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 5
+                        }
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 5
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 5
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 6
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 6
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
                     }
                 }
             ]
@@ -3607,6 +4669,156 @@
                     "properties": {
                         "mda": {
                             "items": {
+                                "allOf": [
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "isa-ms-v"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        3,
+                                                        4
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "m2-1g-sfp+2-10g-sfp+"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        1
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "m4-1g-rj+6-10g-sfp++2-25g-sfp28"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        2
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "m4-rs232-rj45+4-c3794-sfp"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        1
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "m8-1g-rj45"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        1
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "m8-1g-sfp"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        1
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "properties": {
+                                                "type": {
+                                                    "const": "m8-t1e1-rj48"
+                                                }
+                                            },
+                                            "required": [
+                                                "type"
+                                            ]
+                                        },
+                                        "then": {
+                                            "properties": {
+                                                "slot": {
+                                                    "enum": [
+                                                        1
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                ],
                                 "properties": {
                                     "type": {
                                         "enum": [
@@ -3655,6 +4867,156 @@
                         "properties": {
                             "mda": {
                                 "items": {
+                                    "allOf": [
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "isa-ms-v"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            3,
+                                                            4
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "m2-1g-sfp+2-10g-sfp+"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            1
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "m4-1g-rj+6-10g-sfp++2-25g-sfp28"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            2
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "m4-rs232-rj45+4-c3794-sfp"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            1
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "m8-1g-rj45"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            1
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "m8-1g-sfp"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            1
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "properties": {
+                                                    "type": {
+                                                        "const": "m8-t1e1-rj48"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            "then": {
+                                                "properties": {
+                                                    "slot": {
+                                                        "enum": [
+                                                            1
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "properties": {
                                         "type": {
                                             "enum": [
@@ -3671,6 +5033,176 @@
                                 }
                             }
                         }
+                    }
+                },
+                {
+                    "properties": {
+                        "mda": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3,
+                                            4
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 4
+                        },
+                        "xiom": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3,
+                                            4
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 4
+                        }
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 2
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 3
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 4
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 4
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
                     }
                 }
             ]
