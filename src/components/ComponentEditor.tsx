@@ -51,6 +51,7 @@ import {
   isCpmSlot,
   nextCpmSlot,
   nextNumericSlot,
+  onlyChoice,
   slotCountLabel,
   sfmOptions,
   xiomMdaSlotOptions,
@@ -468,7 +469,11 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
           onChange={setChassis}
           allowFreeText={false}
         />
-        <FormControl size="small" fullWidth disabled={!sfmAvailable}>
+        <FormControl
+          size="small"
+          fullWidth
+          disabled={!sfmAvailable || onlyChoice([defaultSfm, ...sharedSfmOptions].filter(Boolean), config.sfm || defaultSfm)}
+        >
           <InputLabel id="sfm-select-label" shrink={sfmAvailable ? undefined : true}>SFM</InputLabel>
           <Select
             labelId="sfm-select-label"
@@ -1131,7 +1136,7 @@ function SlotSelect({
   const visibleOptions = withCurrentSlotOption(options, value);
 
   return (
-    <FormControl size="small" fullWidth>
+    <FormControl size="small" fullWidth disabled={onlyChoice(visibleOptions, value)}>
       <InputLabel>{label}</InputLabel>
       <Select
         label={label}

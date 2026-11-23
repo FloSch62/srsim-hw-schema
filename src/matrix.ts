@@ -546,6 +546,12 @@ function matrixCardSlotOptions(entry: MatrixEntry | undefined, minimumSlot = 1):
   return numberRange(maxSlot, minimumSlot);
 }
 
+/** True when a dropdown offers nothing to change: no options, or only the current value. */
+export function onlyChoice(options: unknown[], value: unknown): boolean {
+  const distinct = [...new Set(options.map(String))];
+  return distinct.length === 0 || (distinct.length === 1 && distinct[0] === String(value ?? ""));
+}
+
 /** Section-title count, e.g. "(1 / max 2)". */
 export function slotCountLabel(used: number, max: number): string {
   return `(${used} / max ${max})`;

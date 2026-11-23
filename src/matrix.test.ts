@@ -22,6 +22,7 @@ import {
   fixedDistributedCpmTypeIsImplied,
   getEntry,
   mdaOptions,
+  onlyChoice,
   srosReleaseFromSource,
   schemaNumericSlotOptions,
   sfmOptions,
@@ -276,6 +277,14 @@ describe("SR-SIM matrix helpers", () => {
     assert.equal(componentCardSlotCount(entry), 6);
     assert.equal(componentCardSlotOptions(entry, [{ slot: 9 }]).length, 9);
     assert.equal(componentCardSlotCount(undefined), 1);
+  });
+
+  it("treats a dropdown as fixed when its only option is already selected", () => {
+    assert.equal(onlyChoice([1], 1), true);
+    assert.equal(onlyChoice(["sfm2-s", "sfm2-s"], "sfm2-s"), true);
+    assert.equal(onlyChoice([], ""), true);
+    assert.equal(onlyChoice(["iom2-se-3.0t"], ""), false);
+    assert.equal(onlyChoice([1, 2], 1), false);
   });
 
   it("formats section counts as used out of maximum", () => {

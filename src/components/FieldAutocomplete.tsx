@@ -4,6 +4,7 @@ import ListSubheader from "@mui/material/ListSubheader";
 import TextField from "@mui/material/TextField";
 import type { ReactNode } from "react";
 
+import { onlyChoice } from "../matrix";
 import { groupOptions, productHelp } from "../productNames";
 
 interface FieldAutocompleteProps {
@@ -45,7 +46,7 @@ export function FieldAutocomplete({
     <Autocomplete
       freeSolo={allowFreeText}
       autoSelect
-      disabled={disabled}
+      disabled={disabled || (!allowFreeText && onlyChoice(options, value))}
       options={grouping.options}
       // groupBy must not toggle with the option list: a closing popup still renders
       // its previous options, which would no longer match the grouped/ungrouped shape.
