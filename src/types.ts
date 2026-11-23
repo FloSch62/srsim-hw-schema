@@ -61,6 +61,11 @@ export interface SrsimConfig {
    * "read it from the installed module", e.g. after a chassis change or a reset.
    */
   hardwareVariant?: string;
+  /**
+   * Chosen physical card per line-card slot when several share a card type (editor state only, never
+   * written to YAML); needed where the MDAs alone do not tell the products apart, e.g. ISA2 vs ISA2-E.
+   */
+  cardProducts?: Record<string, string>;
   edaNamespace: string;
   edaNodeProfile: string;
   edaVersion: string;

@@ -74,17 +74,21 @@ import type {
 
 import {
   builtInMdas,
+  cardProductOf,
+  cardProducts,
   chassisVariants,
   cpmCarriers,
   emptySlots,
+  fitsSfm,
   fittingCarrier,
   integratedCard,
   isBuiltInComponent,
   pinnedOptions,
+  productFits,
   variantOf,
   variantSlotType
 } from "../hardwareModel";
-import type { ChassisVariant, CpmCarrier } from "../hardwareModel";
+import type { CardProduct, ChassisVariant, CpmCarrier } from "../hardwareModel";
 import {
   chassisGroup,
   chassisGroupOrder,
@@ -120,6 +124,26 @@ interface IndexedComponent {
 }
 
 type SlotOption = string | number;
+
+/** A line-card dropdown entry: a card type, or one physical card sharing it with its built-in MDAs. */
+interface CardChoice {
+  key: string;
+  type: string;
+  product?: CardProduct;
+  mda?: SrsimMda[];
+}
+
+const cardGroupOrder = ["XCM", "IOM", "IMM with ports", "Hybrid IMM", "IMM without ports"];
+
+/** Line-card group: IOMs take MDAs; IMMs have their ports built in, an ISA2 in place of ports or next to them. */
+function cardGroup(choice: CardChoice | undefined): string {
+  const type = choice?.type ?? "";
+  if (type.startsWith("xcm")) return "XCM";
+  if (type.startsWith("iom")) return "IOM";
+  const isaSlots = choice?.product?.mdas.filter((types) => types.every((mda) => mda.startsWith("isa"))).length ?? 0;
+  if (!isaSlots) return "IMM with ports";
+  return isaSlots === choice?.product?.mdas.length ? "IMM without ports" : "Hybrid IMM";
+}
 
 /** A chassis dropdown entry: a chassis type, or one physical product of it. */
 interface ChassisChoice {
@@ -279,12 +303,19 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
       const module = variantModule(variant);
       return module && hasXcmModules(entry, component) ? componentWithXcmModules(entry, component, [module], entrySfm) : component;
     });
+    const sfm = variant?.sfm?.length && !variant.sfm.includes(entrySfm) ? variant.sfm[0] : entrySfm;
     updateConfig({
       chassis,
-      components,
-      sfm: variant?.sfm?.length && !variant.sfm.includes(entrySfm) ? variant.sfm[0] : entrySfm,
+      // A backplane variant's SFM can rule out the default line card; the first card that fits replaces it.
+      components: components.map((component) => {
+        if (isCpmSlot(component.slot) || fitsSfm(component.type, sfm)) return component;
+        const choice = cardChoices(component.slot, sfm, entry, variant)[0];
+        return choice ? cardWithChoice({ slot: component.slot }, choice) : component;
+      }),
+      sfm,
       cma: undefined,
       hardwareVariant: variant?.name,
+      cardProducts: undefined,
       edaComponents: []
     });
   };
@@ -304,6 +335,11 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     const type = component.type && typeOptions.includes(component.type)
       ? component.type
       : (typeOptions[0] ?? (distributed ? "" : component.type ?? ""));
+    // A replacement card shared by several physical cards comes with the built-in MDAs of the first one.
+    if (type !== component.type && cardProducts(type).length) {
+      const choice = cardChoices(component.slot, sfm).find((candidate) => candidate.type === type);
+      if (choice) return cardWithChoice({ slot: component.slot }, choice);
+    }
     const next: SrsimComponent = { slot: component.slot, type };
     const base = { slot: component.slot, type };
 
@@ -392,10 +428,52 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     setComponents([...config.components, { slot, type: carrierCpmOptions(config.sfm)[0] ?? "" }]);
   };
 
+  // A card type that several physical cards share (imm-2pac-fp3) is offered as those cards, each with
+  // its built-in MDAs; only products whose MDAs the chassis offers are listed.
+  const cardChoices = (
+    slot: SrsimComponent["slot"],
+    sfm = config.sfm,
+    entry = selectedEntry,
+    variant = selectedVariant
+  ): CardChoice[] =>
+    pinnedOptions(variant, componentTypeOptions(entry, { slot }, sfm)).flatMap((type) => {
+      const available = directMdaOptions(entry, { slot, type }, sfm);
+      const products = cardProducts(type).filter((product) =>
+        product.mdas.every((types) => types.some((mda) => available.includes(mda)))
+      );
+      if (!products.length) return [{ key: type, type }];
+      return products.map((product) => ({
+        key: `${type}:${product.name}`,
+        type,
+        product,
+        mda: product.mdas.map((types, index) => ({ slot: index + 1, type: types.find((mda) => available.includes(mda)) ?? "" }))
+      }));
+    });
+  // The chosen product, while it still fits the MDAs; else the first product they fit.
+  const productOf = (component: SrsimComponent) =>
+    cardProducts(component.type).find(
+      (product) => product.name === config.cardProducts?.[String(component.slot)] && productFits(product, component)
+    ) ?? cardProductOf(component.type, component);
+  const cardChoiceKey = (component: SrsimComponent) => {
+    const product = productOf(component);
+    return product ? `${component.type}:${product.name}` : (component.type ?? "");
+  };
+  const withCardProduct = (slot: SrsimComponent["slot"], choice?: CardChoice) => ({
+    cardProducts: { ...config.cardProducts, [String(slot)]: choice?.product?.name ?? "" }
+  });
+  const cardWithChoice = (component: SrsimComponent, choice: CardChoice): SrsimComponent => {
+    if (choice.mda) return { slot: component.slot, type: choice.type, mda: choice.mda };
+    // A product's built-in MDAs do not carry over to another card.
+    return cardProducts(component.type).length ? { slot: component.slot, type: choice.type } : { ...component, type: choice.type };
+  };
+
   const addCard = () => {
     const slot = availableCardSlots[0] ?? nextNumericSlot(cards.map(({ component }) => component));
-    const type = componentTypeOptions(selectedEntry, { slot }, config.sfm)[0] ?? "";
-    setComponents([...config.components, { slot, type }]);
+    const choice = cardChoices(slot)[0];
+    setComponents(
+      [...config.components, choice ? cardWithChoice({ slot }, choice) : { slot, type: "" }],
+      withCardProduct(slot, choice)
+    );
   };
 
   const resetDefaults = () => {
@@ -405,6 +483,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
       sfm: defaultSfm,
       cma: undefined,
       hardwareVariant: undefined,
+      cardProducts: undefined,
       edaComponents: []
     });
   };
@@ -775,9 +854,26 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 />
                 <FieldAutocomplete
                   label="Type"
-                  value={component.type ?? ""}
-                  options={pinnedOptions(selectedVariant, componentTypeOptions(selectedEntry, { slot: component.slot }, config.sfm))}
-                  onChange={(type) => updateComponent(index, { type })}
+                  value={cardChoiceKey(component)}
+                  options={cardChoices(component.slot).map((choice) => choice.key)}
+                  groupBy={(key) => cardGroup(cardChoices(component.slot).find((choice) => choice.key === key))}
+                  groupOrder={cardGroupOrder}
+                  optionLabels={Object.fromEntries(
+                    cardChoices(component.slot).flatMap((choice) =>
+                      choice.product ? [[choice.key, `${choice.product.name} (${choice.type})`]] : []
+                    )
+                  )}
+                  optionDescription={(key) => {
+                    const choice = cardChoices(component.slot).find((candidate) => candidate.key === key);
+                    return choice?.product ? choice.product.description : productHelp(choice?.type ?? key);
+                  }}
+                  onChange={(key) => {
+                    const choice = cardChoices(component.slot).find((candidate) => candidate.key === key);
+                    if (!choice) return;
+                    const next = [...config.components];
+                    next[index] = withoutEmptyNested(cardWithChoice(component, choice));
+                    setComponents(next, withCardProduct(component.slot, choice));
+                  }}
                   allowFreeText={false}
                 />
               </Box>
@@ -797,6 +893,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                   mdas={component.mda ?? []}
                   builtIn={builtInMdas(component.type)}
                   slotsWithoutMda={emptySlots(component.type)}
+                  product={productOf(component)}
                   options={directMdaOptions(selectedEntry, component, config.sfm)}
                   slotOptions={directMdaSlotsFor(component)}
                   slotOptionsByMda={(component.mda ?? []).map((mda) => directMdaSlotsFor(component, mda.type))}
@@ -1319,6 +1416,7 @@ function NestedMdaSection({
   onUpdate,
   onRemove,
   builtIn = [],
+  product,
   slotsWithoutMda = []
 }: {
   title: string;
@@ -1332,15 +1430,23 @@ function NestedMdaSection({
   onRemove: (index: number) => void;
   /** The card's built-in MDAs; they keep their type and cannot be removed. */
   builtIn?: Array<{ slot: number; type: string }>;
+  /** The physical card, when several share the card type: its MDAs are built in, only their type may change. */
+  product?: CardProduct;
   /** Slot numbers the card has but cannot fill; shown as locked rows so the numbering has no gaps. */
   slotsWithoutMda?: number[];
 }) {
   const isBuiltInMda = (mda: SrsimMda) => builtIn.some((fixed) => fixed.slot === Number(mda.slot) && fixed.type === mda.type);
+  const typeOptions = (mda: SrsimMda) => {
+    if (product) return options.filter((option) => product.mdas[Number(mda.slot) - 1]?.includes(option));
+    return isBuiltInMda(mda) ? [mda.type ?? ""] : options.filter((option) => !builtIn.some((fixed) => fixed.type === option));
+  };
+  const removeBlockedReason = (mda: SrsimMda) =>
+    product ? `Built into the ${product.name}` : isBuiltInMda(mda) ? "Built into its card" : undefined;
   return (
     <Stack spacing={1} sx={{ mt: 1.5 }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
         <Typography variant="subtitle2">{title}</Typography>
-        <Button size="small" startIcon={<AddIcon />} onClick={onAdd} disabled={addDisabled}>
+        <Button size="small" startIcon={<AddIcon />} onClick={onAdd} disabled={addDisabled || Boolean(product)}>
           Add
         </Button>
       </Box>
@@ -1364,23 +1470,19 @@ function NestedMdaSection({
                 <SlotSelect
                   label="Slot"
                   value={mda.slot}
-                  options={isBuiltInMda(mda) ? [slot] : (slotOptionsByMda?.[index] ?? slotOptions)}
+                  options={product || isBuiltInMda(mda) ? [slot] : (slotOptionsByMda?.[index] ?? slotOptions)}
                   onChange={(next) => onUpdate(index, { slot: next })}
                 />
                 <FieldAutocomplete
                   label="Type"
                   value={mda.type ?? ""}
-                  options={isBuiltInMda(mda) ? [mda.type ?? ""] : options.filter((option) => !builtIn.some((fixed) => fixed.type === option))}
+                  options={typeOptions(mda)}
                   groupBy={generationGroup}
                   groupOrder={generationGroupOrder}
                   onChange={(type) => onUpdate(index, { type })}
                   allowFreeText={false}
                 />
-                <RemoveButton
-                  title="Remove MDA"
-                  blockedReason={isBuiltInMda(mda) ? "Built into its card" : undefined}
-                  onClick={() => onRemove(index)}
-                />
+                <RemoveButton title="Remove MDA" blockedReason={removeBlockedReason(mda)} onClick={() => onRemove(index)} />
               </>
             ) : (
               <>
