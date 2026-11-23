@@ -117,6 +117,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   );
   const sharedSfmOptions = sfmOptions(selectedEntry, []);
   const defaultSfm = defaultSfmForEntry(selectedEntry);
+  const sfmAvailable = Boolean(defaultSfm || sharedSfmOptions.length);
 
   const indexed = config.components.map((component, index) => ({ component, index }));
   const cpms = indexed.filter(({ component }) => isCpmSlot(component.slot));
@@ -525,13 +526,15 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
           onChange={setChassis}
           allowFreeText={false}
         />
-        <FormControl size="small" fullWidth>
-          <InputLabel id="sfm-select-label">SFM</InputLabel>
+        <FormControl size="small" fullWidth disabled={!sfmAvailable}>
+          <InputLabel id="sfm-select-label" shrink={sfmAvailable ? undefined : true}>SFM</InputLabel>
           <Select
             labelId="sfm-select-label"
             label="SFM"
-            value={config.sfm || defaultSfm}
-            renderValue={(sfm) => (sfm === defaultSfm ? `Default (${sfm})` : sfm)}
+            notched={sfmAvailable ? undefined : true}
+            displayEmpty={!sfmAvailable}
+            value={sfmAvailable ? config.sfm || defaultSfm : ""}
+            renderValue={(sfm) => (!sfmAvailable ? "N/A" : sfm === defaultSfm ? `Default (${sfm})` : sfm)}
             onChange={(event) => applySfm(event.target.value)}
           >
             {defaultSfm ? (
@@ -547,9 +550,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 </MenuItem>
               ))}
           </Select>
-          <FormHelperText>
-            {sharedSfmOptions.length ? "Set once on the node and applies to the whole chassis." : "This chassis has no SFM constraint"}
-          </FormHelperText>
+          {sfmAvailable ? <FormHelperText>Set once on the node and applies to the whole chassis.</FormHelperText> : null}
         </FormControl>
 
         {!distributed ? (
