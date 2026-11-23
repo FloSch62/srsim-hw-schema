@@ -23,6 +23,8 @@ from urllib.request import Request, urlopen
 
 import yaml
 
+import hardware_model
+
 
 SROS_RELEASE = "26.7"
 DEFAULT_APPENDIX_URL = (
@@ -72,8 +74,7 @@ MDA_SLOT_RESTRICTIONS: dict[tuple[str, str], list[int]] = {
 # MDA slots in an XIOM and the slots an XCM has for XMA or XIOM modules, from
 # https://documentation.nokia.com/sr/26-10/7750-sr/books/interface-configuration/configuration-overview.html
 # "mda N" and "xiom xN" occupy the same physical XCM slot N.
-XIOM_MDA_SLOTS = [1, 2]
-XCM_MODULE_SLOTS = {"sr-1s": 1, "sr-2s": 1, "sr-7s": 1, "sr-14s": 2}
+HARDWARE = hardware_model.build_model()
 EDA_COMPONENT_KIND_ORDER = {
     "controlCard": 0,
     "lineCard": 1,
@@ -1240,10 +1241,10 @@ def build_clab_definitions(values: dict[str, list[str]], allow_unknown: bool = F
                     "items": {
                         "allOf": [
                             {"$ref": "#/definitions/srsim-mda"},
-                            {"properties": {"slot": {"enum": XIOM_MDA_SLOTS}}},
+                            {"properties": {"slot": {"enum": hardware_model.iom_mda_slots(HARDWARE)}}},
                         ]
                     },
-                    "maxItems": len(XIOM_MDA_SLOTS),
+                    "maxItems": len(hardware_model.iom_mda_slots(HARDWARE)),
                     "uniqueItems": True,
                 },
             },
@@ -1551,9 +1552,17 @@ def build_chassis_component_definition(chassis: str, chassis_entry: dict[str, An
     for card, entry in sorted(card_compatibility(chassis_entry).items()):
         rules.append(component_rule_for_card(card, entry, chassis))
 
-    module_slots = XCM_MODULE_SLOTS.get(clab_chassis_token(chassis))
-    if module_slots:
-        rules.extend(xcm_module_rules(module_slots))
+    module_slots = {hardware_model.module_slot_count(HARDWARE, card) for card in (*cpms, *cards)} - {None}
+    if len(module_slots) == 1:
+        rules.extend(xcm_module_rules(module_slots.pop()))
+    line_slots = hardware_model.line_card_slots(HARDWARE, clab_chassis_token(chassis))
+    if line_slots:
+        rules.append(
+            {
+                "if": {"properties": {"slot": {"type": "integer"}}, "required": ["slot"]},
+                "then": {"properties": {"slot": {"enum": line_slots}}},
+            }
+        )
 
     definition: dict[str, Any] = {
         "allOf": [
@@ -2040,7 +2049,6 @@ def nested_slot_errors(
     key: str,
     label: str,
     items: list[Any],
-    allowed: list[int] | None = None,
 ) -> list[str]:
     errors: list[str] = []
     seen: set[str] = set()
@@ -2052,23 +2060,6 @@ def nested_slot_errors(
         if slot in seen:
             errors.append(f"{where}: duplicate {label} slot {slot}")
         seen.add(slot)
-        if allowed and slot.isdigit() and int(slot) not in allowed:
-            errors.append(f"{where}: {label} must use slot(s) {', '.join(str(value) for value in allowed)}")
-    return errors
-
-
-def xcm_module_errors(*, location: str, chassis: str, mdas: list[Any], xioms: list[Any]) -> list[str]:
-    slot_count = XCM_MODULE_SLOTS.get(clab_chassis_token(chassis))
-    allowed = list(range(1, slot_count + 1)) if slot_count else None
-    errors = [
-        *nested_slot_errors(location, "mda", "MDA", mdas, allowed),
-        *nested_slot_errors(location, "xiom", "XIOM", xioms, allowed),
-    ]
-    if slot_count:
-        mda_slots = {str(mda.get("slot")).strip() for mda in mdas if isinstance(mda, dict)}
-        xiom_slots = {str(xiom.get("slot")).strip() for xiom in xioms if isinstance(xiom, dict)}
-        for slot in sorted(mda_slots & xiom_slots):
-            errors.append(f"{location}: XCM slot {slot} holds either a direct MDA or an XIOM, not both")
     return errors
 
 
@@ -2107,7 +2098,8 @@ def validate_component(
             strict=strict,
         )
 
-    errors.extend(xcm_module_errors(location=location, chassis=chassis, mdas=mdas, xioms=xioms))
+    errors.extend(nested_slot_errors(location, "mda", "MDA", mdas))
+    errors.extend(nested_slot_errors(location, "xiom", "XIOM", xioms))
 
     for mda in mdas:
         if not isinstance(mda, dict):
@@ -2144,7 +2136,6 @@ def validate_component(
                 "mda",
                 "MDA",
                 xiom_mdas,
-                XIOM_MDA_SLOTS,
             )
         )
         xiom_base = {**base, "xiom": str(xiom.get("type", ""))}
@@ -2205,6 +2196,12 @@ def inferred_component_slot_count(chassis: str, chassis_entry: dict[str, Any]) -
     return max(matrix_slots, default=1)
 
 
+def hardware_issue_text(node_name: str, issue: hardware_model.Issue) -> str:
+    slot, _, rest = issue.path.partition(".")
+    location = component_name(node_name, slot) + (f".{rest}" if rest else "") if slot else node_name
+    return f"{location}: {issue.message}"
+
+
 def validate_component_list_shape(
     *,
     schema: dict[str, Any],
@@ -2219,7 +2216,10 @@ def validate_component_list_shape(
         return []
 
     mode = deployment_mode(chassis, matrix_entry)
-    errors: list[str] = []
+    errors = [
+        hardware_issue_text(node_name, issue)
+        for issue in hardware_model.hardware_issues(HARDWARE, clab_chassis_token(chassis), components)
+    ]
 
     def slot_value(component: Any) -> str:
         if not isinstance(component, dict) or component.get("slot") is None:
@@ -2271,7 +2271,7 @@ def validate_component_list_shape(
         errors.append(f"{node_name}: distributed SR-SIM chassis {chassis} requires a numeric line-card component slot")
 
     max_slot = inferred_component_slot_count(chassis, matrix_entry)
-    for slot in numeric_slots:
+    for slot in numeric_slots if not hardware_model.line_card_slots(HARDWARE, clab_chassis_token(chassis)) else []:
         number = int(slot)
         if number < 1 or number > max_slot:
             errors.append(f"{component_name(node_name, slot)}: slot must be between 1 and {max_slot}")
@@ -2510,6 +2510,11 @@ def cmd_validate_topology(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_generate_hardware_model(args: argparse.Namespace) -> int:
+    write_json_output(hardware_model.model_json(hardware_model.build_model()), args.output)
+    return 0
+
+
 def cmd_generate_eda_catalog(args: argparse.Namespace) -> int:
     catalog = build_eda_yang_catalog(args.yang_source)
     write_json_output(catalog, args.output)
@@ -2621,6 +2626,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="do not require fields present in matching appendix rows, such as SFM",
     )
     validate.set_defaults(func=cmd_validate_topology)
+
+    model = sub.add_parser("generate-hardware-model", help="export the physical hardware model as JSON")
+    model.add_argument("--output", "-o", default="-", help="output JSON path or '-'")
+    model.set_defaults(func=cmd_generate_hardware_model)
 
     catalog = sub.add_parser(
         "generate-eda-catalog",

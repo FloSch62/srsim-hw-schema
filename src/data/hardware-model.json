@@ -1,0 +1,631 @@
+{
+    "chassis": {
+        "sr-14s": {
+            "slots": [
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-4",
+                    "srsim": 4
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-5",
+                    "srsim": 5
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-6",
+                    "srsim": 6
+                },
+                {
+                    "accepts": [
+                        "cma"
+                    ],
+                    "id": "cpm",
+                    "types": [
+                        "cma-14s",
+                        "cma2-14s"
+                    ]
+                }
+            ]
+        },
+        "sr-1s": {
+            "integrated": "cpm-1s",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "integrated",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-1s"
+                    ]
+                }
+            ],
+            "variants": [
+                {
+                    "description": "Integrated FP4 two-complex XMA-s, 36x QSFP28; 1.6T to 2.4T by license",
+                    "name": "SR-1s Fixed 2.4T",
+                    "parts": [
+                        "s36-100gb-qsfp28",
+                        "s18-100gb-qsfp28"
+                    ]
+                },
+                {
+                    "description": "Integrated FP4 four-complex XMA-s, 36x QSFP28 or QSFP-DD; 3.6T to 4.8T by license",
+                    "name": "SR-1s Fixed 4.8T",
+                    "parts": [
+                        "s36-400gb-qsfpdd",
+                        "s36-100gb-qsfp28-3.6t"
+                    ]
+                },
+                {
+                    "description": "Integrated FP4 two-complex IOM-s-3.0T with two MDA-s/MDA2-s slots",
+                    "name": "SR-1s Modular 3.0T",
+                    "parts": [
+                        "iom-s-3.0t"
+                    ]
+                }
+            ]
+        },
+        "sr-2s": {
+            "slots": [
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-2s"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-2s"
+                    ]
+                }
+            ]
+        },
+        "sr-2se": {
+            "exclusive": [
+                [
+                    "xcm-2se",
+                    "xcmc-2se"
+                ]
+            ],
+            "slots": [
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-2se"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-2se"
+                    ]
+                }
+            ]
+        },
+        "sr-7s": {
+            "slots": [
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-2",
+                    "srsim": 2
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-3",
+                    "srsim": 3
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-4",
+                    "srsim": 4
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-5",
+                    "srsim": 5
+                },
+                {
+                    "accepts": [
+                        "xcm"
+                    ],
+                    "id": "xcm-6",
+                    "srsim": 6
+                },
+                {
+                    "accepts": [
+                        "cma"
+                    ],
+                    "id": "cpm",
+                    "types": [
+                        "cma-7s",
+                        "cma-7s-d",
+                        "cma2-7s"
+                    ]
+                }
+            ]
+        }
+    },
+    "parts": {
+        "cma-14s": {
+            "kind": "cma",
+            "label": "CMA-14s (one or two CPM-s)",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-s"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-s"
+                    ]
+                }
+            ]
+        },
+        "cma-7s": {
+            "kind": "cma",
+            "label": "CMA-7s (one CPM-s)",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-s"
+                    ]
+                }
+            ]
+        },
+        "cma-7s-d": {
+            "kind": "cma",
+            "label": "CMA-7s dual (two CPM-s)",
+            "occupies": [
+                "xcm-6"
+            ],
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm-s"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm-s"
+                    ]
+                }
+            ]
+        },
+        "cma2-14s": {
+            "kind": "cma",
+            "label": "CMA2-14s (one or two CPM2-s)",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm2-s"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm2-s"
+                    ]
+                }
+            ]
+        },
+        "cma2-7s": {
+            "kind": "cma",
+            "label": "CMA2-7s (one or two CPM2-s)",
+            "slots": [
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-a",
+                    "srsim": "A",
+                    "types": [
+                        "cpm2-s"
+                    ]
+                },
+                {
+                    "accepts": [
+                        "cpm"
+                    ],
+                    "id": "cpm-b",
+                    "srsim": "B",
+                    "types": [
+                        "cpm2-s"
+                    ]
+                }
+            ]
+        },
+        "cpm-1s": {
+            "kind": "cpm",
+            "slots": [
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "cpm-2s": {
+            "kind": "cpm"
+        },
+        "cpm-2se": {
+            "kind": "cpm"
+        },
+        "cpm-s": {
+            "kind": "cpm"
+        },
+        "cpm2-s": {
+            "kind": "cpm"
+        },
+        "iom-s-1.5t": {
+            "kind": "iom",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-2",
+                    "srsim": 2
+                }
+            ]
+        },
+        "iom-s-3.0t": {
+            "kind": "iom",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-2",
+                    "srsim": 2
+                }
+            ]
+        },
+        "iom2-se-3.0t": {
+            "kind": "iom",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-2",
+                    "srsim": 2
+                }
+            ]
+        },
+        "iom2-se-6.0t": {
+            "kind": "iom",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "id": "mda-2",
+                    "srsim": 2
+                }
+            ]
+        },
+        "s18-100gb-qsfp28": {
+            "kind": "xma"
+        },
+        "s36-100gb-qsfp28": {
+            "kind": "xma"
+        },
+        "s36-100gb-qsfp28-3.6t": {
+            "kind": "xma"
+        },
+        "s36-400gb-qsfpdd": {
+            "kind": "xma"
+        },
+        "x2-s36-400g-qsfp112-3.0t": {
+            "kind": "xma"
+        },
+        "x2-s36-800g-qsfpdd-12.0t": {
+            "kind": "xma"
+        },
+        "x2-s36-800g-qsfpdd-18.0t": {
+            "kind": "xma"
+        },
+        "x2-s36-800g-qsfpdd-6.0t": {
+            "kind": "xma"
+        },
+        "xcm-14s": {
+            "kind": "xcm",
+            "slots": [
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-2",
+                    "srsim": 2
+                }
+            ]
+        },
+        "xcm-14s-b": {
+            "kind": "xcm",
+            "slots": [
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-2",
+                    "srsim": 2
+                }
+            ]
+        },
+        "xcm-2s": {
+            "kind": "xcm",
+            "slots": [
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "xcm-2se": {
+            "kind": "xcm",
+            "slots": [
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "xcm-7s": {
+            "kind": "xcm",
+            "slots": [
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "xcm-7s-b": {
+            "kind": "xcm",
+            "slots": [
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "xcm2-14s": {
+            "kind": "xcm",
+            "slots": [
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-1",
+                    "srsim": 1
+                },
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-2",
+                    "srsim": 2
+                }
+            ]
+        },
+        "xcm2-7s": {
+            "kind": "xcm",
+            "slots": [
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-1",
+                    "srsim": 1
+                }
+            ]
+        },
+        "xcmc-2se": {
+            "kind": "xcm",
+            "slots": [
+                {
+                    "accepts": [
+                        "xma",
+                        "iom"
+                    ],
+                    "id": "module-1",
+                    "srsim": 1
+                }
+            ]
+        }
+    },
+    "version": 1
+}

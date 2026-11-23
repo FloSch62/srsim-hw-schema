@@ -1,0 +1,75 @@
+[
+  {
+    "name": "SR-7s: single CPM-s leaves all six XCM slots",
+    "chassis": "sr-7s",
+    "components": [{"slot": "A", "type": "cpm-s"}, {"slot": 6, "type": "xcm-7s"}],
+    "issues": []
+  },
+  {
+    "name": "SR-7s: two CPM-s need the dual CMA, which takes XCM slot 6",
+    "chassis": "sr-7s",
+    "components": [{"slot": "A", "type": "cpm-s"}, {"slot": "B", "type": "cpm-s"}, {"slot": 6, "type": "xcm-7s"}],
+    "issues": [{"code": "occupied", "path": "6"}]
+  },
+  {
+    "name": "SR-7s: two CPM2-s fit the single-slot CMA2-7s",
+    "chassis": "sr-7s",
+    "components": [{"slot": "A", "type": "cpm2-s"}, {"slot": "B", "type": "cpm2-s"}, {"slot": 6, "type": "xcm2-7s"}],
+    "issues": []
+  },
+  {
+    "name": "SR-7s: CPM types without a common CMA",
+    "chassis": "sr-7s",
+    "components": [{"slot": "A", "type": "cpm-s"}, {"slot": "B", "type": "cpm2-s"}],
+    "issues": [{"code": "cpm-carrier", "path": "A,B"}]
+  },
+  {
+    "name": "SR-7s: there is no line-card slot 7",
+    "chassis": "sr-7s",
+    "components": [{"slot": "A"}, {"slot": 7, "type": "xcm-7s"}],
+    "issues": [{"code": "no-such-slot", "path": "7"}]
+  },
+  {
+    "name": "SR-14s: six XCM slots, two modules each",
+    "chassis": "sr-14s",
+    "components": [
+      {"slot": "A", "type": "cpm-s"},
+      {"slot": 6, "type": "xcm-14s", "mda": [{"slot": 2, "type": "s36-100gb-qsfp28"}], "xiom": [{"slot": 3, "type": "iom-s-3.0t"}]},
+      {"slot": 7, "type": "xcm-14s"}
+    ],
+    "issues": [{"code": "module-slot", "path": "6.xiom[3]"}, {"code": "no-such-slot", "path": "7"}]
+  },
+  {
+    "name": "SR-2s: IOM-s has two MDA slots",
+    "chassis": "sr-2s",
+    "components": [
+      {"slot": "A", "type": "cpm-2s"},
+      {"slot": 1, "type": "xcm-2s", "xiom": [{"slot": 1, "type": "iom-s-3.0t", "mda": [{"slot": 2, "type": "ms18-100gb-qsfp28"}, {"slot": 3, "type": "ms18-100gb-qsfp28"}]}]}
+    ],
+    "issues": [{"code": "mda-slot", "path": "1.xiom[1].mda[3]"}]
+  },
+  {
+    "name": "SR-2s: CPMs only in A and B",
+    "chassis": "sr-2s",
+    "components": [{"slot": "C", "type": "cpm-2s"}],
+    "issues": [{"code": "no-such-slot", "path": "C"}]
+  },
+  {
+    "name": "SR-2se: XCM-2se and XCMc-2se are not mixed",
+    "chassis": "sr-2se",
+    "components": [{"slot": "A"}, {"slot": 1, "type": "xcm-2se"}, {"slot": 2, "type": "xcmc-2se"}],
+    "issues": [{"code": "mixed-types", "path": ""}]
+  },
+  {
+    "name": "SR-1s: one module slot on the integrated card",
+    "chassis": "sr-1s",
+    "components": [{"slot": "A", "mda": [{"slot": 2, "type": "s36-100gb-qsfp28"}]}],
+    "issues": [{"code": "module-slot", "path": "A.mda[2]"}]
+  },
+  {
+    "name": "Chassis without a model are not checked",
+    "chassis": "sr-7",
+    "components": [{"slot": 99, "type": "iom5-e"}],
+    "issues": []
+  }
+]

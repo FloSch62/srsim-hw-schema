@@ -5148,6 +5148,32 @@
                             "xiom"
                         ]
                     }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "slot": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "slot"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "slot": {
+                                "enum": [
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5,
+                                    6
+                                ]
+                            }
+                        }
+                    }
                 }
             ],
             "required": [
@@ -6159,6 +6185,28 @@
                             "xiom"
                         ]
                     }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "slot": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "slot"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "slot": {
+                                "enum": [
+                                    1,
+                                    2
+                                ]
+                            }
+                        }
+                    }
                 }
             ],
             "required": [
@@ -6552,6 +6600,90 @@
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+                },
+                {
+                    "properties": {
+                        "mda": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 1
+                        },
+                        "xiom": {
+                            "items": {
+                                "properties": {
+                                    "slot": {
+                                        "enum": [
+                                            1
+                                        ]
+                                    }
+                                }
+                            },
+                            "maxItems": 1
+                        }
+                    }
+                },
+                {
+                    "not": {
+                        "properties": {
+                            "mda": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            },
+                            "xiom": {
+                                "contains": {
+                                    "properties": {
+                                        "slot": {
+                                            "const": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "slot"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "mda",
+                            "xiom"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "slot": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "slot"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "slot": {
+                                "enum": [
+                                    1,
+                                    2
+                                ]
                             }
                         }
                     }
@@ -7471,6 +7603,32 @@
                             "mda",
                             "xiom"
                         ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "slot": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "slot"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "slot": {
+                                "enum": [
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5,
+                                    6
+                                ]
+                            }
+                        }
                     }
                 }
             ],
