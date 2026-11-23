@@ -54,6 +54,7 @@ import {
   schemaNumericSlotOptions,
   sfmOptions,
   xiomMdaSlotOptions,
+  withReplacedModules,
   xiomMdaOptions,
   xiomOptions
 } from "../matrix";
@@ -277,10 +278,11 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
 
   const applySfm = (sfm: string) => {
     const nextSfm = sfm || defaultSfm || sharedSfmOptions[0] || "";
-    updateConfig({
-      sfm: nextSfm,
-      components: normalizeComponents(config.components, nextSfm)
+    const components = normalizeComponents(config.components, nextSfm).map((after) => {
+      const before = config.components.find((component) => String(component.slot) === String(after.slot));
+      return before ? withReplacedModules(selectedEntry, before, after, nextSfm) : after;
     });
+    updateConfig({ sfm: nextSfm, components });
   };
 
   const updateComponent = (index: number, updates: Partial<SrsimComponent>) => {

@@ -25,6 +25,7 @@ import {
   schemaNumericSlotOptions,
   sfmOptions,
   upsertComponentBySlot,
+  withReplacedModules,
   xiomMdaOptions,
   xiomOptions
 } from "./matrix";
@@ -304,6 +305,36 @@ describe("SR-SIM matrix helpers", () => {
     assert.deepEqual(freeXcmModuleSlots("xcm-7s", [1], [{ slot: 1 }]), []);
     assert.deepEqual(freeXcmModuleSlots("xcm-14s", [1, 2], [{ slot: 1 }]), [2]);
     assert.deepEqual(freeXcmModuleSlots("iom5-e", [1, 2], [{ slot: 1 }]), [1, 2]);
+  });
+
+  it("replaces modules an SFM switch removed with fitting ones of the same kind", () => {
+    const matrix = buildMatrix(hardware);
+    const sr7s = getEntry(matrix, "sr-7s");
+    const fp5Card = { slot: 1, type: "xcm2-7s", mda: [{ slot: 1, type: "x2-s36-800g-qsfpdd-18.0t" }] };
+    assert.deepEqual(withReplacedModules(sr7s, fp5Card, { slot: 1, type: "xcm-7s" }, "sfm-s"), {
+      slot: 1,
+      type: "xcm-7s",
+      mda: [{ slot: 1, type: "s18-100gb-qsfp28" }]
+    });
+    // Back to FP5: the default layout's XMA2-s is preferred over the first option.
+    assert.deepEqual(
+      withReplacedModules(sr7s, { slot: 1, type: "xcm-7s", mda: [{ slot: 1, type: "s36-100gb-qsfp28" }] }, { slot: 1, type: "xcm2-7s" }, "sfm2-s"),
+      fp5Card
+    );
+
+    const sr14s = getEntry(matrix, "sr-14s");
+    const before = {
+      slot: 1,
+      type: "xcm2-14s",
+      mda: [{ slot: 1, type: "x2-s36-800g-qsfpdd-18.0t" }],
+      xiom: [{ slot: 2, type: "iom2-se-3.0t", mda: [] }]
+    };
+    assert.deepEqual(withReplacedModules(sr14s, before, { slot: 1, type: "xcm-14s" }, "sfm-s"), {
+      slot: 1,
+      type: "xcm-14s",
+      mda: [{ slot: 1, type: "s18-100gb-qsfp28" }],
+      xiom: [{ slot: 2, type: "iom-s-1.5t", mda: [] }]
+    });
   });
 
   it("converts matrix rows into editor components", () => {

@@ -869,3 +869,37 @@ export function defaultImpliesFields(
     return fields.every((field) => rowContainsSelectedDefault(row, field, component, sfm));
   });
 }
+
+/**
+ * Modules a card lost (e.g. when an SFM switch changed the XCM type), replaced in their slots by a
+ * fitting module of the same kind: the default layout's module when it fits, else the first option.
+ */
+export function withReplacedModules(
+  entry: MatrixEntry | undefined,
+  before: SrsimComponent,
+  after: SrsimComponent,
+  sfm: string
+): SrsimComponent {
+  const card = { slot: after.slot, type: after.type };
+  const slots = moduleSlots(after.type);
+  const taken = new Set([...(after.mda ?? []), ...(after.xiom ?? [])].map((module) => Number(module.slot)));
+  const defaults = defaultComponentsForEntry(entry).find((component) => component.type === after.type);
+  const pick = (options: string[], preferred: string | undefined) =>
+    preferred && options.includes(preferred) ? preferred : options[0];
+
+  const mda = [...(after.mda ?? [])];
+  const xiom = [...(after.xiom ?? [])];
+  for (const lost of before.mda ?? []) {
+    const slot = Number(lost.slot);
+    if (taken.has(slot) || !slots.includes(slot)) continue;
+    const type = pick(directMdaOptions(entry, card, sfm), defaults?.mda?.find((item) => Number(item.slot) === slot)?.type);
+    if (type) mda.push({ slot, type });
+  }
+  for (const lost of before.xiom ?? []) {
+    const slot = Number(lost.slot);
+    if (taken.has(slot) || !slots.includes(slot)) continue;
+    const type = pick(xiomOptions(entry, card, sfm), defaults?.xiom?.find((item) => Number(item.slot) === slot)?.type);
+    if (type) xiom.push({ slot, type, mda: [] });
+  }
+  return { ...after, ...(mda.length ? { mda } : {}), ...(xiom.length ? { xiom } : {}) };
+}
