@@ -17,7 +17,7 @@
       "CPM",
       "IOM"
     ],
-    "nokia_name": "cpiom-ixr-r6",
+    "nokia_name": "CPIOM-IXR-R6",
     "port_layout": null,
     "help_text_1": "CPIOM for 7250 IXR-R6; combined CPM/IOM functionality",
     "help_text_2": "7250 IXR-R6 combined CPM/IOM (CPIOM)",
@@ -29,7 +29,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-1",
+    "nokia_name": "CPM-1",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7750 SR-1 (FP4)",
     "help_text_2": "7750 SR-1 (FP4) Integrated CPM",
@@ -41,7 +41,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-1s",
+    "nokia_name": "CPM-1s",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7750 SR-1s",
     "help_text_2": "7750 SR-1s Integrated CPM",
@@ -53,7 +53,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-1se",
+    "nokia_name": "CPM-1se",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7750 SR-1se",
     "help_text_2": "7750 SR-1se Integrated CPM",
@@ -65,7 +65,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-1x",
+    "nokia_name": "CPM-1x",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7750 SR-1/1x fixed platforms and DMS-1-24D",
     "help_text_2": "7750 SR-1/1x fixed platforms and DMS-1-24D Integrated CPM",
@@ -77,7 +77,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-2s",
+    "nokia_name": "CPM-2s",
     "port_layout": null,
     "help_text_1": "CPM for 7750 SR-2s",
     "help_text_2": "7750 SR-2s CPM",
@@ -89,7 +89,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-2se",
+    "nokia_name": "CPM-2se",
     "port_layout": null,
     "help_text_1": "CPM for 7750 SR-2se",
     "help_text_2": "7750 SR-2se CPM",
@@ -101,7 +101,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-a",
+    "nokia_name": "CPM-a",
     "port_layout": null,
     "help_text_1": "CPM for 7750 SR-a4/SR-a8",
     "help_text_2": "7750 SR-a4/SR-a8 CPM",
@@ -113,7 +113,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-e",
+    "nokia_name": "CPM-e",
     "port_layout": null,
     "help_text_1": "CPM for 7750 SR-1e/SR-2e/SR-3e",
     "help_text_2": "7750 SR-1e/SR-2e/SR-3e CPM",
@@ -125,7 +125,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr",
+    "nokia_name": "CPM-IXR",
     "port_layout": null,
     "help_text_1": "CPM for 7250 IXR-6/IXR-10",
     "help_text_2": "7250 IXR-6/IXR-10 CPM",
@@ -137,7 +137,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-e",
+    "nokia_name": "CPM-IXR-e",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-e",
     "help_text_2": "7250 IXR-e Integrated CPM",
@@ -149,7 +149,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-e-gnss",
+    "nokia_name": "CPM-IXR-e GNSS",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-e (GNSS variant)",
     "help_text_2": "7250 IXR-e (GNSS variant) Integrated CPM",
@@ -161,7 +161,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-e2",
+    "nokia_name": "CPM-IXR-e2",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-e2",
     "help_text_2": "7250 IXR-e2 Integrated CPM",
@@ -173,7 +173,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-e2c",
+    "nokia_name": "CPM-IXR-e2c",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-e2c",
     "help_text_2": "7250 IXR-e2c Integrated CPM",
@@ -185,7 +185,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-e2n",
+    "nokia_name": "CPM-IXR-e2n",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-e2n",
     "help_text_2": "7250 IXR-e2n Integrated CPM",
@@ -197,7 +197,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-e2n-s",
+    "nokia_name": "CPM-IXR-e2n-s",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-e2n-s",
     "help_text_2": "7250 IXR-e2n-s Integrated CPM",
@@ -209,7 +209,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-e2sc",
+    "nokia_name": "CPM-IXR-e2sc",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-e2sc",
     "help_text_2": "7250 IXR-e2sc Integrated CPM",
@@ -221,7 +221,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-e3c",
+    "nokia_name": "CPM-IXR-e3c",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-e3c",
     "help_text_2": "7250 IXR-e3c Integrated CPM",
@@ -233,7 +233,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-e3x",
+    "nokia_name": "CPM-IXR-e3x",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-e3x",
     "help_text_2": "7250 IXR-e3x Integrated CPM",
@@ -245,7 +245,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-ec",
+    "nokia_name": "CPM-IXR-ec",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-ec",
     "help_text_2": "7250 IXR-ec Integrated CPM",
@@ -257,7 +257,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-r4",
+    "nokia_name": "CPM-IXR-R4",
     "port_layout": null,
     "help_text_1": "CPM for 7250 IXR-R4",
     "help_text_2": "7250 IXR-R4 CPM",
@@ -269,7 +269,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-r6d",
+    "nokia_name": "CPM-IXR-R6d",
     "port_layout": null,
     "help_text_1": "CPM for 7250 IXR-R6d/IXR-R6dl",
     "help_text_2": "7250 IXR-R6d/IXR-R6dl CPM",
@@ -281,7 +281,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-s",
+    "nokia_name": "CPM-IXR-s",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-s",
     "help_text_2": "7250 IXR-s Integrated CPM",
@@ -293,7 +293,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-ixr-x",
+    "nokia_name": "CPM-IXR-X",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7250 IXR-X1/IXR-Xs/IXR-X3",
     "help_text_2": "7250 IXR-X1/IXR-Xs/IXR-X3 Integrated CPM",
@@ -305,7 +305,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-s",
+    "nokia_name": "CPM-s",
     "port_layout": null,
     "help_text_1": "CPM for 7750 SR-7s/SR-14s",
     "help_text_2": "7750 SR-7s/SR-14s CPM",
@@ -317,7 +317,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-sar-hm",
+    "nokia_name": "CPM-SAR-Hm",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7705 SAR-Hm",
     "help_text_2": "7705 SAR-Hm Integrated CPM",
@@ -329,7 +329,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-sar-hmc",
+    "nokia_name": "CPM-SAR-Hmc",
     "port_layout": null,
     "help_text_1": "Integrated CPM for 7705 SAR-Hmc",
     "help_text_2": "7705 SAR-Hmc Integrated CPM",
@@ -341,7 +341,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-v",
+    "nokia_name": "CPM-V",
     "port_layout": null,
     "help_text_1": "Virtual CPM for VSR-I; single-VM control, management and dataplane; 4 virtual MDA slots",
     "help_text_2": "VSR-I virtual CPM; single VM; 4 virtual MDA slots",
@@ -353,7 +353,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm-x20",
+    "nokia_name": "CPM-X20",
     "port_layout": null,
     "help_text_1": "CPM for 7950 XRS-20/XRS-20e; SFM/SFM2 compatible",
     "help_text_2": "7950 XRS-20/XRS-20e CPM; SFM/SFM2 compatible",
@@ -365,7 +365,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm2-s",
+    "nokia_name": "CPM2-s",
     "port_layout": null,
     "help_text_1": "CPM2 for 7750 SR-7s/SR-14s",
     "help_text_2": "7750 SR-7s/SR-14s CPM2",
@@ -377,7 +377,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm2-x20",
+    "nokia_name": "CPM2-X20",
     "port_layout": null,
     "help_text_1": "CPM2 for 7950 XRS-20/XRS-20e; SFM2 required",
     "help_text_2": "7950 XRS-20/XRS-20e CPM2; SFM2 required",
@@ -389,7 +389,7 @@
     "types": [
       "CPM"
     ],
-    "nokia_name": "cpm5",
+    "nokia_name": "CPM5",
     "port_layout": null,
     "help_text_1": "CPM5 for 7450 ESS-7/ESS-12 and 7750 SR-7/SR-12/SR-12e",
     "help_text_2": "7450 ESS-7/ESS-12 and 7750 SR-7/SR-12/SR-12e CPM5",
@@ -1265,7 +1265,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "m-sfm5-12",
+    "nokia_name": "SFM5-12",
     "port_layout": null,
     "help_text_1": "SFM5-12 (FP3-based) for 7750 SR-7/SR-12",
     "help_text_2": "7750 SR-7/SR-12 SFM5-12 (FP3-based)",
@@ -1277,7 +1277,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "m-sfm5-12e",
+    "nokia_name": "SFM5-12e",
     "port_layout": null,
     "help_text_1": "SFM5-12e (FP3-based) for 7750 SR-12e",
     "help_text_2": "7750 SR-12e SFM5-12e (FP3-based)",
@@ -1289,7 +1289,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "m-sfm5-7",
+    "nokia_name": "SFM5-7",
     "port_layout": null,
     "help_text_1": "SFM5-7 (FP3-based) for 7750 SR-7",
     "help_text_2": "7750 SR-7 SFM5-7 (FP3-based)",
@@ -1301,7 +1301,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "m-sfm6-12e",
+    "nokia_name": "SFM6-12e",
     "port_layout": null,
     "help_text_1": "SFM6-12e (FP4-based) for 7750 SR-12e",
     "help_text_2": "7750 SR-12e SFM6-12e (FP4-based)",
@@ -1313,7 +1313,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "m-sfm6-7/12",
+    "nokia_name": "SFM6-7/12",
     "port_layout": null,
     "help_text_1": "SFM6-7/12 (FP4-based) for 7750 SR-7/SR-12 and 7450 ESS-7/ESS-12",
     "help_text_2": "7750 SR-7/SR-12 and 7450 ESS-7/ESS-12 SFM6-7/12 (FP4-based)",
@@ -2633,7 +2633,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "sfm-2s",
+    "nokia_name": "SFM-2s",
     "port_layout": null,
     "help_text_1": "Fixed integrated SFM for 7750 SR-2s",
     "help_text_2": "7750 SR-2s fixed integrated SFM",
@@ -2645,7 +2645,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "sfm-2se",
+    "nokia_name": "SFM-2se",
     "port_layout": null,
     "help_text_1": "SFM for 7750 SR-2se",
     "help_text_2": "7750 SR-2se SFM",
@@ -2657,7 +2657,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "sfm-ixr-10",
+    "nokia_name": "SFM-IXR-10",
     "port_layout": null,
     "help_text_1": "SFM for 7250 IXR-10",
     "help_text_2": "7250 IXR-10 SFM",
@@ -2669,7 +2669,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "sfm-ixr-6",
+    "nokia_name": "SFM-IXR-6",
     "port_layout": null,
     "help_text_1": "SFM for 7250 IXR-6",
     "help_text_2": "7250 IXR-6 SFM",
@@ -2681,7 +2681,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "sfm-s",
+    "nokia_name": "SFM-s",
     "port_layout": null,
     "help_text_1": "SFM-s (FP4-based) for 7750 SR-7s/SR-14s; XCM-s; FP4 cards",
     "help_text_2": "7750 SR-7s/SR-14s SFM-s (FP4-based); XCM-s; FP4 cards",
@@ -2693,7 +2693,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "sfm-x20",
+    "nokia_name": "SFM-X20",
     "port_layout": null,
     "help_text_1": "Standard SFM for 7950 XRS-20/XRS-20e; FP3 cards only; CPM-X20",
     "help_text_2": "7950 XRS-20/XRS-20e standard SFM; FP3 cards only; CPM-X20",
@@ -2705,7 +2705,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "sfm-x20-b",
+    "nokia_name": "SFM-X20-B",
     "port_layout": null,
     "help_text_1": "SFM for 7950 XRS-20/XRS-20e; FP3 cards only; CPM-X20; x40-10g-sfp / x4-100g-cfp2 compatible",
     "help_text_2": "7950 XRS-20/XRS-20e SFM; FP3 cards only; CPM-X20; x40-10g-sfp / x4-100g-cfp2 compatible",
@@ -2717,7 +2717,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "sfm-x20s-b",
+    "nokia_name": "SFM-X20S-B",
     "port_layout": null,
     "help_text_1": "SFM for 7950 XRS-20/XRS-20e; FP3 cards only; CPM-X20; x40-10g-sfp / x4-100g-cfp2 compatible",
     "help_text_2": "7950 XRS-20/XRS-20e SFM; FP3 cards only; CPM-X20; x40-10g-sfp / x4-100g-cfp2 compatible",
@@ -2729,7 +2729,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "sfm2-s",
+    "nokia_name": "SFM2-s",
     "port_layout": null,
     "help_text_1": "SFM2-s (FP5-based) for 7750 SR-7s/SR-14s; XCM2-s/XCM-b; FP4/FP5 cards",
     "help_text_2": "7750 SR-7s/SR-14s SFM2-s (FP5-based); XCM2-s/XCM-b; FP4/FP5 cards",
@@ -2741,7 +2741,7 @@
     "types": [
       "SFM"
     ],
-    "nokia_name": "sfm2-x20s",
+    "nokia_name": "SFM2-X20S",
     "port_layout": null,
     "help_text_1": "SFM2 for 7950 XRS-20/XRS-20e; FP3/FP4 cards; CPM-X20/CPM2-X20",
     "help_text_2": "7950 XRS-20/XRS-20e SFM2; FP3/FP4 cards; CPM-X20/CPM2-X20",

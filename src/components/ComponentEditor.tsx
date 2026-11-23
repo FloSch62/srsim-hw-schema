@@ -82,7 +82,15 @@ import {
   variantSlotType
 } from "../hardwareModel";
 import type { ChassisVariant, CpmCarrier } from "../hardwareModel";
-import { chassisGroup, chassisGroupOrder, generationGroup, generationGroupOrder, productHelp } from "../productNames";
+import {
+  chassisGroup,
+  chassisGroupOrder,
+  generationGroup,
+  generationGroupOrder,
+  productHelp,
+  productHelpText,
+  productName
+} from "../productNames";
 import {
   componentWithXcmModules,
   hasXcmModules,
@@ -525,13 +533,11 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
           value={selectedVariant ? `${config.chassis}:${selectedVariant.name}` : config.chassis}
           options={chassisChoices.map((choice) => choice.key)}
           optionLabels={Object.fromEntries(
-            chassisChoices.flatMap((choice) =>
-              choice.variant ? [[choice.key, choice.variant.name]] : []
-            )
+            chassisChoices.map((choice) => [choice.key, choice.variant?.name ?? productName(choice.chassis)])
           )}
           optionDescription={(key) => {
             const choice = chassisChoice(key);
-            return choice?.variant ? choice.variant.description : productHelp(choice?.chassis ?? key);
+            return choice?.variant ? choice.variant.description : productHelpText(choice?.chassis ?? key);
           }}
           groupBy={(key) => chassisGroup(chassisChoice(key)?.chassis ?? key)}
           groupOrder={chassisGroupOrder}
@@ -558,19 +564,19 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
             notched={sfmAvailable ? undefined : true}
             displayEmpty={!sfmAvailable}
             value={sfmAvailable ? config.sfm || defaultSfm : ""}
-            renderValue={(sfm) => (sfmAvailable ? sfm : "N/A")}
+            renderValue={(sfm) => (sfmAvailable ? productName(sfm) : "N/A")}
             onChange={(event) => applySfm(event.target.value)}
           >
             {defaultSfm ? (
               <MenuItem value={defaultSfm}>
-                <OptionText label={defaultSfm} description={productHelp(defaultSfm)} />
+                <OptionText label={productName(defaultSfm)} description={productHelpText(defaultSfm)} />
               </MenuItem>
             ) : null}
             {sharedSfmOptions
               .filter((sfm) => sfm !== defaultSfm)
               .map((sfm) => (
                 <MenuItem key={sfm} value={sfm}>
-                  <OptionText label={sfm} description={productHelp(sfm)} />
+                  <OptionText label={productName(sfm)} description={productHelpText(sfm)} />
                 </MenuItem>
               ))}
           </Select>
@@ -661,6 +667,8 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                           label="Type"
                           value={component.type ?? ""}
                           options={carrierCpmOptions(config.sfm)}
+                          optionLabels={Object.fromEntries(carrierCpmOptions(config.sfm).map((type) => [type, productName(type)]))}
+                          optionDescription={productHelpText}
                           onChange={(type) => updateComponent(index, { type })}
                           allowFreeText={false}
                         />
@@ -703,6 +711,8 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                   label="Type"
                   value={component.type ?? ""}
                   options={carrierCpmOptions(config.sfm)}
+                  optionLabels={Object.fromEntries(carrierCpmOptions(config.sfm).map((type) => [type, productName(type)]))}
+                  optionDescription={productHelpText}
                   onChange={(type) => updateComponent(index, { type })}
                   allowFreeText={false}
                 />
@@ -804,7 +814,7 @@ function ComponentHeader({
         </Typography>
         {component.type ? (
           <Typography variant="body2" color="text.secondary" noWrap>
-            {component.type}
+            {productName(component.type)}
           </Typography>
         ) : null}
       </Stack>
@@ -1141,7 +1151,7 @@ function IntegratedComponentSection({
           </Typography>
           {component.type ? (
             <Typography variant="body2" color="text.secondary" noWrap>
-              {component.type}
+              {productName(component.type)}
             </Typography>
           ) : null}
         </Stack>

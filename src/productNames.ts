@@ -20,6 +20,17 @@ export function productHelp(value: string): string {
   return [name, row.help_text_2 ?? ""].filter(Boolean).join(": ");
 }
 
+/** Product name without its family number, e.g. "SR-7s" for sr-7s or "SFM5-12" for m-sfm5-12; the value itself when unknown. */
+export function productName(value: string): string {
+  const row = productNames.get(value) ?? productNames.get(value.toLowerCase());
+  return (row?.nokia_name ?? value).replace(/^\d{4} /, "").replace(/ \(.*\)$/, "");
+}
+
+/** The help text of a value alone, without its Nokia name; "" when no vetted text exists. */
+export function productHelpText(value: string): string {
+  return (productNames.get(value) ?? productNames.get(value.toLowerCase()))?.help_text_2 ?? "";
+}
+
 /** Group order for chassis dropdowns. */
 export const chassisGroupOrder = [
   "7750 SR-s",

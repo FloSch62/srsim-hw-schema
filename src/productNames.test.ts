@@ -1,14 +1,23 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { chassisGroup, chassisGroupOrder, generationGroup, generationGroupOrder, groupOptions, productHelp } from "./productNames";
+import {
+  chassisGroup,
+  chassisGroupOrder,
+  generationGroup,
+  generationGroupOrder,
+  groupOptions,
+  productHelp,
+  productHelpText,
+  productName
+} from "./productNames";
 
 test("productHelp prefixes the Nokia name when it differs from the schema value", () => {
   assert.equal(productHelp("ess-12"), "7450 ESS-12: 10 IOM slots, modular chassis; dual SF/CPM support");
 });
 
 test("productHelp returns only the help text when the name equals the schema value", () => {
-  assert.equal(productHelp("sfm-ixr-6"), "7250 IXR-6 SFM");
+  assert.equal(productHelp("me6-100gb-qsfp28"), "6x 100G QSFP28 MDA-e-XP (E4)");
 });
 
 test("productHelp returns an empty string for values without vetted text", () => {
@@ -54,4 +63,16 @@ test("groupOptions sorts by group order, keeps order within groups, and skips si
   });
   assert.deepEqual(groupOptions(["a2", "a1"], group, ["a"]), { options: ["a2", "a1"], grouped: false });
   assert.deepEqual(groupOptions(["x"], undefined), { options: ["x"], grouped: false });
+});
+
+test("productName gives the product name without its family number", () => {
+  assert.equal(productName("sr-7s"), "SR-7s");
+  assert.equal(productName("dms-1-24d"), "DMS-1-24D");
+  assert.equal(productName("ixr-e2sc"), "IXR-e2sc");
+  assert.equal(productName("vsr-i"), "VSR-I");
+  assert.equal(productName("unknown-chassis"), "unknown-chassis");
+  assert.equal(productName("m-sfm5-12"), "SFM5-12");
+  assert.equal(productName("cpm-ixr-e-gnss"), "CPM-IXR-e GNSS");
+  assert.equal(productName("me6-100gb-qsfp28"), "me6-100gb-qsfp28");
+  assert.equal(productHelpText("sr-7s"), productHelp("sr-7s").replace("7750 SR-7s: ", ""));
 });
