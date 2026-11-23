@@ -3,6 +3,7 @@ import YAML from "yaml";
 
 import clabSchemaData from "./data/clab.schema.json";
 import srsimSchemaData from "./data/srsim-hw.schema.json";
+import { hardwareIssues, iomMdaSlots, lineCardSlots, moduleSlots } from "./hardwareModel";
 import {
   buildMatrix,
   canonicalToken,
@@ -11,10 +12,8 @@ import {
   directMdaSlotOptions,
   deploymentMode,
   isEmptyValue,
-  schemaNumericSlotOptions,
   sfmOptions,
   splitValues,
-  xcmModuleSlotCount,
   xiomMdaSlotOptions
 } from "./matrix";
 import type {
@@ -277,37 +276,15 @@ function validateNestedMdaSlot(params: {
   return issues;
 }
 
-function validateXcmModuleSlots(params: {
-  location: string;
-  chassis: string;
-  mdas: unknown[];
-  xioms: unknown[];
-}): ValidationIssue[] {
-  const { location, chassis, mdas, xioms } = params;
-  const slotCount = xcmModuleSlotCount(chassis);
-  const slotText = (item: unknown) => String(asRecord(item)?.slot ?? "").trim();
-  const mdaSlots = new Set(mdas.map(slotText));
-  const seenSlots = new Set<string>();
+function duplicateXiomSlots(location: string, xioms: unknown[]): ValidationIssue[] {
+  const seen = new Set<string>();
   const issues: ValidationIssue[] = [];
-
-  for (const slot of xioms.map(slotText).filter(Boolean)) {
-    const path = `${location}.xiom[${slot}]`;
-    if (seenSlots.has(slot)) {
-      issues.push({ source: "hardware", path, message: `duplicate XIOM slot ${slot}` });
+  for (const slot of xioms.map((item) => String(asRecord(item)?.slot ?? "").trim()).filter(Boolean)) {
+    if (seen.has(slot)) {
+      issues.push({ source: "hardware", path: `${location}.xiom[${slot}]`, message: `duplicate XIOM slot ${slot}` });
     }
-    seenSlots.add(slot);
-    if (slotCount === undefined) continue;
-
-    const slotNumber = numericSlot(slot);
-    if (slotNumber !== null && slotNumber > slotCount) {
-      const allowed = schemaNumericSlotOptions([], slotCount).join(", ");
-      issues.push({ source: "hardware", path, message: `XIOM must use XCM slot(s) ${allowed}` });
-    }
-    if (mdaSlots.has(slot)) {
-      issues.push({ source: "hardware", path, message: `XCM slot ${slot} holds either a direct MDA or an XIOM, not both` });
-    }
+    seen.add(slot);
   }
-
   return issues;
 }
 
@@ -344,7 +321,7 @@ function validateComponent(params: {
     return validateCriteria({ schema, nodeName, location, modelName: chassis, criteria: base, strict });
   }
 
-  const issues: ValidationIssue[] = [...validateXcmModuleSlots({ location, chassis, mdas, xioms })];
+  const issues: ValidationIssue[] = duplicateXiomSlots(location, xioms);
   const seenDirectMdaSlots = new Set<string>();
   for (const mda of mdas) {
     const mdaRecord = asRecord(mda);
@@ -358,7 +335,10 @@ function validateComponent(params: {
         location: mdaLocation,
         slot: mdaRecord.slot,
         type: mdaRecord.type,
-        allowedSlots: directMdaSlotOptions(matrixEntry, baseComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
+        // Cards in the hardware model are checked there; this only covers the rest.
+        allowedSlots: moduleSlots(baseComponent.type).length
+          ? []
+          : directMdaSlotOptions(matrixEntry, baseComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
         seenSlots: seenDirectMdaSlots
       })
     );
@@ -426,7 +406,9 @@ function validateComponent(params: {
           location: mdaLocation,
           slot: mdaRecord.slot,
           type: mdaRecord.type,
-          allowedSlots: xiomMdaSlotOptions(matrixEntry, baseComponent, xiomComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
+          allowedSlots: iomMdaSlots(xiomComponent.type).length
+            ? []
+            : xiomMdaSlotOptions(matrixEntry, baseComponent, xiomComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
           seenSlots: seenXiomMdaSlots
         })
       );
@@ -467,7 +449,11 @@ function validateComponentListShape(params: {
   const { schema, nodeName, chassis, sfm, components } = params;
   const matrixEntry = buildMatrix(schema).find((entry) => entry.chassis === clabChassisToken(chassis));
   const mode = deploymentMode(matrixEntry);
-  const issues: ValidationIssue[] = [];
+  const issues: ValidationIssue[] = hardwareIssues(clabChassisToken(chassis), components).map((issue) => {
+    const [slot, ...rest] = issue.path.split(".");
+    const path = slot ? [componentName(nodeName, slot), ...rest].join(".") : undefined;
+    return { source: "hardware", ...(path ? { path } : {}), message: path ? issue.message : `${nodeName}: ${issue.message}` };
+  });
   const slotValue = (component: unknown) => {
     const record = asRecord(component);
     return record?.slot === undefined || record.slot === null ? "" : String(record.slot).trim();
@@ -532,7 +518,7 @@ function validateComponentListShape(params: {
     issues.push({ source: "hardware", message: `${nodeName}: distributed SR-SIM chassis ${chassis} requires a numeric line-card component slot` });
   }
   const maxSlot = inferredComponentSlotCount(chassis);
-  for (const slot of numericSlots) {
+  for (const slot of lineCardSlots(clabChassisToken(chassis)).length ? [] : numericSlots) {
     const slotNumber = Number(slot);
     if (slotNumber < 1 || slotNumber > maxSlot) {
       issues.push({ source: "hardware", path: componentName(nodeName, slot), message: `slot must be between 1 and ${maxSlot}` });

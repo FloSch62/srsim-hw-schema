@@ -25,7 +25,6 @@ import {
   schemaNumericSlotOptions,
   sfmOptions,
   upsertComponentBySlot,
-  xcmModuleSlotCount,
   xiomMdaOptions,
   xiomOptions
 } from "./matrix";
@@ -260,7 +259,7 @@ describe("SR-SIM matrix helpers", () => {
     const entry = getEntry(buildMatrix(hardware), "sr-7s");
 
     assert.deepEqual(componentCpmSlotOptions(entry), ["A", "B"]);
-    assert.deepEqual(componentCardSlotOptions(entry), [1, 2, 3, 4, 5, 6, 7]);
+    assert.deepEqual(componentCardSlotOptions(entry), [1, 2, 3, 4, 5, 6]);
     assert.deepEqual(schemaNumericSlotOptions([], 2), [1, 2]);
     assert.deepEqual(schemaNumericSlotOptions([{ slot: 5 }], 2), [1, 2, 3, 4, 5]);
   });
@@ -295,17 +294,13 @@ describe("SR-SIM matrix helpers", () => {
     const sr14s = getEntry(matrix, "sr-14s");
     const sr2se = getEntry(matrix, "sr-2se");
 
-    assert.equal(xcmModuleSlotCount("SR-7s"), 1);
-    assert.equal(xcmModuleSlotCount("sr-14s"), 2);
-    assert.equal(xcmModuleSlotCount("sr-2se"), undefined);
-
     assert.deepEqual(directMdaSlotOptions(sr7s, { slot: 1, type: "xcm-7s" }, "sfm-s"), [1]);
     assert.deepEqual(directMdaSlotOptions(sr14s, { slot: 1, type: "xcm-14s" }, "sfm-s"), [1, 2]);
-    assert.deepEqual(directMdaSlotOptions(sr2se, { slot: 1, type: "xcm-2se" }, "sfm-2se"), [1, 2]);
+    assert.deepEqual(directMdaSlotOptions(sr2se, { slot: 1, type: "xcm-2se" }, "sfm-2se"), [1]);
 
-    assert.deepEqual(freeXcmModuleSlots(sr7s, [1], [{ slot: 1 }]), []);
-    assert.deepEqual(freeXcmModuleSlots(sr14s, [1, 2], [{ slot: 1 }]), [2]);
-    assert.deepEqual(freeXcmModuleSlots(sr2se, [1, 2], [{ slot: 1 }]), [1, 2]);
+    assert.deepEqual(freeXcmModuleSlots("xcm-7s", [1], [{ slot: 1 }]), []);
+    assert.deepEqual(freeXcmModuleSlots("xcm-14s", [1, 2], [{ slot: 1 }]), [2]);
+    assert.deepEqual(freeXcmModuleSlots("iom5-e", [1, 2], [{ slot: 1 }]), [1, 2]);
   });
 
   it("converts matrix rows into editor components", () => {

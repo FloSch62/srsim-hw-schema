@@ -53,7 +53,6 @@ import {
   nextNumericSlot,
   schemaNumericSlotOptions,
   sfmOptions,
-  xcmModuleSlotCount,
   xiomMdaSlotOptions,
   xiomMdaOptions,
   xiomOptions
@@ -70,6 +69,7 @@ import type {
   SrsimXiom
 } from "../types";
 
+import { moduleSlots } from "../hardwareModel";
 import { FieldAutocomplete } from "./FieldAutocomplete";
 
 interface ComponentEditorProps {
@@ -129,19 +129,22 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   const availableCpmSlots = cpmSlotOptions.filter((slot) => !usedCpmSlots.has(String(slot).toUpperCase()));
   const availableCardSlots = cardSlotOptions.filter((slot) => !usedCardSlots.has(String(slot)));
   const integratedComponent = config.components[0] ?? { mda: [] };
-  const moduleSlotCount = xcmModuleSlotCount(selectedEntry?.chassis);
-  const xiomSlotOptions = schemaNumericSlotOptions([], moduleSlotCount ?? nestedSlotCount, slotRules.xiomIntegerMinimum);
 
   const updateConfig = (updates: Partial<SrsimConfig>) => onChange({ ...config, ...updates });
 
   const directMdaSlotsFor = (component: SrsimComponent, mdaType = "") =>
     freeXcmModuleSlots(
-      selectedEntry,
+      component.type,
       directMdaSlotOptions(selectedEntry, component, config.sfm, nestedSlotCount, slotRules.mdaIntegerMinimum, mdaType),
       component.xiom
     );
 
-  const xiomSlotsFor = (component: SrsimComponent) => freeXcmModuleSlots(selectedEntry, xiomSlotOptions, component.mda);
+  const xiomSlotsFor = (component: SrsimComponent) =>
+    freeXcmModuleSlots(
+      component.type,
+      schemaNumericSlotOptions([], moduleSlots(component.type).length || nestedSlotCount, slotRules.xiomIntegerMinimum),
+      component.mda
+    );
 
   const xiomMdaSlotsFor = (component: SrsimComponent, xiom: SrsimXiom, mdaType = "") =>
     xiomMdaSlotOptions(selectedEntry, component, xiom, config.sfm, nestedSlotCount, slotRules.mdaIntegerMinimum, mdaType);
@@ -593,11 +596,11 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 />
               </Box>
 
-              {moduleSlotCount ? (
+              {moduleSlots(component.type).length ? (
                 <FormHelperText sx={{ mt: 1.5 }}>
-                  {moduleSlotCount === 1
+                  {moduleSlots(component.type).length === 1
                     ? "This XCM has one slot, for either a direct MDA or an XIOM."
-                    : `This XCM has ${moduleSlotCount} slots, each for either a direct MDA or an XIOM.`}
+                    : `This XCM has ${moduleSlots(component.type).length} slots, each for either a direct MDA or an XIOM.`}
                 </FormHelperText>
               ) : null}
 

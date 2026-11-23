@@ -413,7 +413,7 @@ describe("topology validation", () => {
     assert.equal(singleComponent.valid, false);
     assert.ok(singleComponent.issues.some((issue) => issue.message.includes("requires a CPM component slot")));
     assert.equal(outOfRange.valid, false);
-    assert.ok(outOfRange.issues.some((issue) => issue.message.includes("slot must be between 1 and 7")));
+    assert.ok(outOfRange.issues.some((issue) => issue.message.includes("sr-7s has line-card slots 1 to 6, not 99")));
   });
 
   it("rejects duplicate distributed component slots", () => {
@@ -523,20 +523,20 @@ describe("XIOM and XCM slot limits", () => {
 
   it("limits an XIOM to two MDAs", () => {
     expectValid(sr7s(xiom([1], [1, 2])));
-    expectRejected(sr7s(xiom([1], [1, 2, 3])), "must use MDA slot(s) 1, 2");
-    expectRejected(sr7s(xiom([1], [3])), "must use MDA slot(s) 1, 2");
+    expectRejected(sr7s(xiom([1], [1, 2, 3])), "has MDA slots 1, 2, not 3");
+    expectRejected(sr7s(xiom([1], [3])), "has MDA slots 1, 2, not 3");
   });
 
   for (const [name, build] of [["SR-2s", sr2s], ["SR-7s", sr7s]] as const) {
     it(`gives ${name} one XCM slot for an XMA or an XIOM`, () => {
       expectValid(build(direct(1)));
       expectValid(build(xiom([1])));
-      expectRejected(build(direct(1) + xiom([1])), "XCM slot 1 holds either a direct MDA or an XIOM, not both");
-      expectRejected(build(direct(1) + xiom([2])), "XIOM must use XCM slot(s) 1");
-      expectRejected(build(direct(1, 2)), "must use MDA slot(s) 1");
-      expectRejected(build(direct(2)), "must use MDA slot(s) 1");
-      expectRejected(build(xiom([1, 2])), "XIOM must use XCM slot(s) 1");
-      expectRejected(build(xiom([2])), "XIOM must use XCM slot(s) 1");
+      expectRejected(build(direct(1) + xiom([1])), "module slot 1 holds either an XMA or an IOM, not both");
+      expectRejected(build(direct(1) + xiom([2])), "has module slot 1, not 2");
+      expectRejected(build(direct(1, 2)), "has module slot 1, not 2");
+      expectRejected(build(direct(2)), "has module slot 1, not 2");
+      expectRejected(build(xiom([1, 2])), "has module slot 1, not 2");
+      expectRejected(build(xiom([2])), "has module slot 1, not 2");
     });
   }
 
@@ -545,9 +545,9 @@ describe("XIOM and XCM slot limits", () => {
     expectValid(sr14s(direct(2) + xiom([1])));
     expectValid(sr14s(direct(1, 2)));
     expectValid(sr14s(xiom([1, 2])));
-    expectRejected(sr14s(direct(1) + xiom([1])), "XCM slot 1 holds either a direct MDA or an XIOM, not both");
-    expectRejected(sr14s(direct(3)), "must use MDA slot(s) 1, 2");
-    expectRejected(sr14s(xiom([3])), "XIOM must use XCM slot(s) 1, 2");
+    expectRejected(sr14s(direct(1) + xiom([1])), "module slot 1 holds either an XMA or an IOM, not both");
+    expectRejected(sr14s(direct(3)), "has module slots 1, 2, not 3");
+    expectRejected(sr14s(xiom([3])), "has module slots 1, 2, not 3");
   });
 
   it("applies the XCM limits to every XCM generation and chassis type spelling", () => {
