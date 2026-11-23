@@ -23,7 +23,8 @@ for (const hardwareCase of cases) {
 test("slot lookups come from the model", () => {
   assert.deepEqual(lineCardSlots("sr-14s"), [1, 2, 3, 4, 5, 6]);
   assert.deepEqual(lineCardSlots("sr-1s"), []);
-  assert.deepEqual(lineCardSlots("sr-7"), []);
+  assert.deepEqual(lineCardSlots("sr-7"), [1, 2, 3, 4, 5]);
+  assert.deepEqual(lineCardSlots("ixr-e2"), []);
   assert.deepEqual(moduleSlots("xcm2-14s"), [1, 2]);
   assert.deepEqual(moduleSlots("cpm-1s"), [1]);
   assert.deepEqual(moduleSlots("iom5-e"), []);

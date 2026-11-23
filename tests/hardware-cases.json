@@ -118,8 +118,41 @@
     "issues": [{"code": "fixed", "path": "1.mda[1]"}]
   },
   {
-    "name": "Chassis without a model are not checked",
+    "name": "SR-1: the integrated card has two MDA-e-XP slots",
+    "chassis": "sr-1",
+    "components": [{"slot": "A", "mda": [{"slot": 1, "type": "me6-100gb-qsfp28"}, {"slot": 2, "type": "me12-100gb-qsfp28"}, {"slot": 3, "type": "me6-100gb-qsfp28"}]}],
+    "issues": [{"code": "module-slot", "path": "A.mda[3]"}]
+  },
+  {
+    "name": "SR-7: five IOM slots and two CPM slots",
     "chassis": "sr-7",
+    "components": [{"slot": "A", "type": "cpm5"}, {"slot": "C", "type": "cpm5"}, {"slot": 5, "type": "iom5-e"}, {"slot": 6, "type": "iom5-e"}],
+    "issues": [{"code": "no-such-slot", "path": "6"}, {"code": "no-such-slot", "path": "C"}]
+  },
+  {
+    "name": "ESS-12: IOMs take two MDAs, IMMs keep their built-in ones",
+    "chassis": "ess-12",
+    "components": [
+      {"slot": "A", "type": "cpm5"},
+      {"slot": 1, "type": "iom4-e", "mda": [{"slot": 1, "type": "me10-10gb-sfp+"}, {"slot": 3, "type": "me10-10gb-sfp+"}]},
+      {"slot": 2, "type": "imm48-1gb-sfp-c", "mda": [{"slot": 1, "type": "imm24-1gb-xp-sfp"}, {"slot": 2, "type": "imm24-1gb-xp-sfp"}]},
+      {"slot": 10, "type": "imm-2pac-fp3", "mda": [{"slot": 1, "type": "p10-10g-sfp"}, {"slot": 2, "type": "p1-100g-cfp"}]}
+    ],
+    "issues": [{"code": "module-slot", "path": "1.mda[3]"}]
+  },
+  {
+    "name": "SR-12e: nine IOM slots; a 400G IMM has one built-in MDA",
+    "chassis": "sr-12e",
+    "components": [
+      {"slot": "B", "type": "cpm5"},
+      {"slot": 9, "type": "imm40-10gb-sfp", "mda": [{"slot": 1, "type": "m4-100g-cfp4"}, {"slot": 2, "type": "m40-10g-sfp"}]},
+      {"slot": 10, "type": "iom5-e"}
+    ],
+    "issues": [{"code": "fixed", "path": "9.mda[1]"}, {"code": "module-slot", "path": "9.mda[2]"}, {"code": "no-such-slot", "path": "10"}]
+  },
+  {
+    "name": "Chassis without a model are not checked",
+    "chassis": "ixr-e2",
     "components": [{"slot": 99, "type": "iom5-e"}],
     "issues": []
   }

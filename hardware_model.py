@@ -107,6 +107,17 @@ def xcm_slots(count: int) -> tuple[Slot, ...]:
     return tuple(Slot(f"xcm-{n}", ("xcm",), srsim=n) for n in range(1, count + 1))
 
 
+def iom_slots(count: int) -> tuple[Slot, ...]:
+    return tuple(Slot(f"iom-{n}", ("line-card",), srsim=n) for n in range(1, count + 1))
+
+
+def integrated_chassis(chassis_id: str, card: str) -> Chassis:
+    """A single-container chassis whose integrated card SR-SIM runs as component slot A."""
+    return Chassis(
+        chassis_id, slots=(Slot("integrated", ("cpm",), srsim="A", types=(card,)),), integrated=card
+    )
+
+
 def fixed_platform(model: Model, chassis_id: str, cpm: str, card: str, mda: str) -> None:
     """A fixed chassis that SR-SIM runs as CPM slot A plus line card 1, both built in, with one built-in MDA."""
     model.add_part(mda_card(card, "line-card", {1: mda}))
@@ -216,10 +227,36 @@ def sr_1_fp5_family(model: Model) -> None:
     fixed_platform(model, "sr-1se", "cpm-1se", "imm36-800g-qsfpdd", "ms36-800g-qsfpdd")
 
 
+def sr_classic_family(model: Model) -> None:
+    """7750 SR-1/7/12/12e and 7450 ESS-7/12: IOMs with two MDA slots, IMMs with built-in MDAs."""
+    model.add_part(mda_card("cpm-1", "cpm", {1: "", 2: ""}))
+    model.chassis["sr-1"] = integrated_chassis("sr-1", "cpm-1")
+
+    model.add_part(Part("cpm5", "cpm"))
+    for type_ in ("iom4-e", "iom4-e-b", "iom4-e-hs", "iom5-e"):
+        model.add_part(mda_card(type_, "line-card", {1: "", 2: ""}))
+    # The pac IMM takes up to two configurable MDAs; the others provision their MDAs themselves.
+    model.add_part(mda_card("imm-2pac-fp3", "line-card", {1: "", 2: ""}))
+    model.add_part(mda_card("imm48-1gb-sfp-c", "line-card", {1: "imm24-1gb-xp-sfp", 2: "imm24-1gb-xp-sfp"}))
+    model.add_part(mda_card("imm40-10gb-sfp", "line-card", {1: "m40-10g-sfp"}))
+    model.add_part(mda_card("imm4-100gb-cfp4", "line-card", {1: "m4-100g-cfp4"}))
+    for chassis_id, ioms in (
+        ("sr-7", 5),
+        ("ess-7", 5),
+        ("sr-12", 10),
+        ("ess-12", 10),
+        ("sr-12e", 9),
+    ):
+        model.chassis[chassis_id] = Chassis(
+            chassis_id, slots=(*iom_slots(ioms), *cpm_slots(("cpm5",), 2))
+        )
+
+
 def build_model() -> Model:
     model = Model()
     sr_s_family(model)
     sr_1_fp5_family(model)
+    sr_classic_family(model)
     check_model(model)
     return model
 
