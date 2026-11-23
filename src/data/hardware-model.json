@@ -2540,6 +2540,11 @@
         },
         "imm48-1gb-sfp-c": {
             "kind": "line-card",
+            "sfm": [
+                "m-sfm5-7",
+                "m-sfm5-12",
+                "m-sfm5-12e"
+            ],
             "slots": [
                 {
                     "accepts": [
@@ -2928,14 +2933,40 @@
                         "mda"
                     ],
                     "id": "mda-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "me1-100gb-cfp2",
+                        "me10-10gb-sfp+",
+                        "me12-10/1gb-sfp+",
+                        "me2-100gb-ms-qsfp28",
+                        "me2-100gb-qsfp28",
+                        "me40-1gb-csfp",
+                        "me6-10gb-sfp+",
+                        "me8-10/25gb-sfp28",
+                        "isa2-aa",
+                        "isa2-bb",
+                        "isa2-tunnel"
+                    ]
                 },
                 {
                     "accepts": [
                         "mda"
                     ],
                     "id": "mda-2",
-                    "srsim": 2
+                    "srsim": 2,
+                    "types": [
+                        "me1-100gb-cfp2",
+                        "me10-10gb-sfp+",
+                        "me12-10/1gb-sfp+",
+                        "me2-100gb-ms-qsfp28",
+                        "me2-100gb-qsfp28",
+                        "me40-1gb-csfp",
+                        "me6-10gb-sfp+",
+                        "me8-10/25gb-sfp28",
+                        "isa2-aa",
+                        "isa2-bb",
+                        "isa2-tunnel"
+                    ]
                 }
             ]
         },
@@ -2947,14 +2978,40 @@
                         "mda"
                     ],
                     "id": "mda-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "me1-100gb-cfp2",
+                        "me10-10gb-sfp+",
+                        "me12-10/1gb-sfp+",
+                        "me2-100gb-ms-qsfp28",
+                        "me2-100gb-qsfp28",
+                        "me40-1gb-csfp",
+                        "me6-10gb-sfp+",
+                        "me8-10/25gb-sfp28",
+                        "isa2-aa",
+                        "isa2-bb",
+                        "isa2-tunnel"
+                    ]
                 },
                 {
                     "accepts": [
                         "mda"
                     ],
                     "id": "mda-2",
-                    "srsim": 2
+                    "srsim": 2,
+                    "types": [
+                        "me1-100gb-cfp2",
+                        "me10-10gb-sfp+",
+                        "me12-10/1gb-sfp+",
+                        "me2-100gb-ms-qsfp28",
+                        "me2-100gb-qsfp28",
+                        "me40-1gb-csfp",
+                        "me6-10gb-sfp+",
+                        "me8-10/25gb-sfp28",
+                        "isa2-aa",
+                        "isa2-bb",
+                        "isa2-tunnel"
+                    ]
                 }
             ]
         },
@@ -2966,35 +3023,94 @@
                         "mda"
                     ],
                     "id": "mda-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "me1-100gb-cfp2",
+                        "me10-10gb-sfp+",
+                        "me12-10/1gb-sfp+",
+                        "me2-100gb-ms-qsfp28",
+                        "me2-100gb-qsfp28",
+                        "me40-1gb-csfp",
+                        "me6-10gb-sfp+",
+                        "me8-10/25gb-sfp28"
+                    ]
                 },
                 {
                     "accepts": [
                         "mda"
                     ],
                     "id": "mda-2",
-                    "srsim": 2
+                    "srsim": 2,
+                    "types": [
+                        "me1-100gb-cfp2",
+                        "me10-10gb-sfp+",
+                        "me12-10/1gb-sfp+",
+                        "me2-100gb-ms-qsfp28",
+                        "me2-100gb-qsfp28",
+                        "me40-1gb-csfp",
+                        "me6-10gb-sfp+",
+                        "me8-10/25gb-sfp28"
+                    ]
                 }
             ]
         },
         "iom5-e": {
             "kind": "line-card",
+            "sfm": [
+                "m-sfm6-7/12",
+                "m-sfm6-12e"
+            ],
             "slots": [
                 {
                     "accepts": [
                         "mda"
                     ],
                     "id": "mda-1",
-                    "srsim": 1
+                    "srsim": 1,
+                    "types": [
+                        "me12-100gb-qsfp28",
+                        "me16-25gb-sfp28+2-100gb-qsfp-b",
+                        "me16-25gb-sfp28+2-100gb-qsfp28",
+                        "me3-200gb-cfp2-dco",
+                        "me3-400gb-qsfpdd",
+                        "me6-100gb-qsfp28",
+                        "me6-400gb-qsfpdd",
+                        "m5e10-100g-qsfp28",
+                        "m5e16-100g-sfp112",
+                        "m5e2-100g-qsfp28+2-800g-qdd",
+                        "m5e8-100g-sfp112+2-800g-qdd"
+                    ]
                 },
                 {
                     "accepts": [
                         "mda"
                     ],
                     "id": "mda-2",
-                    "srsim": 2
+                    "srsim": 2,
+                    "types": [
+                        "me12-100gb-qsfp28",
+                        "me16-25gb-sfp28+2-100gb-qsfp-b",
+                        "me16-25gb-sfp28+2-100gb-qsfp28",
+                        "me3-200gb-cfp2-dco",
+                        "me3-400gb-qsfpdd",
+                        "me6-100gb-qsfp28",
+                        "me6-400gb-qsfpdd",
+                        "m5e10-100g-qsfp28",
+                        "m5e16-100g-sfp112",
+                        "m5e2-100g-qsfp28+2-800g-qdd",
+                        "m5e8-100g-sfp112+2-800g-qdd"
+                    ]
                 }
             ]
+        },
+        "isa2-aa": {
+            "kind": "mda"
+        },
+        "isa2-bb": {
+            "kind": "mda"
+        },
+        "isa2-tunnel": {
+            "kind": "mda"
         },
         "m10-10g-sfp+": {
             "kind": "mda"
@@ -3005,10 +3121,67 @@
         "m4-10g-sfp++1-100g-cfp2": {
             "kind": "mda"
         },
+        "m5e10-100g-qsfp28": {
+            "kind": "mda"
+        },
+        "m5e16-100g-sfp112": {
+            "kind": "mda"
+        },
+        "m5e2-100g-qsfp28+2-800g-qdd": {
+            "kind": "mda"
+        },
+        "m5e8-100g-sfp112+2-800g-qdd": {
+            "kind": "mda"
+        },
         "m6-10g-sfp++1-100g-qsfp28": {
             "kind": "mda"
         },
         "m6-10g-sfp++4-25g-sfp28": {
+            "kind": "mda"
+        },
+        "me1-100gb-cfp2": {
+            "kind": "mda"
+        },
+        "me10-10gb-sfp+": {
+            "kind": "mda"
+        },
+        "me12-10/1gb-sfp+": {
+            "kind": "mda"
+        },
+        "me12-100gb-qsfp28": {
+            "kind": "mda"
+        },
+        "me16-25gb-sfp28+2-100gb-qsfp-b": {
+            "kind": "mda"
+        },
+        "me16-25gb-sfp28+2-100gb-qsfp28": {
+            "kind": "mda"
+        },
+        "me2-100gb-ms-qsfp28": {
+            "kind": "mda"
+        },
+        "me2-100gb-qsfp28": {
+            "kind": "mda"
+        },
+        "me3-200gb-cfp2-dco": {
+            "kind": "mda"
+        },
+        "me3-400gb-qsfpdd": {
+            "kind": "mda"
+        },
+        "me40-1gb-csfp": {
+            "kind": "mda"
+        },
+        "me6-100gb-qsfp28": {
+            "kind": "mda"
+        },
+        "me6-10gb-sfp+": {
+            "kind": "mda"
+        },
+        "me6-400gb-qsfpdd": {
+            "kind": "mda"
+        },
+        "me8-10/25gb-sfp28": {
             "kind": "mda"
         },
         "s18-100gb-qsfp28": {

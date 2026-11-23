@@ -7,8 +7,9 @@ import srsim_hw_schema as srsim
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = hardware_model.build_model()
-# Appendix pairings that the hardware rules out: CPM2-s runs only in an FP5 (SFM2-s) system.
-APPENDIX_ERRORS = {("cpm2-s", "sfm-s")}
+# Appendix pairings that the hardware rules out: CPM2-s runs only in an FP5 (SFM2-s) system, and
+# FP2 cards fail at the fabric speed SFM6 needs.
+APPENDIX_ERRORS = {("cpm2-s", "sfm-s"), ("imm48-1gb-sfp-c", "m-sfm6-7/12")}
 
 
 def placeable_cpms(chassis: hardware_model.Chassis) -> set[str]:

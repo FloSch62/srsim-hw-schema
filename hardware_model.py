@@ -90,15 +90,23 @@ def module_carrier(
     )
 
 
-def mda_card(type_: str, kind: str, mdas: dict[int, str | None]) -> Part:
-    """A card with MDA slots, keyed by SR-SIM slot: the built-in MDA type, "" for a pluggable slot, or None for
-    a slot number the card has but cannot fill."""
+def mda_card(
+    type_: str,
+    kind: str,
+    mdas: dict[int, str | None],
+    sfm: tuple[str, ...] = (),
+    types: tuple[str, ...] = (),
+) -> Part:
+    """A card with MDA slots, keyed by SR-SIM slot: the built-in MDA type, "" for a pluggable slot that takes
+    `types` (empty: any), or None for a slot number the card has but cannot fill."""
     return Part(
         type=type_,
         kind=kind,
         slots=tuple(
-            Slot(f"mda-{n}", () if fixed is None else ("mda",), srsim=n, fixed=fixed or "") for n, fixed in mdas.items()
+            Slot(f"mda-{n}", () if fixed is None else ("mda",), srsim=n, fixed=fixed or "", types=() if fixed else types)
+            for n, fixed in mdas.items()
         ),
+        sfm=sfm,
     )
 
 
@@ -282,12 +290,45 @@ def sr_classic_family(model: Model) -> None:
     model.add_part(mda_card("cpm-1", "cpm", {1: "", 2: ""}))
     model.chassis["sr-1"] = integrated_chassis("sr-1", "cpm-1")
 
+    # CPM5 runs with SFM5 and SFM6. IOM5-e (FP4) needs SFM6 at fabric-speed-c, where FP2 cards fail;
+    # FP3 cards run with both.
+    sfm5, sfm6 = ("m-sfm5-7", "m-sfm5-12", "m-sfm5-12e"), ("m-sfm6-7/12", "m-sfm6-12e")
     model.add_part(Part("cpm5", "cpm"))
-    for type_ in ("iom4-e", "iom4-e-b", "iom4-e-hs", "iom5-e"):
-        model.add_part(mda_card(type_, "line-card", {1: "", 2: ""}))
+    # IOM4-e cards take FP3 MDA-e, and the IOM4-e and IOM4-e-B also an MS-ISA2; IOM5-e takes only
+    # MDA-e-XP (and MDA2-e-XP), never MDA-e.
+    mda_e = (
+        "me1-100gb-cfp2",
+        "me10-10gb-sfp+",
+        "me12-10/1gb-sfp+",
+        "me2-100gb-ms-qsfp28",
+        "me2-100gb-qsfp28",
+        "me40-1gb-csfp",
+        "me6-10gb-sfp+",
+        "me8-10/25gb-sfp28",
+    )
+    isa2 = ("isa2-aa", "isa2-bb", "isa2-tunnel")
+    mda_e_xp = (
+        "me12-100gb-qsfp28",
+        "me16-25gb-sfp28+2-100gb-qsfp-b",
+        "me16-25gb-sfp28+2-100gb-qsfp28",
+        "me3-200gb-cfp2-dco",
+        "me3-400gb-qsfpdd",
+        "me6-100gb-qsfp28",
+        "me6-400gb-qsfpdd",
+        "m5e10-100g-qsfp28",
+        "m5e16-100g-sfp112",
+        "m5e2-100g-qsfp28+2-800g-qdd",
+        "m5e8-100g-sfp112+2-800g-qdd",
+    )
+    for type_ in (*mda_e, *isa2, *mda_e_xp):
+        model.add_part(Part(type_, "mda"))
+    for type_, types in (("iom4-e", (*mda_e, *isa2)), ("iom4-e-b", (*mda_e, *isa2)), ("iom4-e-hs", mda_e)):
+        model.add_part(mda_card(type_, "line-card", {1: "", 2: ""}, types=types))
+    model.add_part(mda_card("iom5-e", "line-card", {1: "", 2: ""}, sfm6, mda_e_xp))
     # The pac IMM takes up to two configurable MDAs; the others provision their MDAs themselves.
     model.add_part(mda_card("imm-2pac-fp3", "line-card", {1: "", 2: ""}))
-    model.add_part(mda_card("imm48-1gb-sfp-c", "line-card", {1: "imm24-1gb-xp-sfp", 2: "imm24-1gb-xp-sfp"}))
+    imm48 = {1: "imm24-1gb-xp-sfp", 2: "imm24-1gb-xp-sfp"}
+    model.add_part(mda_card("imm48-1gb-sfp-c", "line-card", imm48, sfm5))
     model.add_part(mda_card("imm40-10gb-sfp", "line-card", {1: "m40-10g-sfp"}))
     model.add_part(mda_card("imm4-100gb-cfp4", "line-card", {1: "m4-100g-cfp4"}))
     for chassis_id, ioms in (
