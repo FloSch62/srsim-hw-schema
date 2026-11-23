@@ -1317,12 +1317,23 @@ def mda_slot_restriction(chassis: str, mda_type: str) -> list[int]:
     )
 
 
-def array_item_type_schema(values: list[str], *, chassis: str = "", restrict_mda_slots: bool = False) -> dict[str, Any]:
+def mda_slot_rule_slots(chassis: str, card: str, mda_type: str) -> list[int]:
+    """Slots an MDA type is limited to on a card: from the hardware model when it knows the card."""
+    modelled = hardware_model.card_slots(HARDWARE, card)
+    if not modelled:
+        return mda_slot_restriction(chassis, mda_type)
+    allowed = hardware_model.mda_slots_for(HARDWARE, card, mda_type)
+    return [] if allowed == modelled else allowed
+
+
+def array_item_type_schema(
+    values: list[str], *, chassis: str = "", card: str = "", restrict_mda_slots: bool = False
+) -> dict[str, Any]:
     item: dict[str, Any] = {"properties": {"type": {"enum": values}}}
     if restrict_mda_slots:
         rules: list[dict[str, Any]] = []
         for value in values:
-            slots = mda_slot_restriction(chassis, value)
+            slots = mda_slot_rule_slots(chassis, card, value)
             if slots:
                 rules.append(
                     {
@@ -1410,6 +1421,7 @@ def xiom_schema_for_card(entry: dict[str, Any], chassis: str) -> dict[str, Any]:
                     "mda": array_item_type_schema(
                         mdas,
                         chassis=chassis,
+                        card=xiom,
                         restrict_mda_slots=True,
                     )
                 }
@@ -1430,14 +1442,17 @@ def xiom_schema_for_card(entry: dict[str, Any], chassis: str) -> dict[str, Any]:
     return schema
 
 
-def component_rule_for_card(card: str, entry: dict[str, Any], chassis: str) -> dict[str, Any]:
+def component_rule_for_card(
+    card: str, entry: dict[str, Any], chassis: str, card_slots: list[int] | None = None
+) -> dict[str, Any]:
     then: dict[str, Any] = {"properties": {}}
-    all_of: list[dict[str, Any]] = []
+    all_of: list[dict[str, Any]] = card_slot_rules(card_slots) if card_slots else []
 
     if entry["direct_mda"]:
         then["properties"]["mda"] = array_item_type_schema(
             entry["direct_mda"],
             chassis=chassis,
+            card=card,
             restrict_mda_slots=True,
         )
     else:
@@ -1462,10 +1477,9 @@ def component_rule_for_card(card: str, entry: dict[str, Any], chassis: str) -> d
     }
 
 
-def xcm_module_rules(slot_count: int) -> list[dict[str, Any]]:
-    """Limit XMAs and XIOMs to the XCM slots and keep them from sharing one."""
-    slots = list(range(1, slot_count + 1))
-    modules = {"maxItems": slot_count, "items": {"properties": {"slot": {"enum": slots}}}}
+def card_slot_rules(slots: list[int]) -> list[dict[str, Any]]:
+    """Limit MDAs, XMAs and XIOMs to the slots of a card and keep an MDA and an XIOM from sharing one."""
+    modules = {"maxItems": len(slots), "items": {"properties": {"slot": {"enum": slots}}}}
     rules: list[dict[str, Any]] = [{"properties": {"mda": modules, "xiom": modules}}]
     for slot in slots:
         in_slot = {"contains": {"properties": {"slot": {"const": slot}}, "required": ["slot"]}}
@@ -1518,6 +1532,7 @@ def build_chassis_component_definition(chassis: str, chassis_entry: dict[str, An
                         "mda": array_item_type_schema(
                             standalone_mdas,
                             chassis=chassis,
+                            card=hardware_model.integrated_card(HARDWARE, clab_chassis_token(chassis)),
                             restrict_mda_slots=True,
                         )
                     }
@@ -1549,12 +1564,14 @@ def build_chassis_component_definition(chassis: str, chassis_entry: dict[str, An
             }
         )
 
+    # One slot layout for every card also covers components that leave the type to containerlab.
+    layouts = {tuple(hardware_model.card_slots(HARDWARE, card)) for card in (*cpms, *cards)} - {()}
+    shared_layout = list(layouts.pop()) if len(layouts) == 1 else []
     for card, entry in sorted(card_compatibility(chassis_entry).items()):
-        rules.append(component_rule_for_card(card, entry, chassis))
-
-    module_slots = {hardware_model.module_slot_count(HARDWARE, card) for card in (*cpms, *cards)} - {None}
-    if len(module_slots) == 1:
-        rules.extend(xcm_module_rules(module_slots.pop()))
+        card_slots = [] if shared_layout else hardware_model.card_slots(HARDWARE, card)
+        rules.append(component_rule_for_card(card, entry, chassis, card_slots))
+    if shared_layout:
+        rules.extend(card_slot_rules(shared_layout))
     line_slots = hardware_model.line_card_slots(HARDWARE, clab_chassis_token(chassis))
     if line_slots:
         rules.append(

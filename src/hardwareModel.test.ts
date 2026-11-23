@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { hardwareIssues, iomMdaSlots, lineCardSlots, moduleSlots } from "./hardwareModel";
+import { cardSlots, hardwareIssues, integratedCard, iomMdaSlots, lineCardSlots, mdaSlotsFor, moduleSlots } from "./hardwareModel";
 
 interface HardwareCase {
   name: string;
@@ -28,4 +28,11 @@ test("slot lookups come from the model", () => {
   assert.deepEqual(moduleSlots("cpm-1s"), [1]);
   assert.deepEqual(moduleSlots("iom5-e"), []);
   assert.deepEqual(iomMdaSlots("iom2-se-6.0t"), [1, 2]);
+  assert.deepEqual(moduleSlots("x2-s36-400g-qsfp112-3.0t"), []);
+  assert.deepEqual(cardSlots("x2-s36-400g-qsfp112-3.0t"), [1]);
+  assert.deepEqual(cardSlots("cma-7s"), []);
+  assert.deepEqual(mdaSlotsFor("x2-s36-400g-qsfp112-3.0t", "m36-400g-qsfp112"), [1]);
+  assert.deepEqual(mdaSlotsFor("x2-s36-400g-qsfp112-3.0t", "m36-800g-qsfpdd"), []);
+  assert.deepEqual(integratedCard("sr-1s"), "cpm-1s");
+  assert.deepEqual(integratedCard("sr-7s"), "");
 });

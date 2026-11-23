@@ -1,4 +1,4 @@
-import { iomMdaSlots, lineCardSlots, moduleSlots } from "./hardwareModel";
+import { cardSlots, integratedCard, lineCardSlots, mdaSlotsFor, moduleSlots } from "./hardwareModel";
 import type {
   HardwareModelEntry,
   HardwareSchema,
@@ -472,6 +472,12 @@ export function freeXcmModuleSlots(
   return moduleSlots(cardType).length ? availableNumericSlotOptions(slotOptions, otherModules) : slotOptions;
 }
 
+/** MDA slots of a card the hardware model knows; [] leaves the choice to the appendix rows. */
+function modelledMdaSlots(cardType: string, minimumSlot: number, mdaType: string): number[] {
+  const slots = mdaType ? mdaSlotsFor(cardType, mdaType) : cardSlots(cardType);
+  return slots.filter((slot) => slot >= minimumSlot);
+}
+
 function mdaSlotOptionsFromRows(
   entry: MatrixEntry | undefined,
   rows: MatrixRow[],
@@ -501,9 +507,11 @@ export function directMdaSlotOptions(
   minimumSlot = 1,
   mdaType = ""
 ): number[] {
+  const card = component.type || integratedCard(entry?.chassis);
+  if (cardSlots(card).length) return modelledMdaSlots(card, minimumSlot, mdaType);
   const base = { slot: component.slot, type: component.type };
   const rows = optionRows(entry, base, sfm, "mda").filter((row) => !(row.values.xiom ?? []).length);
-  return mdaSlotOptionsFromRows(entry, rows, moduleSlots(component.type).length || fallbackSlotCount, minimumSlot, mdaType);
+  return mdaSlotOptionsFromRows(entry, rows, fallbackSlotCount, minimumSlot, mdaType);
 }
 
 export function xiomMdaSlotOptions(
@@ -515,13 +523,14 @@ export function xiomMdaSlotOptions(
   minimumSlot = 1,
   mdaType = ""
 ): number[] {
+  if (cardSlots(xiom.type).length) return modelledMdaSlots(xiom.type ?? "", minimumSlot, mdaType);
   const base = {
     slot: component.slot,
     type: component.type,
     xiom: xiom.type ? [{ slot: xiom.slot, type: xiom.type }] : []
   };
   const rows = optionRows(entry, base, sfm, "mda").filter((row) => (row.values.xiom ?? []).length);
-  return mdaSlotOptionsFromRows(entry, rows, iomMdaSlots(xiom.type).length || fallbackSlotCount, minimumSlot, mdaType);
+  return mdaSlotOptionsFromRows(entry, rows, fallbackSlotCount, minimumSlot, mdaType);
 }
 
 export function mdaOptions(entry: MatrixEntry | undefined, component: SrsimComponent, sfm: string): string[] {

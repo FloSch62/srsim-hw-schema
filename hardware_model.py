@@ -1,7 +1,7 @@
 """Physical hardware model that the SR-SIM appendix data is mapped onto.
 
 The appendix says which part types fit together; this model adds what it cannot express:
-slot counts, parts that share space or must not be mixed, and chassis variants.
+slot counts, built-in parts, parts that share space or must not be mixed, and chassis variants.
 """
 from __future__ import annotations
 
@@ -23,6 +23,8 @@ class Slot:
     srsim: str | int | None = None
     # Restriction to specific part types, for facts the appendix cannot carry (CMA -> CPM).
     types: tuple[str, ...] = ()
+    # The part built into this slot; it cannot be removed, changed or installed anywhere else.
+    fixed: str = ""
 
 
 @dataclass(frozen=True)
@@ -79,12 +81,17 @@ def module_carrier(type_: str, kind: str, modules: int) -> Part:
     )
 
 
-def iom(type_: str, mdas: int) -> Part:
+def mda_card(type_: str, kind: str, mdas: dict[int, str]) -> Part:
+    """A card with MDA slots, keyed by SR-SIM slot: the built-in MDA type, or "" for a pluggable slot."""
     return Part(
         type=type_,
-        kind="iom",
-        slots=tuple(Slot(f"mda-{n}", ("mda",), srsim=n) for n in range(1, mdas + 1)),
+        kind=kind,
+        slots=tuple(Slot(f"mda-{n}", ("mda",), srsim=n, fixed=fixed) for n, fixed in mdas.items()),
     )
+
+
+def iom(type_: str, mdas: int) -> Part:
+    return mda_card(type_, "iom", dict.fromkeys(range(1, mdas + 1), ""))
 
 
 def cpm_slots(cpm_types: tuple[str, ...], count: int) -> tuple[Slot, ...]:
@@ -118,12 +125,13 @@ def sr_s_family(model: Model) -> None:
         "s36-100gb-qsfp28",
         "s36-100gb-qsfp28-3.6t",
         "s36-400gb-qsfpdd",
-        "x2-s36-400g-qsfp112-3.0t",
-        "x2-s36-800g-qsfpdd-6.0t",
         "x2-s36-800g-qsfpdd-12.0t",
         "x2-s36-800g-qsfpdd-18.0t",
     ):
         model.add_part(Part(type_, "xma"))
+    # One- and two-complex XMA2-s are provisioned as an XIOM whose single MDA is set automatically.
+    model.add_part(mda_card("x2-s36-400g-qsfp112-3.0t", "iom", {1: "m36-400g-qsfp112"}))
+    model.add_part(mda_card("x2-s36-800g-qsfpdd-6.0t", "iom", {1: "m36-800g-qsfpdd"}))
     for type_ in ("iom-s-1.5t", "iom-s-3.0t"):
         model.add_part(iom(type_, 2))
     for type_ in ("iom2-se-3.0t", "iom2-se-6.0t"):
@@ -197,6 +205,8 @@ def check_model(model: Model) -> None:
     for chassis in model.chassis.values():
         slot_ids = {slot.id for slot in chassis.slots}
         for slot in chassis.slots:
+            if slot.fixed and slot.fixed not in model.parts:
+                raise ValueError(f"{chassis.id}.{slot.id} has unknown built-in part {slot.fixed}")
             for type_ in slot.types:
                 part = model.parts.get(type_)
                 if part is None:
@@ -221,6 +231,8 @@ def _slot_json(slot: Slot) -> dict[str, Any]:
         data["srsim"] = slot.srsim
     if slot.types:
         data["types"] = list(slot.types)
+    if slot.fixed:
+        data["fixed"] = slot.fixed
     return data
 
 
@@ -269,40 +281,56 @@ def _slot(value: Any) -> str:
     return "" if value is None else str(value).strip()
 
 
-def _module_issues(model: Model, part: Part, component: dict[str, Any], path: str) -> list[Issue]:
-    """Modules on an XCM or integrated card, and MDAs on the IOMs in them."""
+def _placement_issue(owner: str, slots: tuple[Slot, ...], slot: Slot, type_: str, path: str) -> Issue | None:
+    """A part of type_ in slot of owner (a chassis or card with these slots) that cannot be there."""
+    if not type_:
+        return None
+    if slot.fixed:
+        if type_ == slot.fixed:
+            return None
+        return Issue("fixed", path, f"slot {slot.srsim} of {owner} has the built-in {slot.fixed}, not {type_}")
+    homes = [str(other.srsim) for other in slots if other.fixed == type_]
+    if homes:
+        return Issue("built-in", path, f"{type_} is built into slot {', '.join(homes)} of {owner}, not slot {slot.srsim}")
+    if slot.types and type_ not in slot.types:
+        return Issue("slot-type", path, f"slot {slot.srsim} of {owner} takes {', '.join(slot.types)}, not {type_}")
+    return None
+
+
+def _nested_issues(part: Part, items: list[dict[str, Any]], path: str, code: str, what: str) -> list[Issue]:
+    """Items placed in the slots of part: each needs an existing slot that can hold its type."""
+    slots = {str(slot.srsim): slot for slot in part.slots}
     issues: list[Issue] = []
-    module_slots = {str(slot.srsim) for slot in part.slots}
+    for item in items:
+        slot_text = _slot(item.get("slot"))
+        if not slot_text:
+            continue
+        slot = slots.get(slot_text)
+        item_path = f"{path}[{slot_text}]"
+        if slot is None:
+            plural = "s" if len(slots) > 1 else ""
+            issues.append(Issue(code, item_path, f"{part.type} has {what} slot{plural} {', '.join(sorted(slots))}, not {slot_text}"))
+            continue
+        issue = _placement_issue(part.type, part.slots, slot, str(item.get("type") or ""), item_path)
+        if issue:
+            issues.append(issue)
+    return issues
+
+
+def _module_issues(model: Model, part: Part, component: dict[str, Any], path: str) -> list[Issue]:
+    """Modules or MDAs on a card, and MDAs on the IOMs in its module slots."""
+    issues: list[Issue] = []
+    what = "module" if any("iom" in slot.accepts for slot in part.slots) else "MDA"
     for key in ("mda", "xiom"):
-        for item in _items(component.get(key)):
-            slot = _slot(item.get("slot"))
-            if slot and slot not in module_slots:
-                issues.append(
-                    Issue(
-                        "module-slot",
-                        f"{path}.{key}[{slot}]",
-                        f"{part.type} has module slot{'s' if len(module_slots) > 1 else ''} "
-                        f"{', '.join(sorted(module_slots))}, not {slot}",
-                    )
-                )
+        issues.extend(_nested_issues(part, _items(component.get(key)), f"{path}.{key}", "module-slot", what))
     direct = {_slot(item.get("slot")) for item in _items(component.get("mda"))}
     for slot in sorted(direct & {_slot(item.get("slot")) for item in _items(component.get("xiom"))} - {""}):
         issues.append(Issue("module-taken", f"{path}.xiom[{slot}]", f"module slot {slot} holds either an XMA or an IOM, not both"))
     for xiom in _items(component.get("xiom")):
         iom_part = model.parts.get(str(xiom.get("type", "")))
-        if not iom_part or iom_part.kind != "iom":
-            continue
-        mda_slots = {str(slot.srsim) for slot in iom_part.slots}
-        for mda in _items(xiom.get("mda")):
-            slot = _slot(mda.get("slot"))
-            if slot and slot not in mda_slots:
-                issues.append(
-                    Issue(
-                        "mda-slot",
-                        f"{path}.xiom[{_slot(xiom.get('slot'))}].mda[{slot}]",
-                        f"{iom_part.type} has MDA slots {', '.join(sorted(mda_slots))}, not {slot}",
-                    )
-                )
+        if iom_part and iom_part.kind == "iom":
+            mda_path = f"{path}.xiom[{_slot(xiom.get('slot'))}].mda"
+            issues.extend(_nested_issues(iom_part, _items(xiom.get("mda")), mda_path, "mda-slot", "MDA"))
     return issues
 
 
@@ -328,6 +356,10 @@ def _cpm_issues(model: Model, chassis: Chassis, cpms: list[dict[str, Any]], used
                 issues.append(
                     Issue("no-such-slot", slot, f"{chassis.id} has CPM slots {', '.join(sorted(cpm_slots))}, not {slot}")
                 )
+                continue
+            issue = _placement_issue(chassis.id, chassis.slots, cpm_slots[slot], str(cpm.get("type") or ""), slot)
+            if issue:
+                issues.append(issue)
         return issues
 
     carriers = [model.parts[type_] for type_ in carrier_slot.types]
@@ -358,7 +390,13 @@ def hardware_issues(model: Model, chassis_id: str, components: list[Any]) -> lis
 
     if chassis.integrated:
         part = model.parts[chassis.integrated]
-        return [issue for component in items for issue in _module_issues(model, part, component, "A")]
+        slot = next(slot for slot in chassis.slots if slot.srsim == "A")
+        issues = []
+        for component in items:
+            issue = _placement_issue(chassis.id, chassis.slots, slot, str(component.get("type") or ""), "A")
+            issues.extend([issue] if issue else [])
+            issues.extend(_module_issues(model, part, component, "A"))
+        return issues
 
     issues: list[Issue] = []
     line_slots = {str(slot.srsim): slot for slot in chassis.slots if slot.srsim is not None and "cpm" not in slot.accepts}
@@ -372,16 +410,23 @@ def hardware_issues(model: Model, chassis_id: str, components: list[Any]) -> lis
         slot_text = _slot(card.get("slot"))
         slot = line_slots.get(slot_text)
         if slot is None:
+            plural = "s" if len(line_slots) > 1 else ""
             issues.append(
                 Issue(
                     "no-such-slot",
                     slot_text,
-                    f"{chassis.id} has line-card slots 1 to {len(line_slots)}, not {slot_text or '(none)'}",
+                    f"{chassis.id} has line-card slot{plural} {', '.join(line_slots)}, not {slot_text or '(none)'}",
                 )
             )
             continue
         used[slot.id] = slot_text
-        part = model.parts.get(str(card.get("type") or ""))
+        type_ = str(card.get("type") or "")
+        issue = _placement_issue(chassis.id, chassis.slots, slot, type_, slot_text)
+        if issue:
+            issues.append(issue)
+            continue
+        # A built-in card is there even when the component leaves its type out.
+        part = model.parts.get(type_ or slot.fixed)
         if part is None:
             continue
         line_types.add(part.type)
@@ -410,9 +455,26 @@ def iom_mda_slots(model: Model) -> list[int]:
     return sorted({slot.srsim for part in model.parts.values() if part.kind == "iom" for slot in part.slots})
 
 
-def module_slot_count(model: Model, card_type: str) -> int | None:
-    """Module slots of an XCM or integrated card; None when the model does not know the card."""
+def integrated_card(model: Model, chassis_id: str) -> str:
+    chassis = model.chassis.get(chassis_id)
+    return chassis.integrated if chassis else ""
+
+
+def card_slots(model: Model, card_type: str) -> list[int]:
+    """SR-SIM mda/xiom slots of a component card; [] when the model does not know the card."""
     part = model.parts.get(card_type)
-    if part is None or part.kind not in {"xcm", "cpm"} or not part.slots:
-        return None
-    return len(part.slots)
+    if part is None or part.kind == "cma":
+        return []
+    return [slot.srsim for slot in part.slots if isinstance(slot.srsim, int)]
+
+
+def mda_slots_for(model: Model, card_type: str, mda_type: str) -> list[int]:
+    """The slots of a known card that can hold mda_type (built-in parts only fit their own slot)."""
+    part = model.parts.get(card_type)
+    if part is None or part.kind == "cma":
+        return []
+    return [
+        slot.srsim
+        for slot in part.slots
+        if isinstance(slot.srsim, int) and _placement_issue(part.type, part.slots, slot, mda_type, "") is None
+    ]

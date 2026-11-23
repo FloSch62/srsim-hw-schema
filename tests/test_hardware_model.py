@@ -13,10 +13,17 @@ def placeable_cpms(chassis: hardware_model.Chassis) -> set[str]:
     types: set[str] = set()
     for slot in chassis.slots:
         if "cpm" in slot.accepts:
-            types.update(slot.types)
+            types.update(slot.types or (slot.fixed,))
         if "cma" in slot.accepts:
             types.update(t for cma in slot.types for cpm_slot in MODEL.parts[cma].slots for t in cpm_slot.types)
     return types
+
+
+def placeable(card: hardware_model.Part, type_: str) -> bool:
+    """Some slot of the card takes parts of this kind and can hold this type; unknown types are MDAs."""
+    kind = MODEL.parts[type_].kind if type_ in MODEL.parts else "mda"
+    fitting = hardware_model.mda_slots_for(MODEL, card.type, type_)
+    return any(kind in slot.accepts and slot.srsim in fitting for slot in card.slots)
 
 
 class HardwareModelTest(unittest.TestCase):
@@ -32,15 +39,29 @@ class HardwareModelTest(unittest.TestCase):
         for chassis_id, chassis in MODEL.chassis.items():
             entry = matrix["chassis"][chassis_id]
             cpms, cards = srsim.chassis_card_classes(entry)
+            compatibility = srsim.card_compatibility(entry)
+            line_kinds = {kind for slot in chassis.slots if isinstance(slot.srsim, int) for kind in slot.accepts}
             with self.subTest(chassis_id):
                 self.assertLessEqual(set(cpms), placeable_cpms(chassis))
                 for card in cards:
-                    self.assertEqual(MODEL.parts[card].kind, "xcm", card)
-                for card, compatibility in srsim.card_compatibility(entry).items():
-                    for module in (*compatibility["direct_mda"], *compatibility["xiom"]):
-                        self.assertIn(MODEL.parts[module].kind, {"xma", "iom"}, f"{card}: {module}")
+                    self.assertIn(MODEL.parts[card].kind, line_kinds, card)
+                for slot in chassis.slots:
+                    if slot.fixed:
+                        self.assertIn(slot.fixed, {*cpms, *cards}, slot.id)
+                for card, offered in compatibility.items():
+                    part = MODEL.parts[card]
+                    for module in offered["direct_mda"]:
+                        self.assertTrue(placeable(part, module), f"{card}: {module}")
+                    for xiom, mdas in offered["xiom_mda"].items():
+                        self.assertTrue(placeable(part, xiom), f"{card}: {xiom}")
+                        for mda in mdas:
+                            self.assertTrue(placeable(MODEL.parts[xiom], mda), f"{xiom}: {mda}")
+                    # Built-in parts must be ones the appendix offers for that card.
+                    for slot in part.slots:
+                        if slot.fixed:
+                            self.assertIn(slot.fixed, offered["direct_mda"], f"{card}.{slot.id}")
                 offered_types = {*cpms, *cards}
-                for offered in srsim.card_compatibility(entry).values():
+                for offered in compatibility.values():
                     offered_types.update(offered["direct_mda"], offered["xiom"])
                 for variant in chassis.variants:
                     self.assertLessEqual(set(variant.parts), offered_types, variant.name)

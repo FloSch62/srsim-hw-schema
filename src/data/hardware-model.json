@@ -474,7 +474,17 @@
             "kind": "xma"
         },
         "x2-s36-400g-qsfp112-3.0t": {
-            "kind": "xma"
+            "kind": "iom",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m36-400g-qsfp112",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
         },
         "x2-s36-800g-qsfpdd-12.0t": {
             "kind": "xma"
@@ -483,7 +493,17 @@
             "kind": "xma"
         },
         "x2-s36-800g-qsfpdd-6.0t": {
-            "kind": "xma"
+            "kind": "iom",
+            "slots": [
+                {
+                    "accepts": [
+                        "mda"
+                    ],
+                    "fixed": "m36-800g-qsfpdd",
+                    "id": "mda-1",
+                    "srsim": 1
+                }
+            ]
         },
         "xcm-14s": {
             "kind": "xcm",

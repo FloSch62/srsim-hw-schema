@@ -67,6 +67,21 @@
     "issues": [{"code": "module-slot", "path": "A.mda[2]"}]
   },
   {
+    "name": "SR-2s: CPM slots take only the CPM-2s",
+    "chassis": "sr-2s",
+    "components": [{"slot": "A", "type": "cpm-s"}, {"slot": 1, "type": "xcm-2s"}],
+    "issues": [{"code": "slot-type", "path": "A"}]
+  },
+  {
+    "name": "SR-7s: a one-complex XMA2-s is an XIOM with one built-in MDA",
+    "chassis": "sr-7s",
+    "components": [
+      {"slot": "A", "type": "cpm2-s"},
+      {"slot": 1, "type": "xcm2-7s", "xiom": [{"slot": 1, "type": "x2-s36-400g-qsfp112-3.0t", "mda": [{"slot": 1, "type": "m36-400g-qsfp112"}, {"slot": 2, "type": "m36-400g-qsfp112"}]}]}
+    ],
+    "issues": [{"code": "mda-slot", "path": "1.xiom[1].mda[2]"}]
+  },
+  {
     "name": "Chassis without a model are not checked",
     "chassis": "sr-7",
     "components": [{"slot": 99, "type": "iom5-e"}],

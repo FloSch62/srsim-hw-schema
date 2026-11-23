@@ -6,6 +6,7 @@ interface ModelSlot {
   accepts: string[];
   srsim?: string | number;
   types?: string[];
+  fixed?: string;
 }
 
 interface ModelPart {
@@ -44,11 +45,32 @@ export function lineCardSlots(chassis: string): number[] {
   return model.slots.flatMap((slot) => (typeof slot.srsim === "number" ? [slot.srsim] : []));
 }
 
-/** Module slots of an XCM or integrated card; [] when the model does not know the card. */
+/** The card SR-SIM runs as slot A of a single-container chassis; "" when there is none in the model. */
+export function integratedCard(chassis: string | undefined): string {
+  return chassisModels[chassis ?? ""]?.integrated ?? "";
+}
+
+/** XCM-style module slots that each take an XMA or an XIOM; [] for other cards and unknown ones. */
 export function moduleSlots(cardType: string | undefined): number[] {
+  const slots = parts[cardType ?? ""]?.slots ?? [];
+  return slots.some((slot) => slot.accepts.includes("iom")) ? slots.map((slot) => Number(slot.srsim)) : [];
+}
+
+/** SR-SIM mda/xiom slots of a component card; [] when the model does not know the card. */
+export function cardSlots(cardType: string | undefined): number[] {
   const part = parts[cardType ?? ""];
-  if (!part || !["xcm", "cpm"].includes(part.kind)) return [];
-  return (part.slots ?? []).map((slot) => Number(slot.srsim));
+  if (!part || part.kind === "cma") return [];
+  return (part.slots ?? []).flatMap((slot) => (typeof slot.srsim === "number" ? [slot.srsim] : []));
+}
+
+/** The slots of a known card that can hold mdaType (built-in parts only fit their own slot). */
+export function mdaSlotsFor(cardType: string | undefined, mdaType: string): number[] {
+  const part = parts[cardType ?? ""];
+  if (!part || part.kind === "cma") return [];
+  const slots = part.slots ?? [];
+  return slots.flatMap((slot) =>
+    typeof slot.srsim === "number" && !placementIssue(cardType ?? "", slots, slot, mdaType, "") ? [slot.srsim] : []
+  );
 }
 
 /** MDA slots of an IOM; [] when the model does not know the IOM. */
@@ -57,20 +79,53 @@ export function iomMdaSlots(iomType: string | undefined): number[] {
   return part?.kind === "iom" ? (part.slots ?? []).map((slot) => Number(slot.srsim)) : [];
 }
 
+/** A part of this type in slot of owner (a chassis or card with these slots) that cannot be there. */
+function placementIssue(owner: string, slots: ModelSlot[], slot: ModelSlot, type: string, path: string): HardwareIssue | null {
+  if (!type) return null;
+  if (slot.fixed) {
+    return type === slot.fixed
+      ? null
+      : { code: "fixed", path, message: `slot ${slot.srsim} of ${owner} has the built-in ${slot.fixed}, not ${type}` };
+  }
+  const homes = slots.filter((other) => other.fixed === type).map((other) => String(other.srsim));
+  if (homes.length) {
+    return { code: "built-in", path, message: `${type} is built into slot ${homes.join(", ")} of ${owner}, not slot ${slot.srsim}` };
+  }
+  if (slot.types?.length && !slot.types.includes(type)) {
+    return { code: "slot-type", path, message: `slot ${slot.srsim} of ${owner} takes ${slot.types.join(", ")}, not ${type}` };
+  }
+  return null;
+}
+
+/** Items placed in the slots of a card: each needs an existing slot that can hold its type. */
+function nestedIssues(part: ModelPart, partType: string, nested: Item[], path: string, code: string, what: string): HardwareIssue[] {
+  const slots = part.slots ?? [];
+  const names = srsimSlots(slots);
+  const issues: HardwareIssue[] = [];
+  for (const item of nested) {
+    const slotValue = slotText(item.slot);
+    if (!slotValue) continue;
+    const slot = slots.find((candidate) => String(candidate.srsim) === slotValue);
+    const itemPath = `${path}[${slotValue}]`;
+    if (!slot) {
+      issues.push({
+        code,
+        path: itemPath,
+        message: `${partType} has ${what} slot${names.length > 1 ? "s" : ""} ${[...names].sort().join(", ")}, not ${slotValue}`
+      });
+      continue;
+    }
+    const issue = placementIssue(partType, slots, slot, String(item.type ?? ""), itemPath);
+    if (issue) issues.push(issue);
+  }
+  return issues;
+}
+
 function moduleIssues(part: ModelPart, partType: string, component: Item, path: string): HardwareIssue[] {
   const issues: HardwareIssue[] = [];
-  const modules = srsimSlots(part.slots);
+  const what = (part.slots ?? []).some((slot) => slot.accepts.includes("iom")) ? "module" : "MDA";
   for (const key of ["mda", "xiom"] as const) {
-    for (const item of items(component[key])) {
-      const slot = slotText(item.slot);
-      if (slot && !modules.includes(slot)) {
-        issues.push({
-          code: "module-slot",
-          path: `${path}.${key}[${slot}]`,
-          message: `${partType} has module slot${modules.length > 1 ? "s" : ""} ${[...modules].sort().join(", ")}, not ${slot}`
-        });
-      }
-    }
+    issues.push(...nestedIssues(part, partType, items(component[key]), `${path}.${key}`, "module-slot", what));
   }
   const direct = new Set(items(component.mda).map((item) => slotText(item.slot)));
   const shared = items(component.xiom)
@@ -84,17 +139,7 @@ function moduleIssues(part: ModelPart, partType: string, component: Item, path: 
     const iomType = String(xiom.type ?? "");
     const iom = parts[iomType];
     if (iom?.kind !== "iom") continue;
-    const mdaSlots = srsimSlots(iom.slots);
-    for (const mda of items(xiom.mda)) {
-      const slot = slotText(mda.slot);
-      if (slot && !mdaSlots.includes(slot)) {
-        issues.push({
-          code: "mda-slot",
-          path: `${path}.xiom[${slotText(xiom.slot)}].mda[${slot}]`,
-          message: `${iomType} has MDA slots ${[...mdaSlots].sort().join(", ")}, not ${slot}`
-        });
-      }
-    }
+    issues.push(...nestedIssues(iom, iomType, items(xiom.mda), `${path}.xiom[${slotText(xiom.slot)}].mda`, "mda-slot", "MDA"));
   }
   return issues;
 }
@@ -111,12 +156,16 @@ function carrierFit(carrier: ModelPart, cpms: Item[], used: Set<string>): "fits"
 function cpmIssues(chassisId: string, chassis: ModelChassis, cpms: Item[], used: Map<string, string>): HardwareIssue[] {
   const carrierSlot = chassis.slots.find((slot) => slot.accepts.includes("cma"));
   if (!carrierSlot) {
-    const cpmSlots = chassis.slots.filter((slot) => slot.accepts.includes("cpm")).map((slot) => String(slot.srsim));
+    const cpmSlots = chassis.slots.filter((slot) => slot.accepts.includes("cpm"));
+    const names = srsimSlots(cpmSlots);
     return cpms.flatMap((cpm) => {
-      const slot = slotText(cpm.slot).toUpperCase();
-      return cpmSlots.includes(slot)
-        ? []
-        : [{ code: "no-such-slot", path: slot, message: `${chassisId} has CPM slots ${[...cpmSlots].sort().join(", ")}, not ${slot}` }];
+      const slotValue = slotText(cpm.slot).toUpperCase();
+      const slot = cpmSlots.find((candidate) => String(candidate.srsim) === slotValue);
+      if (!slot) {
+        return [{ code: "no-such-slot", path: slotValue, message: `${chassisId} has CPM slots ${[...names].sort().join(", ")}, not ${slotValue}` }];
+      }
+      const issue = placementIssue(chassisId, chassis.slots, slot, String(cpm.type ?? ""), slotValue);
+      return issue ? [issue] : [];
     });
   }
 
@@ -146,7 +195,11 @@ export function hardwareIssues(chassisId: string, components: unknown[]): Hardwa
 
   if (chassis.integrated) {
     const card = parts[chassis.integrated];
-    return all.flatMap((component) => moduleIssues(card, chassis.integrated as string, component, "A"));
+    const slot = chassis.slots.find((candidate) => candidate.srsim === "A") as ModelSlot;
+    return all.flatMap((component) => {
+      const issue = placementIssue(chassisId, chassis.slots, slot, String(component.type ?? ""), "A");
+      return [...(issue ? [issue] : []), ...moduleIssues(card, chassis.integrated as string, component, "A")];
+    });
   }
 
   const issues: HardwareIssue[] = [];
@@ -163,20 +216,27 @@ export function hardwareIssues(chassisId: string, components: unknown[]): Hardwa
       issues.push({
         code: "no-such-slot",
         path: slotValue,
-        message: `${chassisId} has line-card slots 1 to ${lineSlots.size}, not ${slotValue || "(none)"}`
+        message: `${chassisId} has line-card slot${lineSlots.size > 1 ? "s" : ""} ${[...lineSlots.keys()].join(", ")}, not ${slotValue || "(none)"}`
       });
       continue;
     }
     used.set(slot.id, slotValue);
     const type = String(card.type ?? "");
-    const part = parts[type];
-    if (!part) continue;
-    lineTypes.add(type);
-    if (!slot.accepts.includes(part.kind)) {
-      issues.push({ code: "slot-kind", path: slotValue, message: `slot ${slotValue} takes ${slot.accepts.join("/")}, not ${type}` });
+    const issue = placementIssue(chassisId, chassis.slots, slot, type, slotValue);
+    if (issue) {
+      issues.push(issue);
       continue;
     }
-    issues.push(...moduleIssues(part, type, card, slotValue));
+    // A built-in card is there even when the component leaves its type out.
+    const partType = type || slot.fixed || "";
+    const part = parts[partType];
+    if (!part) continue;
+    lineTypes.add(partType);
+    if (!slot.accepts.includes(part.kind)) {
+      issues.push({ code: "slot-kind", path: slotValue, message: `slot ${slotValue} takes ${slot.accepts.join("/")}, not ${partType}` });
+      continue;
+    }
+    issues.push(...moduleIssues(part, partType, card, slotValue));
   }
 
   issues.push(...cpmIssues(chassisId, chassis, cpms, used));

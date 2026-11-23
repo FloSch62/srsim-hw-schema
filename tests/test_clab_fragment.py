@@ -353,12 +353,12 @@ class ClabFragmentTest(unittest.TestCase):
         self.assertEqual(xiom_mdas["maxItems"], 2)
         self.assertIn({"properties": {"slot": {"enum": [1, 2]}}}, xiom_mdas["items"]["allOf"])
 
-        single_slot_rules = srsim.xcm_module_rules(1)
+        single_slot_rules = srsim.card_slot_rules([1])
         for rule in single_slot_rules:
             self.assertIn(rule, definitions["srsim-component-sr-7s"]["allOf"])
             self.assertIn(rule, definitions["srsim-component-sr-1s"]["allOf"])
 
-        two_slot_rules = srsim.xcm_module_rules(2)
+        two_slot_rules = srsim.card_slot_rules([1, 2])
         self.assertEqual(two_slot_rules[0]["properties"]["xiom"]["maxItems"], 2)
         self.assertEqual(two_slot_rules[0]["properties"]["mda"]["items"]["properties"]["slot"]["enum"], [1, 2])
         self.assertEqual(len(two_slot_rules), 3)

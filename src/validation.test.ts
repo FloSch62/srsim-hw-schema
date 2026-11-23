@@ -413,7 +413,7 @@ describe("topology validation", () => {
     assert.equal(singleComponent.valid, false);
     assert.ok(singleComponent.issues.some((issue) => issue.message.includes("requires a CPM component slot")));
     assert.equal(outOfRange.valid, false);
-    assert.ok(outOfRange.issues.some((issue) => issue.message.includes("sr-7s has line-card slots 1 to 6, not 99")));
+    assert.ok(outOfRange.issues.some((issue) => issue.message.includes("sr-7s has line-card slots 1, 2, 3, 4, 5, 6, not 99")));
   });
 
   it("rejects duplicate distributed component slots", () => {

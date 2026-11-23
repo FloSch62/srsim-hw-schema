@@ -3,7 +3,7 @@ import YAML from "yaml";
 
 import clabSchemaData from "./data/clab.schema.json";
 import srsimSchemaData from "./data/srsim-hw.schema.json";
-import { hardwareIssues, iomMdaSlots, lineCardSlots, moduleSlots } from "./hardwareModel";
+import { cardSlots, hardwareIssues, integratedCard, lineCardSlots } from "./hardwareModel";
 import {
   buildMatrix,
   canonicalToken,
@@ -336,7 +336,7 @@ function validateComponent(params: {
         slot: mdaRecord.slot,
         type: mdaRecord.type,
         // Cards in the hardware model are checked there; this only covers the rest.
-        allowedSlots: moduleSlots(baseComponent.type).length
+        allowedSlots: cardSlots(baseComponent.type || integratedCard(clabChassisToken(chassis))).length
           ? []
           : directMdaSlotOptions(matrixEntry, baseComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
         seenSlots: seenDirectMdaSlots
@@ -406,7 +406,7 @@ function validateComponent(params: {
           location: mdaLocation,
           slot: mdaRecord.slot,
           type: mdaRecord.type,
-          allowedSlots: iomMdaSlots(xiomComponent.type).length
+          allowedSlots: cardSlots(xiomComponent.type).length
             ? []
             : xiomMdaSlotOptions(matrixEntry, baseComponent, xiomComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
           seenSlots: seenXiomMdaSlots
