@@ -2,7 +2,18 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { cardSlots, cpmSlots, hardwareIssues, integratedCard, iomMdaSlots, lineCardSlots, mdaSlotsFor, moduleSlots } from "./hardwareModel";
+import {
+  cardSlots,
+  cpmCarriers,
+  cpmSlots,
+  fittingCarrier,
+  hardwareIssues,
+  integratedCard,
+  iomMdaSlots,
+  lineCardSlots,
+  mdaSlotsFor,
+  moduleSlots
+} from "./hardwareModel";
 
 interface HardwareCase {
   name: string;
@@ -41,4 +52,22 @@ test("slot lookups come from the model", () => {
   assert.deepEqual(integratedCard("sr-7s"), "");
   assert.deepEqual(lineCardSlots("sr-1se"), [1]);
   assert.deepEqual(mdaSlotsFor("imm36-800g-qsfpdd", "ms36-800g-qsfpdd"), [1]);
+});
+
+test("SR-7s CPM adapters say which CPMs they hold and which slots they take", () => {
+  const carriers = cpmCarriers("sr-7s");
+  assert.deepEqual(
+    carriers.map(({ type, cpmTypes, cpmSlots, blocksLineSlots }) => ({ type, cpmTypes, cpmSlots, blocksLineSlots })),
+    [
+      { type: "cma-7s", cpmTypes: ["cpm-s"], cpmSlots: ["A"], blocksLineSlots: [] },
+      { type: "cma-7s-d", cpmTypes: ["cpm-s"], cpmSlots: ["A", "B"], blocksLineSlots: [6] },
+      { type: "cma2-7s", cpmTypes: ["cpm2-s"], cpmSlots: ["A", "B"], blocksLineSlots: [] }
+    ]
+  );
+  assert.deepEqual(cpmCarriers("sr-2s"), []);
+
+  const cpms = [{ slot: "A", type: "cpm-s" }, { slot: "B", type: "cpm-s" }];
+  assert.equal(fittingCarrier("sr-7s", cpms)?.type, "cma-7s-d");
+  assert.equal(fittingCarrier("sr-7s", [...cpms, { slot: 6, type: "xcm-7s" }]), undefined);
+  assert.equal(fittingCarrier("sr-7s", [{ slot: "A", type: "cpm2-s" }])?.type, "cma2-7s");
 });

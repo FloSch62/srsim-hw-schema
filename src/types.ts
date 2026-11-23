@@ -54,6 +54,8 @@ export interface SrsimConfig {
   chassis: string;
   sfm: string;
   components: SrsimComponent[];
+  /** Chosen CPM adapter (CMA); editor state only, SR-SIM has no CMA. Unset: derived from the CPMs. */
+  cma?: string;
   edaNamespace: string;
   edaNodeProfile: string;
   edaVersion: string;

@@ -14,6 +14,7 @@ interface ModelPart {
   slots?: ModelSlot[];
   occupies?: string[];
   label?: string;
+  description?: string;
 }
 
 interface ModelChassis {
@@ -171,6 +172,11 @@ function moduleIssues(part: ModelPart, partType: string, component: Item, path: 
   return issues;
 }
 
+/** The part's name, e.g. "CMA-7s Dual" for cma-7s-d; the provisioning string when it has none. */
+function displayName(type: string): string {
+  return parts[type]?.label || type;
+}
+
 function carrierFit(carrier: ModelPart, cpms: Item[], used: Set<string>): "fits" | "occupied" | "mismatch" {
   for (const cpm of cpms) {
     const slot = (carrier.slots ?? []).find((candidate) => String(candidate.srsim) === slotText(cpm.slot).toUpperCase());
@@ -206,11 +212,11 @@ function cpmIssues(chassisId: string, chassis: ModelChassis, cpms: Item[], used:
       {
         code: "occupied",
         path: taken,
-        message: `these CPMs need the ${blocked.part.label ?? blocked.type}, which also takes line-card slot ${taken}`
+        message: `these CPMs need the ${displayName(blocked.type)}, which also takes line-card slot ${taken}`
       }
     ];
   }
-  const options = carriers.map(({ type, part }) => part.label ?? type).join("; ");
+  const options = carriers.map(({ type }) => displayName(type)).join("; ");
   return [{ code: "cpm-carrier", path: cpms.map((cpm) => slotText(cpm.slot)).join(","), message: `no CPM adapter fits these CPMs (${options})` }];
 }
 
@@ -281,4 +287,47 @@ export function hardwareIssues(chassisId: string, components: unknown[]): Hardwa
     }
   }
   return issues;
+}
+
+/** A CMA (CPM adapter) a chassis can take. */
+export interface CpmCarrier {
+  type: string;
+  label: string;
+  description: string;
+  cpmTypes: string[];
+  cpmSlots: string[];
+  /** Line-card slots the adapter also takes, e.g. XCM slot 6 for the dual CMA-7s. */
+  blocksLineSlots: number[];
+}
+
+export function cpmCarriers(chassisId: string): CpmCarrier[] {
+  const chassis = chassisModels[chassisId];
+  const carrierSlot = chassis?.slots.find((slot) => slot.accepts.includes("cma"));
+  if (!chassis || !carrierSlot) return [];
+  return (carrierSlot.types ?? []).map((type) => {
+    const part = parts[type];
+    const slots = part.slots ?? [];
+    return {
+      type,
+      label: displayName(type),
+      description: part.description ?? "",
+      cpmTypes: [...new Set(slots.flatMap((slot) => slot.types ?? []))],
+      cpmSlots: srsimSlots(slots),
+      blocksLineSlots: chassis.slots.flatMap((slot) =>
+        (part.occupies ?? []).includes(slot.id) && typeof slot.srsim === "number" ? [slot.srsim] : []
+      )
+    };
+  });
+}
+
+/** The first adapter that fits the configured CPMs and line cards. */
+export function fittingCarrier(chassisId: string, components: unknown[]): CpmCarrier | undefined {
+  const all = items(components);
+  const cpms = all.filter((item) => /^[A-Za-z]$/.test(slotText(item.slot)));
+  const usedLineSlots = new Set(all.filter((item) => !cpms.includes(item)).map((item) => Number(slotText(item.slot))));
+  return cpmCarriers(chassisId).find(
+    (carrier) =>
+      carrierFit(parts[carrier.type], cpms, new Set()) === "fits" &&
+      !carrier.blocksLineSlots.some((slot) => usedLineSlots.has(slot))
+  );
 }

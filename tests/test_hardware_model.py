@@ -70,7 +70,7 @@ class HardwareModelTest(unittest.TestCase):
 
     def test_model_references_resolve(self) -> None:
         bad = hardware_model.Model(parts=dict(MODEL.parts), chassis=dict(MODEL.chassis))
-        bad.parts["cma-x"] = hardware_model.cma("cma-x", "", "cpm-s", 1, occupies=("xcm-9",))
+        bad.parts["cma-x"] = hardware_model.cma("cma-x", "", "", "cpm-s", 1, occupies=("xcm-9",))
         bad.chassis["sr-7s"] = hardware_model.Chassis(
             "sr-7s", slots=(hardware_model.Slot("cpm", ("cma",), types=("cma-x",)),)
         )

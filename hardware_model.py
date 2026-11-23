@@ -35,6 +35,7 @@ class Part:
     # Other slots of the parent that this part blocks (a dual-slot CMA).
     occupies: tuple[str, ...] = ()
     label: str = ""
+    description: str = ""
 
 
 @dataclass(frozen=True)
@@ -104,9 +105,13 @@ def cpm_slots(cpm_types: tuple[str, ...], count: int) -> tuple[Slot, ...]:
     return tuple(Slot(f"cpm-{letter.lower()}", ("cpm",), srsim=letter, types=cpm_types) for letter in "AB"[:count])
 
 
-def cma(type_: str, label: str, cpm: str, cpms: int, occupies: tuple[str, ...] = ()) -> Part:
+def cma(
+    type_: str, label: str, description: str, cpm: str, cpms: int, occupies: tuple[str, ...] = ()
+) -> Part:
     """Control-module adapter: SR-SIM does not know it, only the CPMs it holds (slots A and B)."""
-    return Part(type_, "cma", cpm_slots((cpm,), cpms), occupies=occupies, label=label)
+    return Part(
+        type_, "cma", cpm_slots((cpm,), cpms), occupies=occupies, label=label, description=description
+    )
 
 
 def xcm_slots(count: int) -> tuple[Slot, ...]:
@@ -189,11 +194,13 @@ def sr_s_family(model: Model) -> None:
     for type_ in ("iom2-se-3.0t", "iom2-se-6.0t"):
         model.add_part(iom(type_, 2))
 
-    model.add_part(cma("cma-7s", "CMA-7s (one CPM-s)", "cpm-s", 1))
-    model.add_part(cma("cma-7s-d", "CMA-7s dual (two CPM-s)", "cpm-s", 2, occupies=("xcm-6",)))
-    model.add_part(cma("cma2-7s", "CMA2-7s (one or two CPM2-s)", "cpm2-s", 2))
-    model.add_part(cma("cma-14s", "CMA-14s (one or two CPM-s)", "cpm-s", 2))
-    model.add_part(cma("cma2-14s", "CMA2-14s (one or two CPM2-s)", "cpm2-s", 2))
+    model.add_part(cma("cma-7s", "CMA-7s Single", "One CPM-s", "cpm-s", 1))
+    model.add_part(
+        cma("cma-7s-d", "CMA-7s Dual", "Two CPM-s; also takes XCM slot 6", "cpm-s", 2, occupies=("xcm-6",))
+    )
+    model.add_part(cma("cma2-7s", "CMA2-7s", "One or two CPM2-s", "cpm2-s", 2))
+    model.add_part(cma("cma-14s", "CMA-14s", "One or two CPM-s", "cpm-s", 2))
+    model.add_part(cma("cma2-14s", "CMA2-14s", "One or two CPM2-s", "cpm2-s", 2))
 
     model.chassis["sr-7s"] = Chassis(
         "sr-7s",
@@ -506,6 +513,8 @@ def model_json(model: Model) -> dict[str, Any]:
             data["occupies"] = list(part.occupies)
         if part.label:
             data["label"] = part.label
+        if part.description:
+            data["description"] = part.description
         parts[type_] = data
     chassis = {}
     for chassis_id, item in sorted(model.chassis.items()):
@@ -615,6 +624,11 @@ def _chassis_mda_issues(chassis: Chassis, card_type: str, component: dict[str, A
     ]
 
 
+def display_name(part: Part) -> str:
+    """The part's name, e.g. "CMA-7s Dual" for cma-7s-d; the provisioning string when it has none."""
+    return part.label or part.type
+
+
 def _carrier_fit(carrier: Part, cpms: list[dict[str, Any]], used: set[str]) -> str:
     """"fits", "occupied" (the CPMs fit, but the carrier would block a used slot) or "mismatch"."""
     letters = {str(slot.srsim): slot for slot in carrier.slots}
@@ -655,10 +669,10 @@ def _cpm_issues(model: Model, chassis: Chassis, cpms: list[dict[str, Any]], used
             Issue(
                 "occupied",
                 taken,
-                f"these CPMs need the {carrier.label or carrier.type}, which also takes line-card slot {taken}",
+                f"these CPMs need the {display_name(carrier)}, which also takes line-card slot {taken}",
             )
         ]
-    options = "; ".join(carrier.label or carrier.type for carrier in carriers)
+    options = "; ".join(display_name(carrier) for carrier in carriers)
     return [Issue("cpm-carrier", ",".join(_slot(c.get("slot")) for c in cpms), f"no CPM adapter fits these CPMs ({options})")]
 
 
