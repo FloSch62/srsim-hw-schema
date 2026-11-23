@@ -74,6 +74,17 @@ class HardwareModelTest(unittest.TestCase):
                 for card, mdas in chassis.card_mdas:
                     self.assertEqual(set(mdas), set(compatibility[card]["direct_mda"]), f"{card} MDAs")
 
+    def test_card_products_use_appendix_mdas(self) -> None:
+        matrix = srsim.build_clab_matrix(json.loads((ROOT / "srsim-supported-hardware.json").read_text()))
+        offered: dict[str, set[str]] = {}
+        for entry in matrix["chassis"].values():
+            for card, compatibility in srsim.card_compatibility(entry).items():
+                offered.setdefault(card, set()).update(compatibility["direct_mda"])
+        for part in MODEL.parts.values():
+            for product in part.products:
+                with self.subTest(product.name):
+                    self.assertLessEqual({t for types in product.mdas for t in types}, offered[part.type])
+
     def test_model_references_resolve(self) -> None:
         bad = hardware_model.Model(parts=dict(MODEL.parts), chassis=dict(MODEL.chassis))
         bad.parts["cma-x"] = hardware_model.cma("cma-x", "", "", "cpm-s", 1, occupies=("xcm-9",))

@@ -2452,6 +2452,152 @@
         },
         "imm-2pac-fp3": {
             "kind": "line-card",
+            "products": [
+                {
+                    "description": "20x 10G SFP+",
+                    "mdas": [
+                        [
+                            "p10-10g-sfp"
+                        ],
+                        [
+                            "p10-10g-sfp"
+                        ]
+                    ],
+                    "name": "20-port 10GE SFP+ IMM"
+                },
+                {
+                    "description": "12x 10G SFP+",
+                    "mdas": [
+                        [
+                            "p6-10g-sfp"
+                        ],
+                        [
+                            "p6-10g-sfp"
+                        ]
+                    ],
+                    "name": "12-port 10GE SFP+ IMM"
+                },
+                {
+                    "description": "2x 100G CFP",
+                    "mdas": [
+                        [
+                            "p1-100g-cfp"
+                        ],
+                        [
+                            "p1-100g-cfp"
+                        ]
+                    ],
+                    "name": "2-port 100GE CFP IMM"
+                },
+                {
+                    "description": "10x 10G SFP+ + 20x 1G SFP",
+                    "mdas": [
+                        [
+                            "p10-10g-sfp"
+                        ],
+                        [
+                            "p20-1gb-sfp"
+                        ]
+                    ],
+                    "name": "10-port 10GE SFP+ + 20-port 1GE SFP IMM"
+                },
+                {
+                    "description": "1x 100G CFP + 10x 10G SFP+",
+                    "mdas": [
+                        [
+                            "p1-100g-cfp"
+                        ],
+                        [
+                            "p10-10g-sfp"
+                        ]
+                    ],
+                    "name": "1-port 100GE CFP + 10-port 10GE SFP+ IMM"
+                },
+                {
+                    "description": "Two ISA2 processors",
+                    "mdas": [
+                        [
+                            "isa2-aa",
+                            "isa2-bb",
+                            "isa2-tunnel"
+                        ],
+                        [
+                            "isa2-aa",
+                            "isa2-bb",
+                            "isa2-tunnel"
+                        ]
+                    ],
+                    "name": "MS-ISM"
+                },
+                {
+                    "description": "Two ISA2 processors; no IPsec or IP tunnels",
+                    "mdas": [
+                        [
+                            "isa2-aa",
+                            "isa2-bb"
+                        ],
+                        [
+                            "isa2-aa",
+                            "isa2-bb"
+                        ]
+                    ],
+                    "name": "MS-ISM-E"
+                },
+                {
+                    "description": "ISA2 processor + 10x 10G SFP+",
+                    "mdas": [
+                        [
+                            "isa2-aa",
+                            "isa2-bb",
+                            "isa2-tunnel"
+                        ],
+                        [
+                            "p10-10g-sfp"
+                        ]
+                    ],
+                    "name": "ISA2 + 10-port 10GE SFP+ IMM"
+                },
+                {
+                    "description": "ISA2 processor without IPsec or IP tunnels + 10x 10G SFP+",
+                    "mdas": [
+                        [
+                            "isa2-aa",
+                            "isa2-bb"
+                        ],
+                        [
+                            "p10-10g-sfp"
+                        ]
+                    ],
+                    "name": "ISA2-E + 10-port 10GE SFP+ IMM"
+                },
+                {
+                    "description": "ISA2 processor + 1x 100G CFP",
+                    "mdas": [
+                        [
+                            "isa2-aa",
+                            "isa2-bb",
+                            "isa2-tunnel"
+                        ],
+                        [
+                            "p1-100g-cfp"
+                        ]
+                    ],
+                    "name": "ISA2 + 1-port 100GE CFP IMM"
+                },
+                {
+                    "description": "ISA2 processor without IPsec or IP tunnels + 1x 100G CFP",
+                    "mdas": [
+                        [
+                            "isa2-aa",
+                            "isa2-bb"
+                        ],
+                        [
+                            "p1-100g-cfp"
+                        ]
+                    ],
+                    "name": "ISA2-E + 1-port 100GE CFP IMM"
+                }
+            ],
             "slots": [
                 {
                     "accepts": [

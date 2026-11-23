@@ -136,7 +136,7 @@
       {"slot": "A", "type": "cpm5"},
       {"slot": 1, "type": "iom4-e", "mda": [{"slot": 1, "type": "me10-10gb-sfp+"}, {"slot": 3, "type": "me10-10gb-sfp+"}]},
       {"slot": 2, "type": "imm48-1gb-sfp-c", "mda": [{"slot": 1, "type": "imm24-1gb-xp-sfp"}, {"slot": 2, "type": "imm24-1gb-xp-sfp"}]},
-      {"slot": 10, "type": "imm-2pac-fp3", "mda": [{"slot": 1, "type": "p10-10g-sfp"}, {"slot": 2, "type": "p1-100g-cfp"}]}
+      {"slot": 10, "type": "imm-2pac-fp3", "mda": [{"slot": 1, "type": "p1-100g-cfp"}, {"slot": 2, "type": "p10-10g-sfp"}]}
     ],
     "issues": [{"code": "module-slot", "path": "1.mda[3]"}]
   },
@@ -332,6 +332,18 @@
       {"slot": 2, "type": "xcm2-x20", "mda": [{"slot": 1, "type": "x24-100g-qsfp28"}]}
     ],
     "issues": [{"code": "slot-type", "path": "1.mda[2]"}, {"code": "sfm", "path": "A"}, {"code": "sfm", "path": "2"}]
+  },
+  {
+    "name": "SR-12: an imm-2pac-fp3 carries the built-in MDAs of one IMM",
+    "chassis": "sr-12",
+    "components": [
+      {"slot": "A", "type": "cpm5"},
+      {"slot": 1, "type": "imm-2pac-fp3", "mda": [{"slot": 1, "type": "isa2-aa"}, {"slot": 2, "type": "isa2-tunnel"}]},
+      {"slot": 2, "type": "imm-2pac-fp3", "mda": [{"slot": 2, "type": "p20-1gb-sfp"}]},
+      {"slot": 3, "type": "imm-2pac-fp3", "mda": [{"slot": 1, "type": "p6-10g-sfp"}, {"slot": 2, "type": "p1-100g-cfp"}]},
+      {"slot": 4, "type": "imm-2pac-fp3", "mda": [{"slot": 1, "type": "p10-10g-sfp"}, {"slot": 2, "type": "isa2-aa"}]}
+    ],
+    "issues": [{"code": "product", "path": "3.mda"}, {"code": "product", "path": "4.mda"}]
   },
   {
     "name": "Chassis without a model are not checked",

@@ -28,6 +28,16 @@ class Slot:
 
 
 @dataclass(frozen=True)
+class CardProduct:
+    """A physical card that SR-SIM provisions as a shared card type; `mdas` lists, per built-in MDA slot
+    (1, 2, ...), the MDA types it can be provisioned with."""
+
+    name: str
+    description: str
+    mdas: tuple[tuple[str, ...], ...]
+
+
+@dataclass(frozen=True)
 class Part:
     type: str
     kind: str
@@ -38,6 +48,8 @@ class Part:
     sfm: tuple[str, ...] = ()
     label: str = ""
     description: str = ""
+    # The physical cards provisioned as this card type, when several share it (imm-2pac-fp3).
+    products: tuple[CardProduct, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -326,8 +338,10 @@ def sr_classic_family(model: Model) -> None:
     for type_, types in (("iom4-e", (*mda_e, *isa2)), ("iom4-e-b", (*mda_e, *isa2)), ("iom4-e-hs", mda_e)):
         model.add_part(mda_card(type_, "line-card", {1: "", 2: ""}, types=types))
     model.add_part(mda_card("iom5-e", "line-card", {1: "", 2: ""}, sfm6, mda_e_xp))
-    # The pac IMM takes up to two configurable MDAs; the others provision their MDAs themselves.
-    model.add_part(mda_card("imm-2pac-fp3", "line-card", {1: "", 2: ""}))
+    # Several multicore IMMs share imm-2pac-fp3, each with its own two built-in MDAs; the others
+    # provision their MDAs themselves.
+    imm_2pac = mda_card("imm-2pac-fp3", "line-card", {1: "", 2: ""})
+    model.add_part(replace(imm_2pac, products=imm_2pac_products()))
     imm48 = {1: "imm24-1gb-xp-sfp", 2: "imm24-1gb-xp-sfp"}
     model.add_part(mda_card("imm48-1gb-sfp-c", "line-card", imm48, sfm5))
     model.add_part(mda_card("imm40-10gb-sfp", "line-card", {1: "m40-10g-sfp"}))
@@ -346,6 +360,35 @@ def sr_classic_family(model: Model) -> None:
             Variant(new, "FP4 capable: SFM5 or SFM6"),
         )
         model.chassis[chassis_id] = replace(iom_chassis(chassis_id, ioms, "cpm5"), variants=variants)
+
+
+def imm_2pac_products() -> tuple[CardProduct, ...]:
+    """The multicore IMMs SR OS provisions as imm-2pac-fp3. Their MDAs are built in; an ISA2 takes slot 1 and
+    picks its application, and the -E variants (no encryption) cannot run tunnels."""
+    p10, p6, p1, p20 = "p10-10g-sfp", "p6-10g-sfp", "p1-100g-cfp", "p20-1gb-sfp"
+    isa = ("isa2-aa", "isa2-bb", "isa2-tunnel")
+    isa_e = ("isa2-aa", "isa2-bb")
+
+    def imm(name: str, description: str, mdas: tuple[tuple[str, ...], ...]) -> CardProduct:
+        return CardProduct(name, description, mdas)
+
+    return (
+        imm("20-port 10GE SFP+ IMM", "20x 10G SFP+", ((p10,), (p10,))),
+        imm("12-port 10GE SFP+ IMM", "12x 10G SFP+", ((p6,), (p6,))),
+        imm("2-port 100GE CFP IMM", "2x 100G CFP", ((p1,), (p1,))),
+        imm("10-port 10GE SFP+ + 20-port 1GE SFP IMM", "10x 10G SFP+ + 20x 1G SFP", ((p10,), (p20,))),
+        imm("1-port 100GE CFP + 10-port 10GE SFP+ IMM", "1x 100G CFP + 10x 10G SFP+", ((p1,), (p10,))),
+        imm("MS-ISM", "Two ISA2 processors", (isa, isa)),
+        imm("MS-ISM-E", "Two ISA2 processors; no IPsec or IP tunnels", (isa_e, isa_e)),
+        imm("ISA2 + 10-port 10GE SFP+ IMM", "ISA2 processor + 10x 10G SFP+", (isa, (p10,))),
+        imm(
+            "ISA2-E + 10-port 10GE SFP+ IMM",
+            "ISA2 processor without IPsec or IP tunnels + 10x 10G SFP+",
+            (isa_e, (p10,)),
+        ),
+        imm("ISA2 + 1-port 100GE CFP IMM", "ISA2 processor + 1x 100G CFP", (isa, (p1,))),
+        imm("ISA2-E + 1-port 100GE CFP IMM", "ISA2 processor without IPsec or IP tunnels + 1x 100G CFP", (isa_e, (p1,))),
+    )
 
 
 def sr_e_family(model: Model) -> None:
@@ -584,6 +627,11 @@ def model_json(model: Model) -> dict[str, Any]:
             data["label"] = part.label
         if part.description:
             data["description"] = part.description
+        if part.products:
+            data["products"] = [
+                {"name": p.name, "description": p.description, "mdas": [list(types) for types in p.mdas]}
+                for p in part.products
+            ]
         parts[type_] = data
     chassis = {}
     for chassis_id, item in sorted(model.chassis.items()):
@@ -683,6 +731,7 @@ def _module_issues(model: Model, part: Part, component: dict[str, Any], path: st
         if iom_part and iom_part.kind == "iom":
             mda_path = f"{path}.xiom[{_slot(xiom.get('slot'))}].mda"
             issues.extend(_nested_issues(iom_part, _items(xiom.get("mda")), mda_path, "mda-slot", "MDA"))
+    issues.extend(_product_issues(part, component, path))
     return issues
 
 
@@ -696,6 +745,31 @@ def _chassis_mda_issues(chassis: Chassis, card_type: str, component: dict[str, A
         for item in _items(component.get("mda"))
         if item.get("type") and item.get("type") not in allowed
     ]
+
+
+def card_product(part: Part, mdas: dict[int, str]) -> CardProduct | None:
+    """The first product of the card whose built-in MDA slots take every given MDA (by slot)."""
+    return next(
+        (
+            product
+            for product in part.products
+            if all(0 < slot <= len(product.mdas) and type_ in product.mdas[slot - 1] for slot, type_ in mdas.items())
+        ),
+        None,
+    )
+
+
+def _product_issues(part: Part, component: dict[str, Any], path: str) -> list[Issue]:
+    """On a card shared by several physical products, the MDAs must be those of one product."""
+    mdas = {
+        int(_slot(item.get("slot"))): str(item.get("type"))
+        for item in _items(component.get("mda"))
+        if _slot(item.get("slot")).isdigit() and item.get("type")
+    }
+    if not part.products or not mdas or card_product(part, mdas):
+        return []
+    combo = ", ".join(f"{type_} in slot {slot}" for slot, type_ in sorted(mdas.items()))
+    return [Issue("product", f"{path}.mda", f"no {part.type} has {combo}")]
 
 
 def display_name(part: Part) -> str:

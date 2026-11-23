@@ -9,6 +9,14 @@ interface ModelSlot {
   fixed?: string;
 }
 
+/** A physical card that SR-SIM provisions as a shared card type, e.g. the 2-port 100GE CFP IMM as imm-2pac-fp3. */
+export interface CardProduct {
+  name: string;
+  description: string;
+  /** Per built-in MDA slot (1, 2, ...), the MDA types it can be provisioned with. */
+  mdas: string[][];
+}
+
 interface ModelPart {
   kind: string;
   slots?: ModelSlot[];
@@ -16,6 +24,7 @@ interface ModelPart {
   sfm?: string[];
   label?: string;
   description?: string;
+  products?: CardProduct[];
 }
 
 interface ModelChassis {
@@ -170,7 +179,40 @@ function moduleIssues(part: ModelPart, partType: string, component: Item, path: 
     if (iom?.kind !== "iom") continue;
     issues.push(...nestedIssues(iom, iomType, items(xiom.mda), `${path}.xiom[${slotText(xiom.slot)}].mda`, "mda-slot", "MDA"));
   }
+  issues.push(...productIssues(part, partType, component, path));
   return issues;
+}
+
+const mdaTypesBySlot = (component: Item): Map<number, string> =>
+  new Map(
+    items(component.mda).flatMap((item) => {
+      const slot = Number(slotText(item.slot));
+      return Number.isInteger(slot) && slot > 0 && item.type ? [[slot, String(item.type)] as [number, string]] : [];
+    })
+  );
+
+/** Physical cards provisioned as this card type; [] when the card type is a single product. */
+export function cardProducts(cardType: string | undefined): CardProduct[] {
+  return parts[cardType ?? ""]?.products ?? [];
+}
+
+/** Whether the product's built-in MDA slots take the component's MDAs. */
+export function productFits(product: CardProduct, component: unknown): boolean {
+  const mdas = mdaTypesBySlot(items([component])[0] ?? {});
+  return [...mdas].every(([slot, type]) => slot <= product.mdas.length && product.mdas[slot - 1].includes(type));
+}
+
+/** The first product of the card whose built-in MDA slots take the component's MDAs. */
+export function cardProductOf(cardType: string | undefined, component: unknown): CardProduct | undefined {
+  return cardProducts(cardType).find((product) => productFits(product, component));
+}
+
+/** On a card shared by several physical products, the MDAs must be those of one product. */
+function productIssues(part: ModelPart, partType: string, component: Item, path: string): HardwareIssue[] {
+  const mdas = mdaTypesBySlot(component);
+  if (!part.products?.length || !mdas.size || cardProductOf(partType, component)) return [];
+  const combo = [...mdas].sort(([a], [b]) => a - b).map(([slot, type]) => `${type} in slot ${slot}`).join(", ");
+  return [{ code: "product", path: `${path}.mda`, message: `no ${partType} has ${combo}` }];
 }
 
 /** The part's name, e.g. "CMA-7s Dual" for cma-7s-d; the provisioning string when it has none. */
