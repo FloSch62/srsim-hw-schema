@@ -246,6 +246,43 @@ class ClabFragmentTest(unittest.TestCase):
             1,
         )
 
+    def test_enum_descriptions_come_from_product_names(self) -> None:
+        product_names = {
+            "sr-7s": {"schema_string": "sr-7s", "nokia_name": "7750 SR-7s", "help_text_2": "6 line-card slots"},
+            "sfm-s": {"schema_string": "sfm-s", "nokia_name": "sfm-s", "help_text_2": "7750 SR-s SFM"},
+            "iom-s-1.5t": {"schema_string": "iom-s-1.5t", "nokia_name": "7750 IOM-s", "help_text_2": None},
+        }
+        definitions = srsim.build_srsim_schema_module(
+            SAMPLE_HARDWARE_SCHEMA, product_names=product_names
+        )["definitions"]
+
+        chassis = definitions["srsim-chassis-types"]
+        index = chassis["enum"].index("sr-7s")
+        self.assertEqual(len(chassis["enumDescriptions"]), len(chassis["enum"]))
+        self.assertEqual(chassis["enumDescriptions"][index], "7750 SR-7s: 6 line-card slots")
+        self.assertEqual(chassis["markdownEnumDescriptions"][index], "**7750 SR-7s**: 6 line-card slots")
+        self.assertEqual(chassis["enumDescriptions"][chassis["enum"].index("sr-1s")], "")
+
+        sfm = definitions["srsim-sfm-types"]
+        self.assertEqual(sfm["enumDescriptions"][sfm["enum"].index("sfm-s")], "7750 SR-s SFM")
+        xiom = definitions["srsim-xiom-types"]
+        self.assertEqual(xiom["enumDescriptions"][xiom["enum"].index("iom-s-1.5t")], "7750 IOM-s")
+        self.assertNotIn("enumDescriptions", definitions["srsim-mda-types"])
+
+    def test_enum_descriptions_stay_on_known_values_branch(self) -> None:
+        product_names = {"sr-7s": {"schema_string": "sr-7s", "nokia_name": "7750 SR-7s", "help_text_2": "x"}}
+        chassis = srsim.build_srsim_schema_module(
+            SAMPLE_HARDWARE_SCHEMA, allow_unknown=True, product_names=product_names
+        )["definitions"]["srsim-chassis-types"]
+
+        self.assertNotIn("enumDescriptions", chassis)
+        self.assertEqual(len(chassis["anyOf"][0]["enumDescriptions"]), len(chassis["anyOf"][0]["enum"]))
+
+    def test_default_product_names_file_loads(self) -> None:
+        product_names = srsim.load_product_names(srsim.DEFAULT_PRODUCT_NAMES_FILE)
+        self.assertGreater(len(product_names), 200)
+        self.assertEqual(srsim.load_product_names(""), {})
+
     def test_sidecar_sets_sfm_on_the_node_like_containerlab(self) -> None:
         definitions = srsim.build_srsim_schema_module(SAMPLE_HARDWARE_SCHEMA)["definitions"]
 

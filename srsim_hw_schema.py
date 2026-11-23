@@ -36,6 +36,9 @@ CLAB_FRAGMENT_SCHEMA = "https://srl-labs.local/srsim-clab-fragment.schema.v1.jso
 CLAB_SRSIM_SCHEMA = "https://raw.githubusercontent.com/srl-labs/containerlab/main/schemas/srsim-hw.schema.json"
 DEFAULT_SRSIM_SCHEMA_REF = CLAB_SRSIM_SCHEMA
 DEFAULT_SRSIM_SCHEMA_FILE = "srsim-hw.schema.json"
+DEFAULT_PRODUCT_NAMES_FILE = (
+    Path(__file__).resolve().parent / "src" / "data" / "product-enhancements.json"
+)
 CLAB_MATRIX_VERSION = 1
 KIND_SPECIFIC_CONFIG_PREFIX = "kind-specific-config-"
 CLAB_COMPONENT_DEFINITIONS = (
@@ -1171,50 +1174,101 @@ def collect_clab_values(schema: dict[str, Any], matrix: dict[str, Any]) -> dict[
     return values
 
 
-def enum_schema(description: str, values: list[str], allow_unknown: bool = False) -> dict[str, Any]:
+ProductNames = dict[str, dict[str, Any]]
+
+
+def load_product_names(path: str | Path | None) -> ProductNames:
+    """Load schema_string-keyed Nokia product names and help texts."""
+    if not path:
+        return {}
+    rows = json.loads(Path(path).read_text(encoding="utf-8"))
+    return {row["schema_string"]: row for row in rows}
+
+
+def product_help(value: str, product_names: ProductNames, *, markdown: bool = False) -> str:
+    """Return '<Nokia name>: <help text>' for a schema value, or '' when unknown."""
+    row = product_names.get(value)
+    if not row:
+        return ""
+    name = row.get("nokia_name") or ""
+    if name == value:
+        name = ""
+    help_text = row.get("help_text_2") or ""
+    if markdown and name:
+        name = f"**{name}**"
+    return ": ".join(part for part in (name, help_text) if part)
+
+
+def enum_descriptions(values: list[str], product_names: ProductNames) -> dict[str, list[str]]:
+    plain = [product_help(value, product_names) for value in values]
+    if not any(plain):
+        return {}
+    return {
+        "enumDescriptions": plain,
+        "markdownEnumDescriptions": [product_help(value, product_names, markdown=True) for value in values],
+    }
+
+
+def enum_schema(
+    description: str,
+    values: list[str],
+    allow_unknown: bool = False,
+    product_names: ProductNames | None = None,
+) -> dict[str, Any]:
     schema: dict[str, Any] = {
         "type": "string",
         "description": description,
     }
+    known = {"enum": values, **enum_descriptions(values, product_names or {})}
     if allow_unknown:
-        schema["anyOf"] = [{"enum": values}, {"type": "string"}]
+        schema["anyOf"] = [known, {"type": "string"}]
         schema["x-known-values"] = values
     else:
-        schema["enum"] = values
+        schema.update(known)
     return schema
 
 
-def build_clab_definitions(values: dict[str, list[str]], allow_unknown: bool = False) -> dict[str, Any]:
+def build_clab_definitions(
+    values: dict[str, list[str]],
+    allow_unknown: bool = False,
+    product_names: ProductNames | None = None,
+) -> dict[str, Any]:
     return {
         "srsim-chassis-types": enum_schema(
             "SR-SIM chassis types generated from Nokia supported hardware tables.",
             values["chassis"],
             allow_unknown,
+            product_names,
         ),
         "srsim-card-types": enum_schema(
             "SR-SIM line card types generated from Nokia supported hardware tables.",
             values["card"],
             allow_unknown,
+            product_names,
         ),
         "srsim-cpm-types": enum_schema(
             "SR-SIM CPM types generated from Nokia supported hardware tables.",
             values["cpm"],
             allow_unknown,
+            product_names,
         ),
         "srsim-sfm-types": enum_schema(
             "SR-SIM SFM types generated from Nokia supported hardware tables.",
             values["sfm"],
             allow_unknown,
+            product_names,
         ),
         "srsim-xiom-types": enum_schema(
             "SR-SIM XIOM types generated from Nokia supported hardware tables.",
             values["xiom"],
             allow_unknown,
+            product_names,
         ),
         "srsim-mda-types": enum_schema(
             "SR-SIM MDA types generated from Nokia supported hardware tables.",
             values["mda"],
             allow_unknown,
+            product_names,
         ),
         "srsim-mda": {
             "type": "object",
@@ -1637,10 +1691,14 @@ def node_components_schema(definition_name: str, mode: str) -> dict[str, Any]:
     return schema
 
 
-def build_srsim_schema_module(schema: dict[str, Any], allow_unknown: bool = False) -> dict[str, Any]:
+def build_srsim_schema_module(
+    schema: dict[str, Any],
+    allow_unknown: bool = False,
+    product_names: ProductNames | None = None,
+) -> dict[str, Any]:
     matrix = build_clab_matrix(schema)
     values = collect_clab_values(schema, matrix)
-    definitions = build_clab_definitions(values, allow_unknown)
+    definitions = build_clab_definitions(values, allow_unknown, product_names)
 
     chassis_component_groups: dict[str, dict[str, Any]] = {}
     for chassis, chassis_entry in sorted(matrix["chassis"].items()):
@@ -1890,7 +1948,11 @@ def cmd_generate_clab_fragment(args: argparse.Namespace) -> int:
         srsim_schema_ref=srsim_schema_ref,
     )
     if srsim_schema_output:
-        srsim_schema = build_srsim_schema_module(schema, args.allow_unknown_values)
+        srsim_schema = build_srsim_schema_module(
+            schema,
+            args.allow_unknown_values,
+            load_product_names(args.product_names),
+        )
         write_json_output(srsim_schema, srsim_schema_output)
     write_json_output(fragment, args.output)
     return 0
@@ -1912,7 +1974,11 @@ def cmd_update_clab_schema(args: argparse.Namespace) -> int:
         args.allow_unknown_values,
         srsim_schema_ref=srsim_schema_ref,
     )
-    srsim_schema = build_srsim_schema_module(hardware_schema, args.allow_unknown_values)
+    srsim_schema = build_srsim_schema_module(
+        hardware_schema,
+        args.allow_unknown_values,
+        load_product_names(args.product_names),
+    )
     clab_schema = json.loads(clab_schema_path.read_text(encoding="utf-8"))
     updated = apply_clab_fragment(clab_schema, fragment)
     sidecar_up_to_date = srsim_schema_file_matches(sidecar_output_path, srsim_schema)
@@ -2515,6 +2581,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="keep known values as hints while allowing arbitrary strings",
     )
+    fragment.add_argument(
+        "--product-names",
+        default=str(DEFAULT_PRODUCT_NAMES_FILE),
+        help="Nokia product-name JSON used for enum descriptions; pass '' to omit them",
+    )
     fragment.set_defaults(func=cmd_generate_clab_fragment)
 
     update = sub.add_parser(
@@ -2553,6 +2624,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--allow-unknown-values",
         action="store_true",
         help="keep known values as hints while allowing arbitrary strings",
+    )
+    update.add_argument(
+        "--product-names",
+        default=str(DEFAULT_PRODUCT_NAMES_FILE),
+        help="Nokia product-name JSON used for enum descriptions; pass '' to omit them",
     )
     update.set_defaults(func=cmd_update_clab_schema)
 
