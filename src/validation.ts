@@ -428,17 +428,6 @@ function validateComponent(params: {
   return issues;
 }
 
-function inferredComponentSlotCount(chassis: string): number {
-  const value = clabChassisToken(chassis);
-  const srA = value.match(/^sr-a(\d+)$/);
-  if (srA) return Number(srA[1]);
-  const ixrR = value.match(/^ixr-r(\d+)/);
-  if (ixrR) return Number(ixrR[1]);
-  const modular = value.match(/^(?:ess|ixr|sr|xrs)-(\d+)(?:[a-z]*)$/);
-  if (modular) return Number(modular[1]);
-  return 1;
-}
-
 function validateComponentListShape(params: {
   schema: HardwareSchema;
   nodeName: string;
@@ -516,13 +505,6 @@ function validateComponentListShape(params: {
   }
   if (components.length && !numericSlots.length) {
     issues.push({ source: "hardware", message: `${nodeName}: distributed SR-SIM chassis ${chassis} requires a numeric line-card component slot` });
-  }
-  const maxSlot = inferredComponentSlotCount(chassis);
-  for (const slot of lineCardSlots(clabChassisToken(chassis)).length ? [] : numericSlots) {
-    const slotNumber = Number(slot);
-    if (slotNumber < 1 || slotNumber > maxSlot) {
-      issues.push({ source: "hardware", path: componentName(nodeName, slot), message: `slot must be between 1 and ${maxSlot}` });
-    }
   }
   for (const [index, component] of components.entries()) {
     if (asRecord(component) && !slots[index]) {

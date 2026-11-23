@@ -25,12 +25,6 @@ const integratedChassis = new Set([
   "ixr-e3x"
 ]);
 const redundantIntegratedChassis = new Set(["ixr-r6"]);
-const mdaSlotRestrictions = new Map<string, number[]>([
-  ["ixr-r4:m20-1g-csfp", [1, 2, 3]],
-  ["ixr-r4:m10-1g-sfp+2-10g-sfp+", [5]],
-  ["ixr-r6:a32-chds1v2", [5, 6]],
-  ["ixr-r6:m20-1g-csfp", [3, 4]]
-]);
 export type DeploymentMode = "standalone" | "integrated_redundant" | "distributed";
 export type MatrixRowAction = "add" | "replace";
 
@@ -459,10 +453,6 @@ export function xiomMdaOptions(
   );
 }
 
-export function restrictedMdaSlots(chassis: string | undefined, mdaType: string): number[] {
-  return mdaSlotRestrictions.get(`${clabChassisToken(chassis)}:${canonicalToken(mdaType)}`) ?? [];
-}
-
 /** Module slots are shared by XMAs and IOMs, so slots taken by the other kind are not offered. */
 export function freeXcmModuleSlots(
   cardType: string | undefined,
@@ -485,18 +475,11 @@ function mdaSlotOptionsFromRows(
   minimumSlot: number,
   mdaType = ""
 ): number[] {
-  const restrictedSlots = uniqueNumbers(
-    (mdaType ? [mdaType] : uniqueSorted(rows.flatMap(rowMdaValues)))
-      .flatMap((type) => restrictedMdaSlots(entry?.chassis, type))
-  ).filter((slot) => slot >= minimumSlot);
-  if (mdaType && restrictedSlots.length) return restrictedSlots;
-
   const numberedSlots = uniqueNumbers(rows.flatMap((row) => rowNumberedMdaSlots(row, mdaType)))
     .filter((slot) => slot >= minimumSlot);
   if (numberedSlots.length) return numberedSlots;
 
-  const fallbackSlots = numberRange(fallbackSlotCount, minimumSlot);
-  return restrictedSlots.length ? uniqueNumbers([...fallbackSlots, ...restrictedSlots]) : fallbackSlots;
+  return numberRange(fallbackSlotCount, minimumSlot);
 }
 
 export function directMdaSlotOptions(
@@ -555,22 +538,11 @@ function numberRange(max: number, min = 1): number[] {
   return Array.from({ length: end - start + 1 }, (_, index) => start + index);
 }
 
-function inferredComponentSlotCount(chassis: string | undefined): number {
-  const value = chassis ?? "";
-  const srA = value.match(/^sr-a(\d+)$/);
-  if (srA) return Number(srA[1]);
-
-  const modular = value.match(/^(?:ess|ixr|sr|xrs)-(\d+)(?:[a-z]*)$/);
-  if (modular) return Number(modular[1]);
-
-  return 1;
-}
-
 function matrixCardSlotOptions(entry: MatrixEntry | undefined, minimumSlot = 1): number[] {
   const modelled = lineCardSlots(entry?.chassis ?? "");
   if (modelled.length) return modelled.filter((slot) => slot >= minimumSlot);
   const matrixSlots = uniqueNumbers((entry?.rows ?? []).flatMap((row) => row.values.slot ?? []));
-  const maxSlot = Math.max(inferredComponentSlotCount(entry?.chassis), ...matrixSlots, minimumSlot);
+  const maxSlot = Math.max(...matrixSlots, minimumSlot);
   return numberRange(maxSlot, minimumSlot);
 }
 
