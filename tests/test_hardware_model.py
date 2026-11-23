@@ -68,9 +68,9 @@ class HardwareModelTest(unittest.TestCase):
                             self.assertIn(slot.fixed, offered["direct_mda"], f"{card}.{slot.id}")
                 offered_types = {*cpms, *cards}
                 for offered in compatibility.values():
-                    offered_types.update(offered["direct_mda"], offered["xiom"])
+                    offered_types.update(offered["direct_mda"], offered["xiom"], offered["sfm"])
                 for variant in chassis.variants:
-                    self.assertLessEqual(set(variant.parts), offered_types, variant.name)
+                    self.assertLessEqual({*variant.parts, *variant.sfm}, offered_types, variant.name)
                 for card, mdas in chassis.card_mdas:
                     self.assertEqual(set(mdas), set(compatibility[card]["direct_mda"]), f"{card} MDAs")
 

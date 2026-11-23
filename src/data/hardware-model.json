@@ -974,6 +974,21 @@
                         "cpm5"
                     ]
                 }
+            ],
+            "variants": [
+                {
+                    "description": "Not FP4 capable: SFM5 only",
+                    "name": "SR-12 (3HE00...)",
+                    "parts": [],
+                    "sfm": [
+                        "m-sfm5-12"
+                    ]
+                },
+                {
+                    "description": "FP4 capable: SFM5 or SFM6",
+                    "name": "SR-12-B (3HE10...)",
+                    "parts": []
+                }
             ]
         },
         "sr-12e": {
@@ -1060,6 +1075,21 @@
                     "types": [
                         "cpm5"
                     ]
+                }
+            ],
+            "variants": [
+                {
+                    "description": "Not FP4 capable: SFM5 only",
+                    "name": "SR-12e (3HE..AA)",
+                    "parts": [],
+                    "sfm": [
+                        "m-sfm5-12e"
+                    ]
+                },
+                {
+                    "description": "FP4 capable: SFM5 or SFM6",
+                    "name": "SR-12e (3HE..AB)",
+                    "parts": []
                 }
             ]
         },
@@ -1471,6 +1501,21 @@
                     "types": [
                         "cpm5"
                     ]
+                }
+            ],
+            "variants": [
+                {
+                    "description": "Not FP4 capable: SFM5 only",
+                    "name": "SR-7 (3HE00...)",
+                    "parts": [],
+                    "sfm": [
+                        "m-sfm5-7"
+                    ]
+                },
+                {
+                    "description": "FP4 capable: SFM5 or SFM6",
+                    "name": "SR-7-B (3HE10...)",
+                    "parts": []
                 }
             ]
         },

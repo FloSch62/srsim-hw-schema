@@ -6,7 +6,7 @@ slot counts, built-in parts, parts that share space or must not be mixed, and ch
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 MODEL_VERSION = 1
@@ -43,11 +43,12 @@ class Part:
 @dataclass(frozen=True)
 class Variant:
     """A physical product that SR-SIM runs as one chassis type. `parts` pins the CPM, line card or module
-    wherever the chassis offers a choice."""
+    wherever the chassis offers a choice; `sfm` lists the SFMs it runs with (empty: any)."""
 
     name: str
     description: str
     parts: tuple[str, ...] = ()
+    sfm: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -331,14 +332,20 @@ def sr_classic_family(model: Model) -> None:
     model.add_part(mda_card("imm48-1gb-sfp-c", "line-card", imm48, sfm5))
     model.add_part(mda_card("imm40-10gb-sfp", "line-card", {1: "m40-10g-sfp"}))
     model.add_part(mda_card("imm4-100gb-cfp4", "line-card", {1: "m4-100g-cfp4"}))
-    for chassis_id, ioms in (
-        ("sr-7", 5),
-        ("ess-7", 5),
-        ("sr-12", 10),
-        ("ess-12", 10),
-        ("sr-12e", 9),
-    ):
+    for chassis_id, ioms in (("ess-7", 5), ("ess-12", 10)):
         model.chassis[chassis_id] = iom_chassis(chassis_id, ioms, "cpm5")
+    # Only the SR-7-B, SR-12-B and the newer SR-12e backplane take SFM6, and with it IOM5-e. SR-SIM runs
+    # the ESS-7 and ESS-12 with SFM6 only, so they have no revision choice.
+    for chassis_id, old, new, ioms, old_sfm in (
+        ("sr-7", "SR-7 (3HE00...)", "SR-7-B (3HE10...)", 5, "m-sfm5-7"),
+        ("sr-12", "SR-12 (3HE00...)", "SR-12-B (3HE10...)", 10, "m-sfm5-12"),
+        ("sr-12e", "SR-12e (3HE..AA)", "SR-12e (3HE..AB)", 9, "m-sfm5-12e"),
+    ):
+        variants = (
+            Variant(old, "Not FP4 capable: SFM5 only", sfm=(old_sfm,)),
+            Variant(new, "FP4 capable: SFM5 or SFM6"),
+        )
+        model.chassis[chassis_id] = replace(iom_chassis(chassis_id, ioms, "cpm5"), variants=variants)
 
 
 def sr_e_family(model: Model) -> None:
@@ -589,7 +596,12 @@ def model_json(model: Model) -> dict[str, Any]:
             data["card_mdas"] = {card: list(mdas) for card, mdas in item.card_mdas}
         if item.variants:
             data["variants"] = [
-                {"name": v.name, "description": v.description, "parts": list(v.parts)}
+                {
+                    "name": v.name,
+                    "description": v.description,
+                    "parts": list(v.parts),
+                    **({"sfm": list(v.sfm)} if v.sfm else {}),
+                }
                 for v in item.variants
             ]
         chassis[chassis_id] = data
