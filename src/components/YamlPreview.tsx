@@ -4,13 +4,13 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 
 import type { OutputMode, ValidationReport } from "../types";
+import { IssueCounts } from "./IssueCounts";
 import { YamlTextArea } from "./YamlTextArea";
 
 interface YamlPreviewProps {
@@ -37,9 +37,6 @@ export function YamlPreview({ yaml, edaYaml, mode, report, includeDefaults, onIn
     }
   };
 
-  const schemaIssues = report.issues.filter((issue) => issue.source === "schema").length;
-  const hardwareIssues = report.issues.filter((issue) => issue.source === "hardware").length;
-  const yamlIssues = report.issues.filter((issue) => issue.source === "yaml").length;
 
   return (
     <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, height: "100%" }}>
@@ -78,11 +75,7 @@ export function YamlPreview({ yaml, edaYaml, mode, report, includeDefaults, onIn
             : (mode === "eda" ? "Generated EDA TopoNode has validation issues." : "Generated topology has validation issues.")}
         </Alert>
 
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-          <Chip size="small" color={yamlIssues ? "error" : "default"} label={`${yamlIssues} YAML`} />
-          <Chip size="small" color={schemaIssues ? "error" : "default"} label={`${schemaIssues} schema`} />
-          <Chip size="small" color={hardwareIssues ? "error" : "default"} label={`${hardwareIssues} hardware`} />
-        </Stack>
+        <IssueCounts report={report} />
 
         {report.issues.length ? (
           <Box sx={{ maxHeight: 150, overflow: "auto" }}>

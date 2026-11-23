@@ -281,6 +281,16 @@ describe("topology validation", () => {
     assert.equal(validateTopologyYaml(yaml, hardware).valid, true);
   });
 
+  it("tells hardware SR-SIM runs but that does not exist apart from what SR-SIM rejects", () => {
+    // SR-SIM's appendix pairs CPM2-s with SFM-s, but CPM2-s runs only in an FP5 (SFM2-s) system.
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-100gb-qsfp28\n",
+      hardware
+    );
+
+    assert.deepEqual(report.issues.map((issue) => issue.source), ["hardware"]);
+  });
+
   it("reports incompatible pasted SR-SIM hardware tuples", () => {
     const yaml = buildTopologyYaml({
       ...validConfig,
@@ -297,7 +307,7 @@ describe("topology validation", () => {
     const report = validateTopologyYaml(yaml, hardware);
 
     assert.equal(report.valid, false);
-    assert.ok(report.issues.some((issue) => issue.source === "hardware"));
+    assert.ok(report.issues.some((issue) => issue.source === "srsim"));
   });
 
   it("requires SFM for non-default supported CPMs", () => {
@@ -345,7 +355,7 @@ describe("topology validation", () => {
 
     assert.equal(report.valid, false);
     assert.ok(report.issues.some((issue) => issue.source === "schema"));
-    assert.ok(report.issues.some((issue) => issue.source === "hardware" && issue.message.startsWith("unsupported tuple")));
+    assert.ok(report.issues.some((issue) => issue.source === "srsim" && issue.message.startsWith("unsupported tuple")));
   });
 
   it("rejects a node SFM on a chassis without SFMs", () => {

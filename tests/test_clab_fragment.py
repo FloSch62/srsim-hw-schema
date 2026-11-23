@@ -359,7 +359,7 @@ class ClabFragmentTest(unittest.TestCase):
         self.assertEqual(errors({"slot": "A", "type": "cpm-1s", "xiom": [iom]}), [])
         self.assertTrue(errors({"slot": "A", "type": "cpm-1s", "xiom": [{**iom, "type": "iom-s-1.5t"}]}))
         both = {"slot": "A", "type": "cpm-1s", "mda": [{"slot": 1, "type": "s36-100gb-qsfp28"}], "xiom": [iom]}
-        self.assertIn("sros1[slot=A].xiom[1]: module slot 1 holds either an XMA or an IOM, not both", errors(both))
+        self.assertIn("hardware: sros1[slot=A].xiom[1]: module slot 1 holds either an XMA or an IOM, not both", errors(both))
 
     def test_validate_component_reads_sfm_from_the_node(self) -> None:
         component = {"slot": 1, "type": "xcm-7s"}
@@ -408,11 +408,11 @@ class ClabFragmentTest(unittest.TestCase):
 
         iom = {"slot": 1, "type": "iom-s-1.5t", "mda": [{"slot": 3, "type": "ms2-400gb-qsfpdd+2-100gb-qsfp28"}]}
         self.assertIn(
-            "sros1[slot=1].xiom[1].mda[3]: iom-s-1.5t has MDA slots 1, 2, not 3",
+            "hardware: sros1[slot=1].xiom[1].mda[3]: iom-s-1.5t has MDA slots 1, 2, not 3",
             errors("sr-7s", [{"slot": "A", "type": "cpm-s"}, {"slot": 1, "type": "xcm-7s", "xiom": [iom]}]),
         )
         self.assertIn(
-            "sros1[slot=1].xiom[2]: xcm-7s has module slot 1, not 2",
+            "hardware: sros1[slot=1].xiom[2]: xcm-7s has module slot 1, not 2",
             errors("sr-7s", [{"slot": "A", "type": "cpm-s"}, {"slot": 1, "type": "xcm-7s", "xiom": [{**iom, "slot": 2}]}]),
         )
 

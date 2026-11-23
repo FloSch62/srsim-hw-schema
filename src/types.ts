@@ -162,7 +162,7 @@ export interface EdaYangCatalog {
 }
 
 export interface ValidationIssue {
-  source: "yaml" | "schema" | "hardware";
+  source: "yaml" | "schema" | "srsim" | "hardware";
   message: string;
   path?: string;
 }

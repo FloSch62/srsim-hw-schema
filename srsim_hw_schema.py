@@ -2225,10 +2225,14 @@ def validate_component(
     return errors
 
 
+HARDWARE_PREFIX = "hardware: "
+
+
 def hardware_issue_text(node_name: str, issue: hardware_model.Issue) -> str:
+    """A physical-model issue; the prefix tells it apart from what SR-SIM itself would reject."""
     slot, _, rest = issue.path.partition(".")
     location = component_name(node_name, slot) + (f".{rest}" if rest else "") if slot else node_name
-    return f"{location}: {issue.message}"
+    return f"{HARDWARE_PREFIX}{location}: {issue.message}"
 
 
 def validate_component_list_shape(
@@ -2525,9 +2529,9 @@ def cmd_validate_topology(args: argparse.Namespace) -> int:
             )
 
     if errors:
-        print(f"{args.topology}: unsupported SR-SIM hardware ({len(errors)} issue(s))")
+        print(f"{args.topology}: {len(errors)} issue(s)")
         for error in errors:
-            print(f"- {error}")
+            print(f"- {error}" if error.startswith(HARDWARE_PREFIX) else f"- SR-SIM: {error}")
         return 1
 
     print(f"{args.topology}: OK ({checked} SR-SIM component(s) checked)")
