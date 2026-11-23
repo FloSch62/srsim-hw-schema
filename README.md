@@ -70,8 +70,13 @@ omits them until you change away from the default. The card type of
 integrated chassis that Containerlab derives from the node type (for example
 `sr-1s` or `ixr-e2c`) is never written, because Containerlab rejects it.
 Component and nested
-MDA/XIOM slots are selected from schema-compatible dropdowns instead of
+module/MDA slots are selected from schema-compatible dropdowns instead of
 free-text fields, and matrix rows can be added back into the hardware editor.
+
+Each module slot of an XCM holds either an XMA or an IOM with MDAs. The editor
+writes the SR OS hierarchy for you: XMA-s and four/six-complex XMA2-s go under
+`mda`, one/two-complex XMA2-s (3.0T/6.0T) under `xiom` together with their
+automatically set MDA, and IOMs under `xiom` with the MDAs you add.
 
 The app is static and builds with relative asset paths for future GitHub Pages
 hosting:
@@ -132,7 +137,7 @@ empty description. Use `--product-names <file>` to pick another file, or
 `--product-names ''` to omit the descriptions. The web configurator shows the
 same text under each dropdown option and as a tooltip on matrix-row values.
 Chassis dropdowns are grouped by the `product_family` field (7750 SR-s, SR-x,
-SR, SR-e, SR-a, then 7450, 7705, 7250, 7950); MDA and XIOM dropdowns by
+SR, SR-e, SR-a, then 7450, 7705, 7250, 7950); MDA, XMA and IOM dropdowns by
 forwarding generation (FP5/E5, FP4/E4, FP3),
 taken from the `forwarding_generation` field of the same file.
 

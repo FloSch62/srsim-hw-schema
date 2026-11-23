@@ -52,7 +52,6 @@ import {
   isCpmSlot,
   nextCpmSlot,
   nextNumericSlot,
-  schemaNumericSlotOptions,
   slotCountLabel,
   sfmOptions,
   xiomMdaSlotOptions,
@@ -72,9 +71,18 @@ import type {
   SrsimXiom
 } from "../types";
 
-import { cpmCarriers, fittingCarrier, moduleSlots } from "../hardwareModel";
+import { cpmCarriers, fittingCarrier } from "../hardwareModel";
 import type { CpmCarrier } from "../hardwareModel";
 import { chassisGroup, chassisGroupOrder, generationGroup, generationGroupOrder, productHelp } from "../productNames";
+import {
+  componentWithXcmModules,
+  hasXcmModules,
+  xcmIomOptions,
+  xcmModuleSlotOptions,
+  xcmModulesFromComponent,
+  xcmXmaOptions
+} from "../xcmModules";
+import type { XcmModule, XcmModuleKind } from "../xcmModules";
 import { FieldAutocomplete, OptionText } from "./FieldAutocomplete";
 
 interface ComponentEditorProps {
@@ -168,13 +176,6 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
       component.type,
       directMdaSlotOptions(selectedEntry, component, config.sfm, nestedSlotCount, slotRules.mdaIntegerMinimum, mdaType),
       component.xiom
-    );
-
-  const xiomSlotsFor = (component: SrsimComponent) =>
-    freeXcmModuleSlots(
-      component.type,
-      schemaNumericSlotOptions([], moduleSlots(component.type).length || nestedSlotCount, slotRules.xiomIntegerMinimum),
-      component.mda
     );
 
   const xiomMdaSlotsFor = (component: SrsimComponent, xiom: SrsimXiom, mdaType = "") =>
@@ -366,70 +367,10 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     updateComponent(componentIndex, { mda: (component.mda ?? []).filter((_, idx) => idx !== mdaIndex) });
   };
 
-  const addXiom = (componentIndex: number) => {
-    const component = config.components[componentIndex];
-    const xioms = component.xiom ?? [];
-    const slot = availableNumericSlotOptions(xiomSlotsFor(component), xioms)[0];
-    if (!slot) return;
-    updateComponent(componentIndex, {
-      xiom: [
-        ...xioms,
-        {
-          slot,
-          type: xiomOptions(selectedEntry, component, config.sfm)[0] ?? "",
-          mda: []
-        }
-      ]
-    });
-  };
-
-  const updateXiom = (componentIndex: number, xiomIndex: number, updates: Partial<SrsimXiom>) => {
-    const component = config.components[componentIndex];
-    const xioms = [...(component.xiom ?? [])];
-    xioms[xiomIndex] = { ...xioms[xiomIndex], ...updates };
-    updateComponent(componentIndex, { xiom: xioms });
-  };
-
-  const removeXiom = (componentIndex: number, xiomIndex: number) => {
-    const component = config.components[componentIndex];
-    updateComponent(componentIndex, { xiom: (component.xiom ?? []).filter((_, idx) => idx !== xiomIndex) });
-  };
-
-  const addXiomMda = (componentIndex: number, xiomIndex: number) => {
-    const component = config.components[componentIndex];
-    const xioms = [...(component.xiom ?? [])];
-    const xiom = xioms[xiomIndex];
-    const mdas = xiom.mda ?? [];
-    const nextMda = nextXiomMdaFor(component, xiom);
-    if (!nextMda) return;
-    xioms[xiomIndex] = {
-      ...xiom,
-      mda: [...mdas, nextMda]
-    };
-    updateComponent(componentIndex, { xiom: xioms });
-  };
-
-  const updateXiomMda = (
-    componentIndex: number,
-    xiomIndex: number,
-    mdaIndex: number,
-    updates: Partial<SrsimMda>
-  ) => {
-    const component = config.components[componentIndex];
-    const xioms = [...(component.xiom ?? [])];
-    const xiom = xioms[xiomIndex];
-    const mdas = [...(xiom.mda ?? [])];
-    mdas[mdaIndex] = { ...mdas[mdaIndex], ...updates };
-    xioms[xiomIndex] = { ...xiom, mda: mdas };
-    updateComponent(componentIndex, { xiom: xioms });
-  };
-
-  const removeXiomMda = (componentIndex: number, xiomIndex: number, mdaIndex: number) => {
-    const component = config.components[componentIndex];
-    const xioms = [...(component.xiom ?? [])];
-    const xiom = xioms[xiomIndex];
-    xioms[xiomIndex] = { ...xiom, mda: (xiom.mda ?? []).filter((_, idx) => idx !== mdaIndex) };
-    updateComponent(componentIndex, { xiom: xioms });
+  const setModules = (componentIndex: number, modules: XcmModule[]) => {
+    const next = [...config.components];
+    next[componentIndex] = componentWithXcmModules(selectedEntry, next[componentIndex], modules, config.sfm);
+    setComponents(next);
   };
 
   const setEdaComponents = (components: EdaTopoNodeComponent[]) => {
@@ -725,76 +666,36 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 />
               </Box>
 
-              {moduleSlots(component.type).length ? (
-                <FormHelperText sx={{ mt: 1.5 }}>
-                  {moduleSlots(component.type).length === 1
-                    ? "This XCM has one slot, for either a direct MDA or an XIOM."
-                    : `This XCM has ${moduleSlots(component.type).length} slots, each for either a direct MDA or an XIOM.`}
-                </FormHelperText>
-              ) : null}
-
-              <NestedMdaSection
-                title="Direct MDAs"
-                mdas={component.mda ?? []}
-                options={directMdaOptions(selectedEntry, component, config.sfm)}
-                slotOptions={directMdaSlotsFor(component)}
-                slotOptionsByMda={(component.mda ?? []).map((mda) => directMdaSlotsFor(component, mda.type))}
-                addDisabled={!nextDirectMdaFor(component)}
-                defaultSlots={(component.mda ?? []).map((mda) =>
-                  defaultImpliesFields(selectedEntry, { ...component, mda: [mda] }, config.sfm, ["mda"]) ? [mda.slot ?? 1] : []
-                )}
-                defaultTypes={(component.mda ?? []).map((mda) =>
-                  directMdaOptions(selectedEntry, component, config.sfm).filter((type) =>
-                    defaultImpliesFields(selectedEntry, { ...component, mda: [{ ...mda, type }] }, config.sfm, ["mda"])
-                  )
-                )}
-                onAdd={() => addMda(index)}
-                onUpdate={(mdaIndex, updates) => updateMda(index, mdaIndex, updates)}
-                onRemove={(mdaIndex) => removeMda(index, mdaIndex)}
-              />
-
-              <NestedXiomSection
-                xioms={component.xiom ?? []}
-                xiomOptions={xiomOptions(selectedEntry, component, config.sfm)}
-                mdaOptionsByXiom={(component.xiom ?? []).map((xiom) => xiomMdaOptions(selectedEntry, component, xiom, config.sfm))}
-                mdaSlotOptionsByXiom={(component.xiom ?? []).map((xiom) => xiomMdaSlotsFor(component, xiom))}
-                mdaSlotOptionsByXiomMda={(component.xiom ?? []).map((xiom) =>
-                  (xiom.mda ?? []).map((mda) => xiomMdaSlotsFor(component, xiom, mda.type))
-                )}
-                canAddMdaByXiom={(component.xiom ?? []).map((xiom) => Boolean(nextXiomMdaFor(component, xiom)))}
-                xiomSlotOptions={xiomSlotsFor(component)}
-                xiomDefaultSlots={(component.xiom ?? []).map((xiom) =>
-                  defaultImpliesFields(selectedEntry, { ...component, xiom: [xiom] }, config.sfm, ["xiom", "mda"]) ? [1] : []
-                )}
-                xiomDefaultTypes={(component.xiom ?? []).map((xiom) =>
-                  xiomOptions(selectedEntry, component, config.sfm).filter((type) =>
-                    defaultImpliesFields(selectedEntry, { ...component, xiom: [{ ...xiom, type }] }, config.sfm, ["xiom", "mda"])
-                  )
-                )}
-                mdaDefaultSlots={(component.xiom ?? []).map((xiom) =>
-                  (xiom.mda ?? []).map((mda) =>
-                    defaultImpliesFields(selectedEntry, { ...component, xiom: [{ ...xiom, mda: [mda] }] }, config.sfm, ["mda"]) ? [mda.slot ?? 1] : []
-                  )
-                )}
-                mdaDefaultTypes={(component.xiom ?? []).map((xiom) =>
-                  (xiom.mda ?? []).map((mda) =>
-                    xiomMdaOptions(selectedEntry, component, xiom, config.sfm).filter((type) =>
-                      defaultImpliesFields(
-                        selectedEntry,
-                        { ...component, xiom: [{ ...xiom, mda: [{ ...mda, type }] }] },
-                        config.sfm,
-                        ["mda"]
-                      )
+              {hasXcmModules(selectedEntry, component) ? (
+                <XcmModuleSection
+                  entry={selectedEntry}
+                  component={component}
+                  sfm={config.sfm}
+                  mdaSlotsFor={(iom, mdaType) => xiomMdaSlotsFor(component, iom, mdaType)}
+                  nextMdaFor={(iom) => nextXiomMdaFor(component, iom)}
+                  onChange={(modules) => setModules(index, modules)}
+                />
+              ) : (
+                <NestedMdaSection
+                  title="MDAs"
+                  mdas={component.mda ?? []}
+                  options={directMdaOptions(selectedEntry, component, config.sfm)}
+                  slotOptions={directMdaSlotsFor(component)}
+                  slotOptionsByMda={(component.mda ?? []).map((mda) => directMdaSlotsFor(component, mda.type))}
+                  addDisabled={!nextDirectMdaFor(component)}
+                  defaultSlots={(component.mda ?? []).map((mda) =>
+                    defaultImpliesFields(selectedEntry, { ...component, mda: [mda] }, config.sfm, ["mda"]) ? [mda.slot ?? 1] : []
+                  )}
+                  defaultTypes={(component.mda ?? []).map((mda) =>
+                    directMdaOptions(selectedEntry, component, config.sfm).filter((type) =>
+                      defaultImpliesFields(selectedEntry, { ...component, mda: [{ ...mda, type }] }, config.sfm, ["mda"])
                     )
-                  )
-                )}
-                onAdd={() => addXiom(index)}
-                onUpdate={(xiomIndex, updates) => updateXiom(index, xiomIndex, updates)}
-                onRemove={(xiomIndex) => removeXiom(index, xiomIndex)}
-                onAddMda={(xiomIndex) => addXiomMda(index, xiomIndex)}
-                onUpdateMda={(xiomIndex, mdaIndex, updates) => updateXiomMda(index, xiomIndex, mdaIndex, updates)}
-                onRemoveMda={(xiomIndex, mdaIndex) => removeXiomMda(index, xiomIndex, mdaIndex)}
-              />
+                  )}
+                  onAdd={() => addMda(index)}
+                  onUpdate={(mdaIndex, updates) => updateMda(index, mdaIndex, updates)}
+                  onRemove={(mdaIndex) => removeMda(index, mdaIndex)}
+                />
+              )}
             </Paper>
               )}
             />
@@ -1360,102 +1261,144 @@ function NestedMdaSection({
   );
 }
 
-function NestedXiomSection({
-  xioms,
-  xiomOptions: xiomTypeOptions,
-  mdaOptionsByXiom,
-  mdaSlotOptionsByXiom,
-  mdaSlotOptionsByXiomMda,
-  canAddMdaByXiom,
-  xiomSlotOptions,
-  xiomDefaultSlots,
-  xiomDefaultTypes,
-  mdaDefaultSlots,
-  mdaDefaultTypes,
-  onAdd,
-  onUpdate,
-  onRemove,
-  onAddMda,
-  onUpdateMda,
-  onRemoveMda
+/** Module slots of an XCM: each holds an XMA, or an IOM with its MDAs. */
+function XcmModuleSection({
+  entry,
+  component,
+  sfm,
+  mdaSlotsFor,
+  nextMdaFor,
+  onChange
 }: {
-  xioms: SrsimXiom[];
-  xiomOptions: string[];
-  mdaOptionsByXiom: string[][];
-  mdaSlotOptionsByXiom: number[][];
-  mdaSlotOptionsByXiomMda: number[][][];
-  canAddMdaByXiom: boolean[];
-  xiomSlotOptions: number[];
-  xiomDefaultSlots?: SlotOption[][];
-  xiomDefaultTypes?: string[][];
-  mdaDefaultSlots?: SlotOption[][][];
-  mdaDefaultTypes?: string[][][];
-  onAdd: () => void;
-  onUpdate: (index: number, updates: Partial<SrsimXiom>) => void;
-  onRemove: (index: number) => void;
-  onAddMda: (xiomIndex: number) => void;
-  onUpdateMda: (xiomIndex: number, mdaIndex: number, updates: Partial<SrsimMda>) => void;
-  onRemoveMda: (xiomIndex: number, mdaIndex: number) => void;
+  entry: MatrixEntry | undefined;
+  component: SrsimComponent;
+  sfm: string;
+  mdaSlotsFor: (iom: SrsimXiom, mdaType?: string) => number[];
+  nextMdaFor: (iom: SrsimXiom) => SrsimMda | null;
+  onChange: (modules: XcmModule[]) => void;
 }) {
-  return (
-    <Stack spacing={1} sx={{ mt: 1.5 }}>
+  const modules = xcmModulesFromComponent(component);
+  const slots = xcmModuleSlotOptions(entry, component);
+  const optionsByKind: Record<XcmModuleKind, string[]> = {
+    xma: xcmXmaOptions(entry, component, sfm),
+    iom: xcmIomOptions(entry, component, sfm)
+  };
+  const freeSlots = (own?: number) => slots.filter((slot) => slot === own || !modules.some((module) => module.slot === slot));
+  const isDefault = (module: XcmModule) => {
+    const derived = componentWithXcmModules(entry, component, [module], sfm);
+    return defaultImpliesFields(entry, derived, sfm, derived.mda ? ["mda"] : ["xiom", "mda"]);
+  };
+  const update = (target: XcmModule, updates: Partial<XcmModule>) =>
+    onChange(modules.map((module) => (module === target ? { ...module, ...updates } : module)));
+  const remove = (target: XcmModule) => onChange(modules.filter((module) => module !== target));
+  const add = (kind: XcmModuleKind) => {
+    const slot = freeSlots()[0];
+    if (slot === undefined || !optionsByKind[kind].length) return;
+    onChange([...modules, { slot, kind, type: optionsByKind[kind][0], mda: [] }]);
+  };
+  const slotText = slots.length === 1 ? "one module slot, for" : `${slots.length} module slots, each for`;
+
+  const moduleRow = (module: XcmModule) => (
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: nestedComponentGridColumns,
+        gap: 1,
+        alignItems: "center"
+      }}
+    >
+      <SlotSelect
+        label="Slot"
+        value={module.slot}
+        options={freeSlots(module.slot)}
+        defaultOptions={freeSlots(module.slot).filter((slot) => isDefault({ ...module, slot }))}
+        onChange={(slot) => update(module, { slot: Number(slot) })}
+      />
+      <FieldAutocomplete
+        label={module.kind === "xma" ? "XMA type" : "IOM type"}
+        value={module.type}
+        options={optionsByKind[module.kind]}
+        groupBy={generationGroup}
+        groupOrder={generationGroupOrder}
+        defaultOptions={optionsByKind[module.kind].filter((type) => isDefault({ ...module, type }))}
+        onChange={(type) => update(module, { type, mda: module.kind === "iom" ? [] : module.mda })}
+        allowFreeText={false}
+      />
+      <IconButton size="small" color="error" onClick={() => remove(module)} sx={{ justifySelf: { xs: "end", sm: "auto" } }}>
+        <DeleteOutlineIcon fontSize="small" />
+      </IconButton>
+    </Box>
+  );
+
+  // XMAs and IOMs share the module slots: a kind with no module of its own and no free slot is blocked by the other.
+  const blockedBy = (kind: XcmModuleKind): string => {
+    if (freeSlots().length || modules.some((module) => module.kind === kind)) return "";
+    return kind === "xma" ? "IOM" : "XMA";
+  };
+
+  const header = (kind: XcmModuleKind, title: string, addLabel: string) => {
+    const blocker = blockedBy(kind);
+    return (
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-        <Typography variant="subtitle2">XIOMs</Typography>
-        <Button
-          size="small"
-          startIcon={<AddIcon />}
-          onClick={onAdd}
-          disabled={!xiomTypeOptions.length || !availableNumericSlotOptions(xiomSlotOptions, xioms).length}
-        >
-          Add XIOM
+        <Typography variant="subtitle2" sx={{ color: blocker ? "text.disabled" : undefined }}>
+          {title}
+          {blocker ? (
+            <Box component="span" sx={{ fontWeight: 400 }}>
+              {` (Blocked by ${blocker})`}
+            </Box>
+          ) : null}
+        </Typography>
+        <Button size="small" startIcon={<AddIcon />} onClick={() => add(kind)} disabled={!optionsByKind[kind].length || !freeSlots().length}>
+          {addLabel}
         </Button>
       </Box>
-      {xioms.map((xiom, xiomIndex) => (
-        <Paper key={xiomIndex} variant="outlined" sx={{ p: 1.25, bgcolor: "action.hover" }}>
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: nestedComponentGridColumns,
-              gap: 1,
-              alignItems: "center"
-            }}
-          >
-            <SlotSelect
-              label="Slot"
-              value={xiom.slot}
-              options={xiomSlotOptions}
-              defaultOptions={xiomDefaultSlots?.[xiomIndex] ?? []}
-              onChange={(slot) => onUpdate(xiomIndex, { slot })}
-            />
-            <FieldAutocomplete
-              label="XIOM type"
-              value={xiom.type ?? ""}
-              options={xiomTypeOptions}
-              groupBy={generationGroup}
-              groupOrder={generationGroupOrder}
-              defaultOptions={xiomDefaultTypes?.[xiomIndex] ?? []}
-              onChange={(type) => onUpdate(xiomIndex, { type })}
-              allowFreeText={false}
-            />
-            <IconButton size="small" color="error" onClick={() => onRemove(xiomIndex)} sx={{ justifySelf: { xs: "end", sm: "auto" } }}>
-              <DeleteOutlineIcon fontSize="small" />
-            </IconButton>
-          </Box>
-          <NestedMdaSection
-            title="XIOM MDAs"
-            mdas={xiom.mda ?? []}
-            options={mdaOptionsByXiom[xiomIndex] ?? []}
-            slotOptions={mdaSlotOptionsByXiom[xiomIndex] ?? []}
-            slotOptionsByMda={mdaSlotOptionsByXiomMda[xiomIndex] ?? []}
-            addDisabled={!canAddMdaByXiom[xiomIndex]}
-            defaultSlots={mdaDefaultSlots?.[xiomIndex]}
-            defaultTypes={mdaDefaultTypes?.[xiomIndex]}
-            onAdd={() => onAddMda(xiomIndex)}
-            onUpdate={(mdaIndex, updates) => onUpdateMda(xiomIndex, mdaIndex, updates)}
-            onRemove={(mdaIndex) => onRemoveMda(xiomIndex, mdaIndex)}
-          />
-        </Paper>
-      ))}
-    </Stack>
+    );
+  };
+
+  return (
+    <>
+      <FormHelperText sx={{ mt: 1.5 }}>
+        {optionsByKind.iom.length
+          ? `This XCM has ${slotText} either an XMA or an IOM with MDAs.`
+          : `This XCM has ${slotText} an XMA.`}
+      </FormHelperText>
+
+      <Stack spacing={1} sx={{ mt: 1.5 }}>
+        {header("xma", "XMA", "Add XMA")}
+        {modules.filter((module) => module.kind === "xma").map((module) => (
+          <Box key={module.slot}>{moduleRow(module)}</Box>
+        ))}
+      </Stack>
+
+      {optionsByKind.iom.length ? (
+        <Stack spacing={1} sx={{ mt: 1.5 }}>
+          {header("iom", "IOM + MDA", "Add IOM")}
+          {modules.filter((module) => module.kind === "iom").map((module) => {
+            const iom = { slot: module.slot, type: module.type, mda: module.mda };
+            return (
+              <Paper key={module.slot} variant="outlined" sx={{ p: 1.25, bgcolor: "action.hover" }}>
+                {moduleRow(module)}
+                <NestedMdaSection
+                  title="MDAs"
+                  mdas={module.mda}
+                  options={xiomMdaOptions(entry, component, iom, sfm)}
+                  slotOptions={mdaSlotsFor(iom)}
+                  slotOptionsByMda={module.mda.map((mda) => mdaSlotsFor(iom, mda.type))}
+                  addDisabled={!nextMdaFor(iom)}
+                  onAdd={() => {
+                    const mda = nextMdaFor(iom);
+                    if (mda) update(module, { mda: [...module.mda, mda] });
+                  }}
+                  onUpdate={(mdaIndex, updates) =>
+                    update(module, { mda: module.mda.map((mda, idx) => (idx === mdaIndex ? { ...mda, ...updates } : mda)) })
+                  }
+                  onRemove={(mdaIndex) => update(module, { mda: module.mda.filter((_, idx) => idx !== mdaIndex) })}
+                />
+              </Paper>
+            );
+          })}
+        </Stack>
+      ) : null}
+    </>
   );
 }
