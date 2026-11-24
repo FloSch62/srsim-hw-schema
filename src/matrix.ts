@@ -1,3 +1,4 @@
+import { cardSlots, cpmSlots, fitsSfm, integratedCard, lineCardSlots, mdaSlotsFor, moduleSlots } from "./hardwareModel";
 import type {
   HardwareModelEntry,
   HardwareSchema,
@@ -24,20 +25,6 @@ const integratedChassis = new Set([
   "ixr-e3x"
 ]);
 const redundantIntegratedChassis = new Set(["ixr-r6"]);
-const mdaSlotRestrictions = new Map<string, number[]>([
-  ["ixr-r4:m20-1g-csfp", [1, 2, 3]],
-  ["ixr-r4:m10-1g-sfp+2-10g-sfp+", [5]],
-  ["ixr-r6:a32-chds1v2", [5, 6]],
-  ["ixr-r6:m20-1g-csfp", [3, 4]]
-]);
-// Slots an XCM has for its XMA or XIOM modules, from the SR OS interface configuration
-// guide. `mda N` and `xiom xN` occupy the same physical slot N.
-const xcmModuleSlots = new Map<string, number>([
-  ["sr-2s", 1],
-  ["sr-7s", 1],
-  ["sr-14s", 2]
-]);
-
 export type DeploymentMode = "standalone" | "integrated_redundant" | "distributed";
 export type MatrixRowAction = "add" | "replace";
 
@@ -404,7 +391,7 @@ export function cpmOptions(entry: MatrixEntry | undefined, sfm: string): string[
     if (sfm && (row.values.sfm ?? []).length && !row.values.sfm.includes(sfm)) continue;
     values.push(...rowCpmCards(row, entry));
   }
-  return uniqueSorted(values);
+  return uniqueSorted(values).filter((type) => fitsSfm(type, sfm));
 }
 
 export function componentTypeOptions(entry: MatrixEntry | undefined, component: SrsimComponent, sfm: string): string[] {
@@ -427,7 +414,7 @@ export function sfmOptions(entry: MatrixEntry | undefined, components: SrsimComp
       (entry?.rows ?? [])
         .filter((row) => rowMatchesComponent(row, entry, component, "", "sfm"))
         .flatMap((row) => row.values.sfm ?? [])
-    );
+    ).filter((value) => fitsSfm(component.type, value));
     if (!values.length) continue;
     intersection = intersection === null ? values : intersection.filter((value) => values.includes(value));
   }
@@ -466,22 +453,19 @@ export function xiomMdaOptions(
   );
 }
 
-export function restrictedMdaSlots(chassis: string | undefined, mdaType: string): number[] {
-  return mdaSlotRestrictions.get(`${clabChassisToken(chassis)}:${canonicalToken(mdaType)}`) ?? [];
-}
-
-export function xcmModuleSlotCount(chassis: string | undefined): number | undefined {
-  return xcmModuleSlots.get(clabChassisToken(chassis));
-}
-
+/** Module slots are shared by XMAs and IOMs, so slots taken by the other kind are not offered. */
 export function freeXcmModuleSlots(
-  entry: MatrixEntry | undefined,
+  cardType: string | undefined,
   slotOptions: number[],
   otherModules: Array<{ slot?: string | number }> = []
 ): number[] {
-  return xcmModuleSlotCount(entry?.chassis) === undefined
-    ? slotOptions
-    : availableNumericSlotOptions(slotOptions, otherModules);
+  return moduleSlots(cardType).length ? availableNumericSlotOptions(slotOptions, otherModules) : slotOptions;
+}
+
+/** MDA slots of a card the hardware model knows; [] leaves the choice to the appendix rows. */
+function modelledMdaSlots(cardType: string, minimumSlot: number, mdaType: string): number[] {
+  const slots = mdaType ? mdaSlotsFor(cardType, mdaType) : cardSlots(cardType);
+  return slots.filter((slot) => slot >= minimumSlot);
 }
 
 function mdaSlotOptionsFromRows(
@@ -491,18 +475,11 @@ function mdaSlotOptionsFromRows(
   minimumSlot: number,
   mdaType = ""
 ): number[] {
-  const restrictedSlots = uniqueNumbers(
-    (mdaType ? [mdaType] : uniqueSorted(rows.flatMap(rowMdaValues)))
-      .flatMap((type) => restrictedMdaSlots(entry?.chassis, type))
-  ).filter((slot) => slot >= minimumSlot);
-  if (mdaType && restrictedSlots.length) return restrictedSlots;
-
   const numberedSlots = uniqueNumbers(rows.flatMap((row) => rowNumberedMdaSlots(row, mdaType)))
     .filter((slot) => slot >= minimumSlot);
   if (numberedSlots.length) return numberedSlots;
 
-  const fallbackSlots = numberRange(fallbackSlotCount, minimumSlot);
-  return restrictedSlots.length ? uniqueNumbers([...fallbackSlots, ...restrictedSlots]) : fallbackSlots;
+  return numberRange(fallbackSlotCount, minimumSlot);
 }
 
 export function directMdaSlotOptions(
@@ -513,9 +490,11 @@ export function directMdaSlotOptions(
   minimumSlot = 1,
   mdaType = ""
 ): number[] {
+  const card = component.type || integratedCard(entry?.chassis);
+  if (cardSlots(card).length) return modelledMdaSlots(card, minimumSlot, mdaType);
   const base = { slot: component.slot, type: component.type };
   const rows = optionRows(entry, base, sfm, "mda").filter((row) => !(row.values.xiom ?? []).length);
-  return mdaSlotOptionsFromRows(entry, rows, xcmModuleSlotCount(entry?.chassis) ?? fallbackSlotCount, minimumSlot, mdaType);
+  return mdaSlotOptionsFromRows(entry, rows, fallbackSlotCount, minimumSlot, mdaType);
 }
 
 export function xiomMdaSlotOptions(
@@ -527,6 +506,7 @@ export function xiomMdaSlotOptions(
   minimumSlot = 1,
   mdaType = ""
 ): number[] {
+  if (cardSlots(xiom.type).length) return modelledMdaSlots(xiom.type ?? "", minimumSlot, mdaType);
   const base = {
     slot: component.slot,
     type: component.type,
@@ -558,24 +538,28 @@ function numberRange(max: number, min = 1): number[] {
   return Array.from({ length: end - start + 1 }, (_, index) => start + index);
 }
 
-function inferredComponentSlotCount(chassis: string | undefined): number {
-  const value = chassis ?? "";
-  const srA = value.match(/^sr-a(\d+)$/);
-  if (srA) return Number(srA[1]);
-
-  const modular = value.match(/^(?:ess|ixr|sr|xrs)-(\d+)(?:[a-z]*)$/);
-  if (modular) return Number(modular[1]);
-
-  return 1;
-}
-
 function matrixCardSlotOptions(entry: MatrixEntry | undefined, minimumSlot = 1): number[] {
+  const modelled = lineCardSlots(entry?.chassis ?? "");
+  if (modelled.length) return modelled.filter((slot) => slot >= minimumSlot);
   const matrixSlots = uniqueNumbers((entry?.rows ?? []).flatMap((row) => row.values.slot ?? []));
-  const maxSlot = Math.max(inferredComponentSlotCount(entry?.chassis), ...matrixSlots, minimumSlot);
+  const maxSlot = Math.max(...matrixSlots, minimumSlot);
   return numberRange(maxSlot, minimumSlot);
 }
 
+/** True when a dropdown offers nothing to change: no options, or only the current value. */
+export function onlyChoice(options: unknown[], value: unknown): boolean {
+  const distinct = [...new Set(options.map(String))];
+  return distinct.length === 0 || (distinct.length === 1 && distinct[0] === String(value ?? ""));
+}
+
+/** Section-title count, e.g. "(1 / max 2)". */
+export function slotCountLabel(used: number, max: number): string {
+  return `(${used} / max ${max})`;
+}
+
 export function componentCpmSlotOptions(entry: MatrixEntry | undefined, schemaSlots: string[] = ["A", "B"]): string[] {
+  const modelled = cpmSlots(entry?.chassis ?? "");
+  if (modelled.length) return modelled;
   const slots = (entry?.rows ?? [])
     .flatMap((row) => row.values.slot ?? [])
     .filter((slot) => /^[AB]$/i.test(slot))
@@ -591,6 +575,11 @@ export function componentCardSlotOptions(
   const configuredSlots = uniqueNumbers(components.map((component) => component.slot));
   const maxSlot = Math.max(...matrixCardSlotOptions(entry, minimumSlot), ...configuredSlots, minimumSlot);
   return numberRange(maxSlot, minimumSlot);
+}
+
+/** Line-card slots the chassis provides, ignoring slots of already configured cards. */
+export function componentCardSlotCount(entry: MatrixEntry | undefined, minimumSlot = 1): number {
+  return componentCardSlotOptions(entry, [], minimumSlot).length;
 }
 
 export function schemaNumericSlotOptions(
@@ -843,7 +832,7 @@ export function matchingRowsForSummary(entry: MatrixEntry | undefined, component
 
 export function componentCompatibleWithSfm(entry: MatrixEntry | undefined, component: SrsimComponent, sfm: string): boolean {
   if (!component.type || !sfm) return true;
-  return (entry?.rows ?? []).some((row) => rowMatchesComponent(row, entry, component, sfm));
+  return fitsSfm(component.type, sfm) && (entry?.rows ?? []).some((row) => rowMatchesComponent(row, entry, component, sfm));
 }
 
 type DefaultField = "sfm" | "xiom" | "mda";
@@ -895,4 +884,38 @@ export function defaultImpliesFields(
 
     return fields.every((field) => rowContainsSelectedDefault(row, field, component, sfm));
   });
+}
+
+/**
+ * Modules a card lost (e.g. when an SFM switch changed the XCM type), replaced in their slots by a
+ * fitting module of the same kind: the default layout's module when it fits, else the first option.
+ */
+export function withReplacedModules(
+  entry: MatrixEntry | undefined,
+  before: SrsimComponent,
+  after: SrsimComponent,
+  sfm: string
+): SrsimComponent {
+  const card = { slot: after.slot, type: after.type };
+  const slots = moduleSlots(after.type);
+  const taken = new Set([...(after.mda ?? []), ...(after.xiom ?? [])].map((module) => Number(module.slot)));
+  const defaults = defaultComponentsForEntry(entry).find((component) => component.type === after.type);
+  const pick = (options: string[], preferred: string | undefined) =>
+    preferred && options.includes(preferred) ? preferred : options[0];
+
+  const mda = [...(after.mda ?? [])];
+  const xiom = [...(after.xiom ?? [])];
+  for (const lost of before.mda ?? []) {
+    const slot = Number(lost.slot);
+    if (taken.has(slot) || !slots.includes(slot)) continue;
+    const type = pick(directMdaOptions(entry, card, sfm), defaults?.mda?.find((item) => Number(item.slot) === slot)?.type);
+    if (type) mda.push({ slot, type });
+  }
+  for (const lost of before.xiom ?? []) {
+    const slot = Number(lost.slot);
+    if (taken.has(slot) || !slots.includes(slot)) continue;
+    const type = pick(xiomOptions(entry, card, sfm), defaults?.xiom?.find((item) => Number(item.slot) === slot)?.type);
+    if (type) xiom.push({ slot, type, mda: [] });
+  }
+  return { ...after, ...(mda.length ? { mda } : {}), ...(xiom.length ? { xiom } : {}) };
 }

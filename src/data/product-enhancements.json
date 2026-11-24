@@ -1,0 +1,3303 @@
+[
+  {
+    "schema_string": "a32-chds1v2",
+    "types": [
+      "Adapter Card"
+    ],
+    "nokia_name": "a32-chds1v2",
+    "port_layout": "32x T1/E1 (2x 68-pin AMP)",
+    "help_text_1": "ASAP Adapter Card v2 with 32x T1/E1 (2x 68-pin AMP)",
+    "help_text_2": "32x T1/E1 (2x 68-pin AMP) ASAP Adapter Card v2",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpiom-ixr-r6",
+    "types": [
+      "CPM",
+      "IOM"
+    ],
+    "nokia_name": "CPIOM-IXR-R6",
+    "port_layout": null,
+    "help_text_1": "CPIOM for 7250 IXR-R6; combined CPM/IOM functionality",
+    "help_text_2": "7250 IXR-R6 combined CPM/IOM (CPIOM)",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-1",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-1",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7750 SR-1 (FP4)",
+    "help_text_2": "7750 SR-1 (FP4) Integrated CPM",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-1s",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-1s",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7750 SR-1s",
+    "help_text_2": "7750 SR-1s Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-1se",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-1se",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7750 SR-1se",
+    "help_text_2": "7750 SR-1se Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-1x",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-1x",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7750 SR-1/1x fixed platforms and DMS-1-24D",
+    "help_text_2": "7750 SR-1/1x fixed platforms and DMS-1-24D Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-2s",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-2s",
+    "port_layout": null,
+    "help_text_1": "CPM for 7750 SR-2s",
+    "help_text_2": "7750 SR-2s CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-2se",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-2se",
+    "port_layout": null,
+    "help_text_1": "CPM for 7750 SR-2se",
+    "help_text_2": "7750 SR-2se CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-a",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-a",
+    "port_layout": null,
+    "help_text_1": "CPM for 7750 SR-a4/SR-a8",
+    "help_text_2": "7750 SR-a4/SR-a8 CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-e",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-e",
+    "port_layout": null,
+    "help_text_1": "CPM for 7750 SR-1e/SR-2e/SR-3e",
+    "help_text_2": "7750 SR-1e/SR-2e/SR-3e CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR",
+    "port_layout": null,
+    "help_text_1": "CPM for 7250 IXR-6/IXR-10",
+    "help_text_2": "7250 IXR-6/IXR-10 CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-e",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-e",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-e",
+    "help_text_2": "7250 IXR-e Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-e-gnss",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-e GNSS",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-e (GNSS variant)",
+    "help_text_2": "7250 IXR-e (GNSS variant) Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-e2",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-e2",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-e2",
+    "help_text_2": "7250 IXR-e2 Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-e2c",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-e2c",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-e2c",
+    "help_text_2": "7250 IXR-e2c Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-e2n",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-e2n",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-e2n",
+    "help_text_2": "7250 IXR-e2n Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-e2n-s",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-e2n-s",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-e2n-s",
+    "help_text_2": "7250 IXR-e2n-s Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-e2sc",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-e2sc",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-e2sc",
+    "help_text_2": "7250 IXR-e2sc Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-e3c",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-e3c",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-e3c",
+    "help_text_2": "7250 IXR-e3c Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-e3x",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-e3x",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-e3x",
+    "help_text_2": "7250 IXR-e3x Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-ec",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-ec",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-ec",
+    "help_text_2": "7250 IXR-ec Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-r4",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-R4",
+    "port_layout": null,
+    "help_text_1": "CPM for 7250 IXR-R4",
+    "help_text_2": "7250 IXR-R4 CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-r6d",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-R6d",
+    "port_layout": null,
+    "help_text_1": "CPM for 7250 IXR-R6d/IXR-R6dl",
+    "help_text_2": "7250 IXR-R6d/IXR-R6dl CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-s",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-s",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-s",
+    "help_text_2": "7250 IXR-s Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-ixr-x",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-IXR-X",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7250 IXR-X1/IXR-Xs/IXR-X3",
+    "help_text_2": "7250 IXR-X1/IXR-Xs/IXR-X3 Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-s",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-s",
+    "port_layout": null,
+    "help_text_1": "CPM for 7750 SR-7s/SR-14s",
+    "help_text_2": "7750 SR-7s/SR-14s CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-sar-hm",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-SAR-Hm",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7705 SAR-Hm",
+    "help_text_2": "7705 SAR-Hm Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-sar-hmc",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-SAR-Hmc",
+    "port_layout": null,
+    "help_text_1": "Integrated CPM for 7705 SAR-Hmc",
+    "help_text_2": "7705 SAR-Hmc Integrated CPM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-v",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-V",
+    "port_layout": null,
+    "help_text_1": "Virtual CPM for VSR-I; single-VM control, management and dataplane; 4 virtual MDA slots",
+    "help_text_2": "VSR-I virtual CPM; single VM; 4 virtual MDA slots",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm-x20",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM-X20",
+    "port_layout": null,
+    "help_text_1": "CPM for 7950 XRS-20/XRS-20e; SFM/SFM2 compatible",
+    "help_text_2": "7950 XRS-20/XRS-20e CPM; SFM/SFM2 compatible",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm2-s",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM2-s",
+    "port_layout": null,
+    "help_text_1": "CPM2 for 7750 SR-7s/SR-14s",
+    "help_text_2": "7750 SR-7s/SR-14s CPM2",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm2-x20",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM2-X20",
+    "port_layout": null,
+    "help_text_1": "CPM2 for 7950 XRS-20/XRS-20e; SFM2 required",
+    "help_text_2": "7950 XRS-20/XRS-20e CPM2; SFM2 required",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "cpm5",
+    "types": [
+      "CPM"
+    ],
+    "nokia_name": "CPM5",
+    "port_layout": null,
+    "help_text_1": "CPM5 for 7450 ESS-7/ESS-12 and 7750 SR-7/SR-12/SR-12e",
+    "help_text_2": "7450 ESS-7/ESS-12 and 7750 SR-7/SR-12/SR-12e CPM5",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "d24-800g-qsfpdd-1",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "d24-800g-qsfpdd-1",
+    "port_layout": "24x 800G QSFP-DD (20 for network connectivity)",
+    "help_text_1": "Fixed-Port Virtual MDA for 7750 DMS-1-24D with 24x 800G QSFP-DD (20 for network connectivity)",
+    "help_text_2": "24x 800G QSFP-DD (20 for network connectivity) Fixed-Port Virtual MDA for 7750 DMS-1-24D",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "dms-1-24d",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 DMS-1-24D",
+    "port_layout": "24x 800G QSFP-DD (20 for network connectivity)",
+    "help_text_1": "Fixed DDoS mitigation chassis (FP5) with 24x 800G QSFP-DD (20 for network connectivity); simplex CPM",
+    "help_text_2": "24x 800G QSFP-DD (20 for network connectivity) fixed DDoS mitigation chassis (FP5); simplex CPM",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "dms24-800g-qsfpdd-1",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "dms24-800g-qsfpdd-1",
+    "port_layout": "24x 800G QSFP-DD (20 for network connectivity)",
+    "help_text_1": "Fixed-Port IMM View for 7750 DMS-1-24D with 24x 800G QSFP-DD (20 for network connectivity)",
+    "help_text_2": "24x 800G QSFP-DD (20 for network connectivity) Fixed-Port IMM View for 7750 DMS-1-24D",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "ess-12",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7450 ESS-12",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 10 IOM slots; dual SF/CPM support",
+    "help_text_2": "10 IOM slots, modular chassis; dual SF/CPM support",
+    "forwarding_generation": null,
+    "product_family": "7450 ESS"
+  },
+  {
+    "schema_string": "ess-7",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7450 ESS-7",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 5 IOM slots; dual SF/CPM support",
+    "help_text_2": "5 IOM slots, modular chassis; dual SF/CPM support",
+    "forwarding_generation": null,
+    "product_family": "7450 ESS"
+  },
+  {
+    "schema_string": "i1-wlan",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "i1-wlan",
+    "port_layout": null,
+    "help_text_1": "7705 SAR-Hm WLAN interface",
+    "help_text_2": "Integrated WLAN interface for 7705 SAR-Hm",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "i2-cellular",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "i2-cellular",
+    "port_layout": null,
+    "help_text_1": "7705 SAR-Hm/Hmc cellular interfaces",
+    "help_text_2": "Integrated cellular interfaces for 7705 SAR-Hm/Hmc",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "i2-sdi",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "i2-sdi",
+    "port_layout": null,
+    "help_text_1": "7705 SAR-Hm/Hmc serial data interfaces",
+    "help_text_2": "Integrated serial data interfaces for 7705 SAR-Hm/Hmc",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "i24-800g-qsfpdd-1",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "i24-800g-qsfpdd-1",
+    "port_layout": "24x 800G QSFP-DD",
+    "help_text_1": "Fixed-Port IMM View for 7750 SR-1-24D with 24x 800G QSFP-DD",
+    "help_text_2": "24x 800G QSFP-DD Fixed-Port IMM View for 7750 SR-1-24D",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "i3-10/100eth-tx",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "i3-10/100eth-tx",
+    "port_layout": "3x 10M/100M RJ-45",
+    "help_text_1": "Fixed-Port Virtual MDA for 7705 SAR-Hmc with 3x 10M/100M RJ-45",
+    "help_text_2": "3x 10M/100M RJ-45 Fixed-Port Virtual MDA for 7705 SAR-Hmc",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "i40-200g-sfpdd+6-800g-qsfpdd-1",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "i40-200g-sfpdd+6-800g-qsfpdd-1",
+    "port_layout": "40x 200G SFP-DD + 6x 800G QSFP-DD",
+    "help_text_1": "Fixed-Port IMM View for 7750 SR-1-46S with 40x 200G SFP-DD + 6x 800G QSFP-DD",
+    "help_text_2": "40x 200G SFP-DD + 6x 800G QSFP-DD Fixed-Port IMM View for 7750 SR-1-46S",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "i48-400g-qsfpdd-1",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "i48-400g-qsfpdd-1",
+    "port_layout": "48x 400G QSFP-DD",
+    "help_text_1": "Fixed-Port IMM View for 7750 SR-1-48D with 48x 400G QSFP-DD",
+    "help_text_2": "48x 400G QSFP-DD Fixed-Port IMM View for 7750 SR-1-48D",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "i48-800g-qsfpdd-1x",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "i48-800g-qsfpdd-1x",
+    "port_layout": "48x 800G QSFP-DD",
+    "help_text_1": "Fixed-Port IMM View for 7750 SR-1x-48D with 48x 800G QSFP-DD",
+    "help_text_2": "48x 800G QSFP-DD Fixed-Port IMM View for 7750 SR-1x-48D",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "i6-10/100eth-tx",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "i6-10/100eth-tx",
+    "port_layout": "6x 10M/100M RJ-45",
+    "help_text_1": "Fixed-Port Virtual MDA for 7705 SAR-Hm with 6x 10M/100M RJ-45",
+    "help_text_2": "6x 10M/100M RJ-45 Fixed-Port Virtual MDA for 7705 SAR-Hm",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "i80-200g-sfpdd+12-400g-qsfpdd-1",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "i80-200g-sfpdd+12-400g-qsfpdd-1",
+    "port_layout": "80x 200G SFP-DD + 12x 400G QSFP-DD",
+    "help_text_1": "Fixed-Port IMM View for 7750 SR-1-92S with 80x 200G SFP-DD + 12x 400G QSFP-DD",
+    "help_text_2": "80x 200G SFP-DD + 12x 400G QSFP-DD Fixed-Port IMM View for 7750 SR-1-92S",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "i80-200g-sfpdd+12-800g-qsfpdd-1x",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "i80-200g-sfpdd+12-800g-qsfpdd-1x",
+    "port_layout": "80x 200G SFP-DD + 12x 800G QSFP-DD",
+    "help_text_1": "Fixed-Port IMM View for 7750 SR-1x-92S with 80x 200G SFP-DD + 12x 800G QSFP-DD",
+    "help_text_2": "80x 200G SFP-DD + 12x 800G QSFP-DD Fixed-Port IMM View for 7750 SR-1x-92S",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm-2pac-fp3",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm-2pac-fp3",
+    "port_layout": null,
+    "help_text_1": "IMM (FP3) with up to two built-in MDA functions",
+    "help_text_2": "Up to two built-in MDA functions on an IMM (FP3)",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "imm14-10g-sfp++4-1g-tx",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm14-10g-sfp++4-1g-tx",
+    "port_layout": "14x 10G SFP+ + 4x 1G RJ-45",
+    "help_text_1": "Fixed-Port IMM View for 7250 IXR-e with 14x 10G SFP+ + 4x 1G RJ-45",
+    "help_text_2": "14x 10G SFP+ + 4x 1G RJ-45 Fixed-Port IMM View for 7250 IXR-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm16-sfp++4-sfp28",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm16-sfp++4-sfp28",
+    "port_layout": "16x 10G SFP+ + 4x 25G SFP28",
+    "help_text_1": "Fixed-Port IMM View for 7250 IXR-e2sc with 16x 10G SFP+ + 4x 25G SFP28",
+    "help_text_2": "16x 10G SFP+ + 4x 25G SFP28 Fixed-Port IMM View for 7250 IXR-e2sc",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm16-sfp112+15-sfp56+6-qsfpdd",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm16-sfp112+15-sfp56+6-qsfpdd",
+    "port_layout": "6x 400G QSFP-DD + 16x 100G SFP112 + 15x 50G SFP56",
+    "help_text_1": "Fixed-Port IMM View for 7250 IXR-e3x with 6x 400G QSFP-DD + 16x 100G SFP112 + 15x 50G SFP56",
+    "help_text_2": "6x 400G QSFP-DD + 16x 100G SFP112 + 15x 50G SFP56 Fixed-Port IMM View for 7250 IXR-e3x",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm24-1gb-xp-sfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "imm24-1gb-xp-sfp",
+    "port_layout": null,
+    "help_text_1": "Built-in MDA view of the 48-port GE SFP IMM",
+    "help_text_2": "48-port GE SFP IMM built-in MDA view",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm24-sfp++8-sfp28+2-qsfp28",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm24-sfp++8-sfp28+2-qsfp28",
+    "port_layout": "24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28",
+    "help_text_1": "Fixed-Port IMM View for 7250 IXR-e with 24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28",
+    "help_text_2": "24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28 Fixed-Port IMM View for 7250 IXR-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm32-qsfp28+4-qsfpdd",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm32-qsfp28+4-qsfpdd",
+    "port_layout": "32x 100G QSFP28 + 4x 400G QSFP-DD",
+    "help_text_1": "Fixed-Port IMM View for 7250 IXR-X1 with 32x 100G QSFP28 + 4x 400G QSFP-DD",
+    "help_text_2": "32x 100G QSFP28 + 4x 400G QSFP-DD Fixed-Port IMM View for 7250 IXR-X1",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm36-100g-qsfp28",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm36-100g-qsfp28",
+    "port_layout": "36x 100G QSFP28",
+    "help_text_1": "IMM for 7250 IXR-6/IXR-10 with 36x 100G QSFP28",
+    "help_text_2": "36x 100G QSFP28 IMM for 7250 IXR-6/IXR-10",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm36-800g-qsfpdd",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm36-800g-qsfpdd",
+    "port_layout": "36x 800G QSFP-DD",
+    "help_text_1": "Fixed-Port IMM View for 7750 SR-1se (FP5) with 36x 800G QSFP-DD; 19.2 Tb/s FD",
+    "help_text_2": "36x 800G QSFP-DD Fixed-Port IMM View for 7750 SR-1se (FP5); 19.2 Tb/s FD",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "imm36-qsfpdd",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm36-qsfpdd",
+    "port_layout": "36x 400G QSFP-DD",
+    "help_text_1": "Fixed-Port IMM View for 7250 IXR-X3 with 36x 400G QSFP-DD",
+    "help_text_2": "36x 400G QSFP-DD Fixed-Port IMM View for 7250 IXR-X3",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm4-100gb-cfp4",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm4-100gb-cfp4",
+    "port_layout": "4x 100G CFP4",
+    "help_text_1": "IMM (FP3) with 4x 100G CFP4",
+    "help_text_2": "4x 100G CFP4 IMM (FP3)",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "imm4-qsfp28+16-sfp28+8-sfp56",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm4-qsfp28+16-sfp28+8-sfp56",
+    "port_layout": "4x 100G QSFP28 + 16x 25G SFP28 + 8x 50G SFP56",
+    "help_text_1": "Fixed-Port IMM View for 7250 IXR-e3c with 4x 100G QSFP28 + 16x 25G SFP28 + 8x 50G SFP56",
+    "help_text_2": "4x 100G QSFP28 + 16x 25G SFP28 + 8x 50G SFP56 Fixed-Port IMM View for 7250 IXR-e3c",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm4-sfp+4-sfp+",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm4-sfp+4-sfp+",
+    "port_layout": "4x 10G SFP+ + 4x 1G SFP",
+    "help_text_1": "Fixed-Port IMM View for 7250 IXR-e2n with 4x 10G SFP+ + 4x 1G SFP",
+    "help_text_2": "4x 10G SFP+ + 4x 1G SFP Fixed-Port IMM View for 7250 IXR-e2n",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm4-sfp+4-sfp+-s",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm4-sfp+4-sfp+-s",
+    "port_layout": "4x 10G SFP+ + 4x 1G SFP",
+    "help_text_1": "Fixed-Port IMM View for 7250 IXR-e2n-s with 4x 10G SFP+ + 4x 1G SFP",
+    "help_text_2": "4x 10G SFP+ + 4x 1G SFP Fixed-Port IMM View for 7250 IXR-e2n-s",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm40-10gb-sfp",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm40-10gb-sfp",
+    "port_layout": "40x 10G SFP+",
+    "help_text_1": "IMM (FP3) with 40x 10G SFP+",
+    "help_text_2": "40x 10G SFP+ IMM (FP3)",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "imm48-1gb-sfp-c",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm48-1gb-sfp-c",
+    "port_layout": "48x 1G SFP",
+    "help_text_1": "IMM (FP2) with 48x 1G SFP",
+    "help_text_2": "48x 1G SFP IMM (FP2)",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm48-sfp++6-qsfp28",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm48-sfp++6-qsfp28",
+    "port_layout": "48x 10G SFP+ + 6x 100G QSFP28",
+    "help_text_1": "Fixed-Port IMM View for 7250 IXR-s with 48x 10G SFP+ + 6x 100G QSFP28",
+    "help_text_2": "48x 10G SFP+ + 6x 100G QSFP28 Fixed-Port IMM View for 7250 IXR-s",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm48-sfp+2-qsfp28",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm48-sfp+2-qsfp28",
+    "port_layout": "48x 10G SFP+ + 2x 100G QSFP28",
+    "help_text_1": "IMM for 7250 IXR-6/IXR-10 with 48x 10G SFP+ + 2x 100G QSFP28",
+    "help_text_2": "48x 10G SFP+ + 2x 100G QSFP28 IMM for 7250 IXR-6/IXR-10",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "imm6-qsfpdd+48-sfp56",
+    "types": [
+      "IMM"
+    ],
+    "nokia_name": "imm6-qsfpdd+48-sfp56",
+    "port_layout": "6x 400G QSFP-DD + 48x 50G SFP56",
+    "help_text_1": "Fixed-Port IMM View for 7250 IXR-Xs with 6x 400G QSFP-DD + 48x 50G SFP56",
+    "help_text_2": "6x 400G QSFP-DD + 48x 50G SFP56 Fixed-Port IMM View for 7250 IXR-Xs",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "iom-a",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom-a",
+    "port_layout": null,
+    "help_text_1": "IOM-a (FP3) with 4 MDA slots; 0.1 Tb/s FD",
+    "help_text_2": "0.1 Tb/s FD IOM-a (FP3); 4 MDA slots",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "iom-e",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom-e",
+    "port_layout": null,
+    "help_text_1": "IOM-e (FP3) with 4 MDA slots; 0.2 Tb/s FD; 0.4 Tb/s IA",
+    "help_text_2": "0.2 Tb/s FD IOM-e (FP3); 4 MDA slots; 0.4 Tb/s IA",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "iom-ixr-r4",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom-ixr-r4",
+    "port_layout": null,
+    "help_text_1": "IOM (iom-ixr-r4)",
+    "help_text_2": "Integrated IOM of the 7250 IXR-R4; five MDA slots, slot 5 holds the integrated MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "iom-ixr-r6d",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom-ixr-r6d",
+    "port_layout": null,
+    "help_text_1": "IOM (iom-ixr-r6d)",
+    "help_text_2": "Integrated IOM of the 7250 IXR-R6d/R6dl; six MDA slots",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "iom-s-1.5t",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom-s-1.5t",
+    "port_layout": null,
+    "help_text_1": "IOM-s (FP4) with 2 MDA slots; 1.5 Tb/s FD; 4.0 Tb/s IA",
+    "help_text_2": "1.5 Tb/s FD IOM-s (FP4); 2 MDA slots; 4.0 Tb/s IA",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "iom-s-3.0t",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom-s-3.0t",
+    "port_layout": null,
+    "help_text_1": "IOM-s (FP4) with 2 MDA slots; 3.0 Tb/s FD; 4.0 Tb/s IA; SR-1s modular-interface profile",
+    "help_text_2": "3.0 Tb/s FD IOM-s (FP4); 2 MDA slots; 4.0 Tb/s IA; SR-1s modular-interface profile",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "iom-sar",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom-sar",
+    "port_layout": null,
+    "help_text_1": "Virtual IOM for 7705 SAR-1",
+    "help_text_2": "7705 SAR-1 virtual IOM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "iom-sar-1x",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom-sar-1x",
+    "port_layout": null,
+    "help_text_1": "Virtual IOM for 7705 SAR-Hx/SAR-Mx",
+    "help_text_2": "7705 SAR-Hx/SAR-Mx virtual IOM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "iom-v",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom-v",
+    "port_layout": null,
+    "help_text_1": "Virtual IOM (iom-v)",
+    "help_text_2": "Virtual IOM of the VSR-I",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "iom2-se-3.0t",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom2-se-3.0t",
+    "port_layout": null,
+    "help_text_1": "IOM2-se (FP5) with 2 MDA-se slots; 3.0 Tb/s FD; 12.8 Tb/s IA",
+    "help_text_2": "3.0 Tb/s FD IOM2-se (FP5); 2 MDA-se slots; 12.8 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "iom2-se-6.0t",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom2-se-6.0t",
+    "port_layout": null,
+    "help_text_1": "IOM2-se (FP5) with 2 MDA-se slots; 6.0 Tb/s FD; 12.8 Tb/s IA",
+    "help_text_2": "6.0 Tb/s FD IOM2-se (FP5); 2 MDA-se slots; 12.8 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "iom4-e",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom4-e",
+    "port_layout": null,
+    "help_text_1": "IOM4-e (FP3) with 2 MDA slots; 0.2 Tb/s FD; 0.4 Tb/s IA",
+    "help_text_2": "0.2 Tb/s FD IOM4-e (FP3); 2 MDA slots; 0.4 Tb/s IA",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "iom4-e-b",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom4-e-b",
+    "port_layout": null,
+    "help_text_1": "IOM4-e-B (FP3) with 2 MDA-e slots; 0.2 Tb/s FD",
+    "help_text_2": "2 MDA-e slots, IOM4-e-B (FP3); 0.2 Tb/s FD",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "iom4-e-hs",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom4-e-hs",
+    "port_layout": null,
+    "help_text_1": "IOM4-e-HS (FP3) with 2 MDA-e slots; 0.2 Tb/s FD",
+    "help_text_2": "2 MDA-e slots, IOM4-e-HS (FP3); 0.2 Tb/s FD",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "iom5-e",
+    "types": [
+      "IOM"
+    ],
+    "nokia_name": "iom5-e",
+    "port_layout": null,
+    "help_text_1": "IOM5-e (FP4) with 2 MDA slots; 1.2 Tb/s IA on SR-7/12; 4.0 Tb/s IA on SR-12e; SFM6 required",
+    "help_text_2": "2 MDA slots, IOM5-e (FP4); 1.2 Tb/s IA on SR-7/12; 4.0 Tb/s IA on SR-12e; SFM6 required",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "isa-ms-v",
+    "types": [
+      "ISA"
+    ],
+    "nokia_name": "isa-ms-v",
+    "port_layout": null,
+    "help_text_1": "Virtual multiservice ISA",
+    "help_text_2": "Virtual Multiservice Integrated Services Adapter",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "isa2-aa",
+    "types": [
+      "ISA"
+    ],
+    "nokia_name": "isa2-aa",
+    "port_layout": null,
+    "help_text_1": "Application Assurance ISA2",
+    "help_text_2": "Application Assurance Integrated Services Adapter",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "isa2-bb",
+    "types": [
+      "ISA"
+    ],
+    "nokia_name": "isa2-bb",
+    "port_layout": null,
+    "help_text_1": "Broadband ISA2",
+    "help_text_2": "Broadband Integrated Services Adapter",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "isa2-tunnel",
+    "types": [
+      "ISA"
+    ],
+    "nokia_name": "isa2-tunnel",
+    "port_layout": null,
+    "help_text_1": "Tunnel ISA2",
+    "help_text_2": "IP tunnels Integrated Services Adapter",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "ixr-10",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-10",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 8 line-card slots; dual CPM support",
+    "help_text_2": "8 line-card slots, modular chassis; dual CPM support",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-6",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-6",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 4 line-card slots; dual CPM support",
+    "help_text_2": "4 line-card slots, modular chassis; dual CPM support",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-e",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-e",
+    "port_layout": "24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28 OR 14x 10G SFP+ + 4x 1G RJ-45",
+    "help_text_1": "Fixed chassis with 24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28 OR 14x 10G SFP+ + 4x 1G RJ-45",
+    "help_text_2": "24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28 OR 14x 10G SFP+ + 4x 1G RJ-45; fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-e2",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-e2",
+    "port_layout": "2x 400G QSFP-DD + 2x 100G QSFP28 + 24x 25G SFP28",
+    "help_text_1": "Fixed chassis with 2x 400G QSFP-DD + 2x 100G QSFP28 + 24x 25G SFP28",
+    "help_text_2": "2x 400G QSFP-DD + 2x 100G QSFP28 + 24x 25G SFP28 fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-e2c",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-e2c",
+    "port_layout": "2x 100G QSFP28 + 12x 25G SFP28",
+    "help_text_1": "Fixed chassis with 2x 100G QSFP28 + 12x 25G SFP28",
+    "help_text_2": "2x 100G QSFP28 + 12x 25G SFP28 fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-e2n",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-e2n",
+    "port_layout": "4x 10G SFP+ + 4x 1G SFP",
+    "help_text_1": "Fixed chassis with 4x 10G SFP+ + 4x 1G SFP",
+    "help_text_2": "4x 10G SFP+ + 4x 1G SFP fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-e2n-s",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-e2n-s",
+    "port_layout": "4x 10G SFP+ + 4x 1G SFP",
+    "help_text_1": "Fixed chassis with 4x 10G SFP+ + 4x 1G SFP",
+    "help_text_2": "4x 10G SFP+ + 4x 1G SFP fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-e2sc",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-e2sc",
+    "port_layout": "16x 10G SFP+ + 4x 25G SFP28",
+    "help_text_1": "Fixed chassis with 16x 10G SFP+ + 4x 25G SFP28",
+    "help_text_2": "16x 10G SFP+ + 4x 25G SFP28 fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-e3c",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-e3c",
+    "port_layout": "4x 100G QSFP28 + 16x 25G SFP28 + 8x 50G SFP56",
+    "help_text_1": "Fixed chassis with 4x 100G QSFP28 + 16x 25G SFP28 + 8x 50G SFP56",
+    "help_text_2": "4x 100G QSFP28 + 16x 25G SFP28 + 8x 50G SFP56 fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-e3x",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-e3x",
+    "port_layout": "16x 100G SFP112 + 15x 50G SFP56 + 6x 400G QSFP-DD",
+    "help_text_1": "Fixed chassis with 16x 100G SFP112 + 15x 50G SFP56 + 6x 400G QSFP-DD",
+    "help_text_2": "16x 100G SFP112 + 15x 50G SFP56 + 6x 400G QSFP-DD fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-ec",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-ec",
+    "port_layout": "4x 1G RJ-45 + 20x 1G SFP + 6x 10G SFP+",
+    "help_text_1": "Fixed chassis with 4x 1G RJ-45 + 20x 1G SFP + 6x 10G SFP+",
+    "help_text_2": "4x 1G RJ-45 + 20x 1G SFP + 6x 10G SFP+ fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-r4",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-R4",
+    "port_layout": "10x 1G SFP + 2x 10G SFP+",
+    "help_text_1": "Modular chassis with 4 adapter slots; dual CPM support; 10x 1G SFP + 2x 10G SFP+ fixed ports",
+    "help_text_2": "4 adapter slots, modular chassis; dual CPM support; 10x 1G SFP + 2x 10G SFP+ fixed ports",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-r6",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-R6",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 6 adapter slots; dual CPIOM support",
+    "help_text_2": "6 adapter slots, modular chassis; dual CPIOM support",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-r6d",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-R6d",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 6 compact adapter slots; dual CPIOM support",
+    "help_text_2": "6 compact adapter slots, modular chassis; dual CPIOM support",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-r6dl",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-R6dl",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 6 adapter slots; dual CPIOM support",
+    "help_text_2": "6 adapter slots, modular chassis; dual CPIOM support",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-s",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-s",
+    "port_layout": "48x 10G SFP+ + 6x 100G QSFP28",
+    "help_text_1": "Fixed chassis with 48x 10G SFP+ + 6x 100G QSFP28",
+    "help_text_2": "48x 10G SFP+ + 6x 100G QSFP28 fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-x",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-X1 / 7250 IXR-Xs",
+    "port_layout": "X1: 32x 100G QSFP28 + 4x 400G QSFP-DD OR Xs: 48x 50G SFP56 + 6x 400G QSFP-DD",
+    "help_text_1": "Fixed chassis with X1: 32x 100G QSFP28 + 4x 400G QSFP-DD OR Xs: 48x 50G SFP56 + 6x 400G QSFP-DD",
+    "help_text_2": "X1: 32x 100G QSFP28 + 4x 400G QSFP-DD OR Xs: 48x 50G SFP56 + 6x 400G QSFP-DD; fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "ixr-x3",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7250 IXR-X3",
+    "port_layout": "36x 400G QSFP-DD",
+    "help_text_1": "Fixed chassis with 36x 400G QSFP-DD",
+    "help_text_2": "36x 400G QSFP-DD fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7250 IXR"
+  },
+  {
+    "schema_string": "m-sfm5-12",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM5-12",
+    "port_layout": null,
+    "help_text_1": "SFM5-12 (FP3-based) for 7750 SR-7/SR-12",
+    "help_text_2": "7750 SR-7/SR-12 SFM5-12 (FP3-based)",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "m-sfm5-12e",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM5-12e",
+    "port_layout": null,
+    "help_text_1": "SFM5-12e (FP3-based) for 7750 SR-12e",
+    "help_text_2": "7750 SR-12e SFM5-12e (FP3-based)",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "m-sfm5-7",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM5-7",
+    "port_layout": null,
+    "help_text_1": "SFM5-7 (FP3-based) for 7750 SR-7",
+    "help_text_2": "7750 SR-7 SFM5-7 (FP3-based)",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "m-sfm6-12e",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM6-12e",
+    "port_layout": null,
+    "help_text_1": "SFM6-12e (FP4-based) for 7750 SR-12e",
+    "help_text_2": "7750 SR-12e SFM6-12e (FP4-based)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "m-sfm6-7/12",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM6-7/12",
+    "port_layout": null,
+    "help_text_1": "SFM6-7/12 (FP4-based) for 7750 SR-7/SR-12 and 7450 ESS-7/ESS-12",
+    "help_text_2": "7750 SR-7/SR-12 and 7450 ESS-7/ESS-12 SFM6-7/12 (FP4-based)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "m1-400g-qsfpdd+1-100g-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m1-400g-qsfpdd+1-100g-qsfp28",
+    "port_layout": "1x 400G QSFP-DD + 1x 100G QSFP28",
+    "help_text_1": "7250 IXR-R MDA with 1x 400G QSFP-DD + 1x 100G QSFP28",
+    "help_text_2": "1x 400G QSFP-DD + 1x 100G QSFP28 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m10-10g-sfp+",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m10-10g-sfp+",
+    "port_layout": "10x 10G SFP+",
+    "help_text_1": "7250 IXR-R MDA with 10x 10G SFP+",
+    "help_text_2": "10x 10G SFP+ 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m10-1g-sfp+2-10g-sfp+",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m10-1g-sfp+2-10g-sfp+",
+    "port_layout": "10x 1G SFP + 2x 10G SFP+",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-R4 with 10x 1G SFP + 2x 10G SFP+",
+    "help_text_2": "10x 1G SFP + 2x 10G SFP+ Fixed-Port Virtual MDA for 7250 IXR-R4",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m10-50g-sfp56",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m10-50g-sfp56",
+    "port_layout": "10x 50G SFP56",
+    "help_text_1": "7250 IXR-R MDA with 10x 50G SFP56",
+    "help_text_2": "10x 50G SFP56 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m10-sfp++6-sfp",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m10-sfp++6-sfp",
+    "port_layout": "10x 10G SFP+ + 6x 1G SFP",
+    "help_text_1": "Fixed-Port Virtual MDA for 7705 SAR-1 with 10x 10G SFP+ + 6x 1G SFP",
+    "help_text_2": "10x 10G SFP+ + 6x 1G SFP Fixed-Port Virtual MDA for 7705 SAR-1",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m12-sfp28+2-qsfp28",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m12-sfp28+2-qsfp28",
+    "port_layout": "12x 25G SFP28 + 2x 100G QSFP28",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-e2c with 12x 25G SFP28 + 2x 100G QSFP28",
+    "help_text_2": "12x 25G SFP28 + 2x 100G QSFP28 Fixed-Port Virtual MDA for 7250 IXR-e2c",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m14-10g-sfp++4-1g-tx",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m14-10g-sfp++4-1g-tx",
+    "port_layout": "14x 10G SFP+ + 4x 1G RJ-45",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-e with 14x 10G SFP+ + 4x 1G RJ-45",
+    "help_text_2": "14x 10G SFP+ + 4x 1G RJ-45 Fixed-Port Virtual MDA for 7250 IXR-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m16-sfp++4-sfp28",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m16-sfp++4-sfp28",
+    "port_layout": "16x 10G SFP+ + 4x 25G SFP28",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-e2sc with 16x 10G SFP+ + 4x 25G SFP28",
+    "help_text_2": "16x 10G SFP+ + 4x 25G SFP28 Fixed-Port Virtual MDA for 7250 IXR-e2sc",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m16-sfp112+15-sfp56+6-qsfpdd",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m16-sfp112+15-sfp56+6-qsfpdd",
+    "port_layout": "16x 100G SFP112 + 15x 50G SFP56 + 6x 400G QSFP-DD",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-e3x with 16x 100G SFP112 + 15x 50G SFP56 + 6x 400G QSFP-DD",
+    "help_text_2": "16x 100G SFP112 + 15x 50G SFP56 + 6x 400G QSFP-DD Fixed-Port Virtual MDA for 7250 IXR-e3x",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m18-25g-sfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m18-25g-sfp28",
+    "port_layout": "18x 25G SFP28 (15x 25G/10G + 3x 10G in IXR configuration)",
+    "help_text_1": "7250 IXR-R MDA with 18x 25G SFP28 (15x 25G/10G + 3x 10G in IXR configuration)",
+    "help_text_2": "18x 25G SFP28 (15x 25G/10G + 3x 10G in IXR configuration) 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m2-100g-qsfp28+16-10g-sfp+",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m2-100g-qsfp28+16-10g-sfp+",
+    "port_layout": "2x 100G QSFP28 + 16x 10G SFP+",
+    "help_text_1": "7250 IXR-R MDA with 2x 100G QSFP28 + 16x 10G SFP+",
+    "help_text_2": "2x 100G QSFP28 + 16x 10G SFP+ 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m2-1g-sfp+2-10g-sfp+",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m2-1g-sfp+2-10g-sfp+",
+    "port_layout": "2x 1G SFP + 2x 10G SFP+ (MACsec)",
+    "help_text_1": "7705 SAR MDA with 2x 1G SFP + 2x 10G SFP+ (MACsec)",
+    "help_text_2": "2x 1G SFP + 2x 10G SFP+ (MACsec) 7705 SAR MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m2-cfp2",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m2-cfp2",
+    "port_layout": "2x 100G/400G CFP2-DCO",
+    "help_text_1": "7250 IXR-R MDA with 2x 100G/400G CFP2-DCO",
+    "help_text_2": "2x 100G/400G CFP2-DCO 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m2-qsfpdd+2-qsfp28+24-sfp28",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m2-qsfpdd+2-qsfp28+24-sfp28",
+    "port_layout": "2x 400G QSFP-DD + 2x 100G QSFP28 + 24x 25G SFP28",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-e2 with 2x 400G QSFP-DD + 2x 100G QSFP28 + 24x 25G SFP28",
+    "help_text_2": "2x 400G QSFP-DD + 2x 100G QSFP28 + 24x 25G SFP28 Fixed-Port Virtual MDA for 7250 IXR-e2",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m20-10g-sfp+",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m20-10g-sfp+",
+    "port_layout": "20x 10G SFP+",
+    "help_text_1": "7250 IXR-R MDA with 20x 10G SFP+",
+    "help_text_2": "20x 10G SFP+ 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m20-1g-csfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m20-1g-csfp",
+    "port_layout": "20x 1G cSFP",
+    "help_text_1": "7250 IXR-R MDA with 20x 1G cSFP",
+    "help_text_2": "20x 1G cSFP 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m20-v",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m20-v",
+    "port_layout": "20x virtual Ethernet ports",
+    "help_text_1": "Virtual I/O MDA with 20x virtual Ethernet ports",
+    "help_text_2": "20x virtual Ethernet ports Virtual I/O MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m24-800g-qsfpdd-1",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m24-800g-qsfpdd-1",
+    "port_layout": "24x 800G QSFP-DD",
+    "help_text_1": "Fixed-Port Virtual MDA for 7750 SR-1-24D with 24x 800G QSFP-DD",
+    "help_text_2": "24x 800G QSFP-DD Fixed-Port Virtual MDA for 7750 SR-1-24D",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m24-sfp++8-sfp28+2-qsfp28",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m24-sfp++8-sfp28+2-qsfp28",
+    "port_layout": "24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-e with 24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28",
+    "help_text_2": "24x 10G SFP+ + 8x 25G SFP28 + 2x 100G QSFP28 Fixed-Port Virtual MDA for 7250 IXR-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m32-1g-csfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m32-1g-csfp",
+    "port_layout": "16x 1G cSFP (32 logical ports)",
+    "help_text_1": "7250 IXR-R MDA with 16x 1G cSFP (32 logical ports)",
+    "help_text_2": "16x 1G cSFP (32 logical ports) 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m32-qsfp28+4-qsfpdd",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m32-qsfp28+4-qsfpdd",
+    "port_layout": "32x 100G QSFP28 + 4x 400G QSFP-DD",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-X1 with 32x 100G QSFP28 + 4x 400G QSFP-DD",
+    "help_text_2": "32x 100G QSFP28 + 4x 400G QSFP-DD Fixed-Port Virtual MDA for 7250 IXR-X1",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m36-100g-qsfp28",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m36-100g-qsfp28",
+    "port_layout": "36x 100G QSFP28",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-6/IXR-10 IMM with 36x 100G QSFP28",
+    "help_text_2": "36x 100G QSFP28 Fixed-Port Virtual MDA for 7250 IXR-6/IXR-10 IMM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m36-400g-qsfp112",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m36-400g-qsfp112",
+    "port_layout": "36x 400G QSFP112",
+    "help_text_1": "Fixed-Port Virtual MDA for XMA2-s (FP5) with 36x 400G QSFP112",
+    "help_text_2": "36x 400G QSFP112 Fixed-Port Virtual MDA for XMA2-s (FP5)",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "m36-800g-qsfpdd",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m36-800g-qsfpdd",
+    "port_layout": "36x 800G QSFP-DD",
+    "help_text_1": "Fixed-Port Virtual MDA for XMA2-s (FP5) with 36x 800G QSFP-DD",
+    "help_text_2": "36x 800G QSFP-DD Fixed-Port Virtual MDA for XMA2-s (FP5)",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "m36-qsfpdd",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m36-qsfpdd",
+    "port_layout": "36x 400G QSFP-DD",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-X3 with 36x 400G QSFP-DD",
+    "help_text_2": "36x 400G QSFP-DD Fixed-Port Virtual MDA for 7250 IXR-X3",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m4-100g-cfp4",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m4-100g-cfp4",
+    "port_layout": "4x 100G CFP4",
+    "help_text_1": "Built-in IMM MDA with 4x 100G CFP4",
+    "help_text_2": "4x 100G CFP4 built-in IMM MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m4-10g-sfp++1-100g-cfp2",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m4-10g-sfp++1-100g-cfp2",
+    "port_layout": "4x 10G SFP+ + 1x 100G CFP2-DCO",
+    "help_text_1": "7250 IXR-R MDA with 4x 10G SFP+ + 1x 100G CFP2-DCO",
+    "help_text_2": "4x 10G SFP+ + 1x 100G CFP2-DCO 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m4-1g-rj+6-10g-sfp++2-25g-sfp28",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m4-1g-rj+6-10g-sfp++2-25g-sfp28",
+    "port_layout": "4x 1G RJ-45 + 6x 10G SFP+ + 2x 25G SFP28",
+    "help_text_1": "Fixed-Port Virtual MDA for 7705 SAR-Mx/Hx with 4x 1G RJ-45 + 6x 10G SFP+ + 2x 25G SFP28",
+    "help_text_2": "4x 1G RJ-45 + 6x 10G SFP+ + 2x 25G SFP28 Fixed-Port Virtual MDA for 7705 SAR-Mx/Hx",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m4-1g-tx+20-1g-sfp+6-10g-sfp+",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m4-1g-tx+20-1g-sfp+6-10g-sfp+",
+    "port_layout": "4x 1G RJ-45 + 20x 1G SFP + 6x 10G SFP+",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-ec with 4x 1G RJ-45 + 20x 1G SFP + 6x 10G SFP+",
+    "help_text_2": "4x 1G RJ-45 + 20x 1G SFP + 6x 10G SFP+ Fixed-Port Virtual MDA for 7250 IXR-ec",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m4-qsfp28+16-sfp28+8-sfp56",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m4-qsfp28+16-sfp28+8-sfp56",
+    "port_layout": "4x 100G QSFP28 + 16x 25G SFP28 + 8x 50G SFP56",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-e3c with 4x 100G QSFP28 + 16x 25G SFP28 + 8x 50G SFP56",
+    "help_text_2": "4x 100G QSFP28 + 16x 25G SFP28 + 8x 50G SFP56 Fixed-Port Virtual MDA for 7250 IXR-e3c",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m4-rs232-rj45+4-c3794-sfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m4-rs232-rj45+4-c3794-sfp",
+    "port_layout": "4x RS-232/RS-485 RJ-45 + 4x C37.94 SFP",
+    "help_text_1": "7705 SAR MDA with 4x RS-232/RS-485 RJ-45 + 4x C37.94 SFP",
+    "help_text_2": "4x RS-232/RS-485 RJ-45 + 4x C37.94 SFP 7705 SAR MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m4-sfp+4-sfp+",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m4-sfp+4-sfp+",
+    "port_layout": "4x 10G SFP+ + 4x 1G SFP",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-e2n with 4x 10G SFP+ + 4x 1G SFP",
+    "help_text_2": "4x 10G SFP+ + 4x 1G SFP Fixed-Port Virtual MDA for 7250 IXR-e2n",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m4-sfp+4-sfp+-s",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m4-sfp+4-sfp+-s",
+    "port_layout": "4x 10G SFP+ + 4x 1G SFP",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-e2n-s with 4x 10G SFP+ + 4x 1G SFP",
+    "help_text_2": "4x 10G SFP+ + 4x 1G SFP Fixed-Port Virtual MDA for 7250 IXR-e2n-s",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m40-10g-sfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m40-10g-sfp",
+    "port_layout": "40x 10G SFP+",
+    "help_text_1": "Built-in IMM MDA with 40x 10G SFP+",
+    "help_text_2": "40x 10G SFP+ built-in IMM MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m40-200g-sfpdd+6-800g-qsfpdd-1",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m40-200g-sfpdd+6-800g-qsfpdd-1",
+    "port_layout": "40x 200G SFP-DD + 6x 800G QSFP-DD",
+    "help_text_1": "Fixed-Port Virtual MDA for 7750 SR-1-46S with 40x 200G SFP-DD + 6x 800G QSFP-DD",
+    "help_text_2": "40x 200G SFP-DD + 6x 800G QSFP-DD Fixed-Port Virtual MDA for 7750 SR-1-46S",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m46-10g-sfp+",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m46-10g-sfp+",
+    "port_layout": "46x SFP+ (45x 10G/1G + 1x 1G in IXR configuration)",
+    "help_text_1": "7250 IXR-R MDA with 46x SFP+ (45x 10G/1G + 1x 1G in IXR configuration)",
+    "help_text_2": "46x SFP+ (45x 10G/1G + 1x 1G in IXR configuration) 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m48-400g-qsfpdd-1",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m48-400g-qsfpdd-1",
+    "port_layout": "48x 400G QSFP-DD",
+    "help_text_1": "Fixed-Port Virtual MDA for 7750 SR-1-48D with 48x 400G QSFP-DD",
+    "help_text_2": "48x 400G QSFP-DD Fixed-Port Virtual MDA for 7750 SR-1-48D",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m48-800g-qsfpdd-1x",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m48-800g-qsfpdd-1x",
+    "port_layout": "48x 800G QSFP-DD",
+    "help_text_1": "Fixed-Port Virtual MDA for 7750 SR-1x-48D with 48x 800G QSFP-DD",
+    "help_text_2": "48x 800G QSFP-DD Fixed-Port Virtual MDA for 7750 SR-1x-48D",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m48-sfp++6-qsfp28",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m48-sfp++6-qsfp28",
+    "port_layout": "48x 10G SFP+ + 6x 100G QSFP28",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-s with 48x 10G SFP+ + 6x 100G QSFP28",
+    "help_text_2": "48x 10G SFP+ + 6x 100G QSFP28 Fixed-Port Virtual MDA for 7250 IXR-s",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m48-sfp+2-qsfp28",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m48-sfp+2-qsfp28",
+    "port_layout": "48x 10G SFP+ + 2x 100G QSFP28",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-6/IXR-10 IMM with 48x 10G SFP+ + 2x 100G QSFP28",
+    "help_text_2": "48x 10G SFP+ + 2x 100G QSFP28 Fixed-Port Virtual MDA for 7250 IXR-6/IXR-10 IMM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m5-100g-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m5-100g-qsfp28",
+    "port_layout": "5x 100G QSFP28",
+    "help_text_1": "7250 IXR-R MDA with 5x 100G QSFP28",
+    "help_text_2": "5x 100G QSFP28 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m5e10-100g-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m5e10-100g-qsfp28",
+    "port_layout": "10x 100G QSFP28",
+    "help_text_1": "MDA2-e-XP (E5) with 10x 100G QSFP28",
+    "help_text_2": "10x 100G QSFP28 MDA2-e-XP (E5)",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "m5e16-100g-sfp112",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m5e16-100g-sfp112",
+    "port_layout": "16x 100G SFP112",
+    "help_text_1": "MDA2-e-XP (E5) with 16x 100G SFP112; 1.0 Tb/s IA",
+    "help_text_2": "16x 100G SFP112 MDA2-e-XP (E5); 1.0 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "m5e2-100g-qsfp28+2-800g-qdd",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m5e2-100g-qsfp28+2-800g-qdd",
+    "port_layout": "2x 100G QSFP28 + 2x 800G QSFP-DD",
+    "help_text_1": "MDA2-e-XP (E5) with 2x 100G QSFP28 + 2x 800G QSFP-DD; 1.0 Tb/s IA",
+    "help_text_2": "2x 100G QSFP28 + 2x 800G QSFP-DD MDA2-e-XP (E5); 1.0 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "m5e8-100g-sfp112+2-800g-qdd",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m5e8-100g-sfp112+2-800g-qdd",
+    "port_layout": "8x 100G SFP112 + 2x 800G QSFP-DD",
+    "help_text_1": "MDA2-e-XP (E5) with 8x 100G SFP112 + 2x 800G QSFP-DD; 1.0 Tb/s IA",
+    "help_text_2": "8x 100G SFP112 + 2x 800G QSFP-DD MDA2-e-XP (E5); 1.0 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "m6-10g-sfp++1-100g-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m6-10g-sfp++1-100g-qsfp28",
+    "port_layout": "6x 10G SFP+ + 1x 100G QSFP28",
+    "help_text_1": "7250 IXR-R MDA with 6x 10G SFP+ + 1x 100G QSFP28",
+    "help_text_2": "6x 10G SFP+ + 1x 100G QSFP28 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m6-10g-sfp++4-25g-sfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m6-10g-sfp++4-25g-sfp28",
+    "port_layout": "6x 10G SFP+ + 4x 25G SFP28",
+    "help_text_1": "7250 IXR-R MDA with 6x 10G SFP+ + 4x 25G SFP28",
+    "help_text_2": "6x 10G SFP+ + 4x 25G SFP28 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m6-qsfpdd+48-sfp56",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m6-qsfpdd+48-sfp56",
+    "port_layout": "6x 400G QSFP-DD + 48x 50G SFP56",
+    "help_text_1": "Fixed-Port Virtual MDA for 7250 IXR-Xs with 6x 400G QSFP-DD + 48x 50G SFP56",
+    "help_text_2": "6x 400G QSFP-DD + 48x 50G SFP56 Fixed-Port Virtual MDA for 7250 IXR-Xs",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m8-1g-rj45",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m8-1g-rj45",
+    "port_layout": "8x 1G RJ-45 (MACsec)",
+    "help_text_1": "7705 SAR MDA with 8x 1G RJ-45 (MACsec)",
+    "help_text_2": "8x 1G RJ-45 (MACsec) 7705 SAR MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m8-1g-sfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m8-1g-sfp",
+    "port_layout": "8x 1G SFP (MACsec)",
+    "help_text_1": "7705 SAR MDA with 8x 1G SFP (MACsec)",
+    "help_text_2": "8x 1G SFP (MACsec) 7705 SAR MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m8-t1e1-rj48",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m8-t1e1-rj48",
+    "port_layout": "8x T1/E1 RJ-48",
+    "help_text_1": "7705 SAR MDA with 8x T1/E1 RJ-48",
+    "help_text_2": "8x T1/E1 RJ-48 7705 SAR MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m80-1g-csfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "m80-1g-csfp",
+    "port_layout": "40x 1G cSFP (80 logical ports)",
+    "help_text_1": "7250 IXR-R MDA with 40x 1G cSFP (80 logical ports)",
+    "help_text_2": "40x 1G cSFP (80 logical ports) 7250 IXR-R MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m80-200g-sfpdd+12-400g-qsfpdd-1",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m80-200g-sfpdd+12-400g-qsfpdd-1",
+    "port_layout": "80x 200G SFP-DD + 12x 400G QSFP-DD",
+    "help_text_1": "Fixed-Port Virtual MDA for 7750 SR-1-92S with 80x 200G SFP-DD + 12x 400G QSFP-DD",
+    "help_text_2": "80x 200G SFP-DD + 12x 400G QSFP-DD Fixed-Port Virtual MDA for 7750 SR-1-92S",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "m80-200g-sfpdd+12-800g-qsfpdd-1x",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "m80-200g-sfpdd+12-800g-qsfpdd-1x",
+    "port_layout": "80x 200G SFP-DD + 12x 800G QSFP-DD",
+    "help_text_1": "Fixed-Port Virtual MDA for 7750 SR-1x-92S with 80x 200G SFP-DD + 12x 800G QSFP-DD",
+    "help_text_2": "80x 200G SFP-DD + 12x 800G QSFP-DD Fixed-Port Virtual MDA for 7750 SR-1x-92S",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "ma2-10gb-sfp+12-1gb-sfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ma2-10gb-sfp+12-1gb-sfp",
+    "port_layout": "2x 10G SFP+ + 12x 1G SFP",
+    "help_text_1": "MDA-a with 2x 10G SFP+ + 12x 1G SFP",
+    "help_text_2": "2x 10G SFP+ + 12x 1G SFP MDA-a",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "ma20-1gb-tx",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ma20-1gb-tx",
+    "port_layout": "20x 10M/100M/1G RJ-45",
+    "help_text_1": "MDA-a with 20x 10M/100M/1G RJ-45",
+    "help_text_2": "20x 10M/100M/1G RJ-45 MDA-a",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "ma4-10gb-sfp+",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ma4-10gb-sfp+",
+    "port_layout": "4x 10G SFP+",
+    "help_text_1": "MDA-a with 4x 10G SFP+",
+    "help_text_2": "4x 10G SFP+ MDA-a",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "ma44-1gb-csfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ma44-1gb-csfp",
+    "port_layout": "22x 1G cSFP (44 logical ports) or 22x 1G SFP",
+    "help_text_1": "MDA-a with 22x 1G cSFP (44 logical ports) or 22x 1G SFP",
+    "help_text_2": "22x 1G cSFP (44 logical ports) or 22x 1G SFP MDA-a",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "maxp1-100gb-cfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "maxp1-100gb-cfp",
+    "port_layout": "1x 100G CFP",
+    "help_text_1": "MDA-a XP with 1x 100G CFP",
+    "help_text_2": "1x 100G CFP MDA-a XP",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "maxp1-100gb-cfp2",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "maxp1-100gb-cfp2",
+    "port_layout": "1x 100G CFP2",
+    "help_text_1": "MDA-a XP with 1x 100G CFP2",
+    "help_text_2": "1x 100G CFP2 MDA-a XP",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "maxp1-100gb-cfp4",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "maxp1-100gb-cfp4",
+    "port_layout": "1x 100G CFP4",
+    "help_text_1": "MDA-a XP with 1x 100G CFP4",
+    "help_text_2": "1x 100G CFP4 MDA-a XP",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "maxp10-10/1gb-msec-sfp+",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "maxp10-10/1gb-msec-sfp+",
+    "port_layout": "10x 1G/10G SFP+/SFP (MACsec)",
+    "help_text_1": "MDA-a XP with 10x 1G/10G SFP+/SFP (MACsec)",
+    "help_text_2": "10x 1G/10G SFP+/SFP (MACsec) MDA-a XP",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "maxp10-10gb-sfp+",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "maxp10-10gb-sfp+",
+    "port_layout": "10x 10G SFP+",
+    "help_text_1": "MDA-a XP with 10x 10G SFP+",
+    "help_text_2": "10x 10G SFP+ MDA-a XP",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "me1-100gb-cfp2",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me1-100gb-cfp2",
+    "port_layout": "1x 100G CFP2",
+    "help_text_1": "MDA-e with 1x 100G CFP2",
+    "help_text_2": "1x 100G CFP2 MDA-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "me10-10gb-sfp+",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me10-10gb-sfp+",
+    "port_layout": "10x 10G SFP+",
+    "help_text_1": "MDA-e with 10x 10G SFP+",
+    "help_text_2": "10x 10G SFP+ MDA-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "me12-10/1gb-sfp+",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me12-10/1gb-sfp+",
+    "port_layout": "12x 1G/10G SFP+ (MACsec)",
+    "help_text_1": "MDA-e with 12x 1G/10G SFP+ (MACsec)",
+    "help_text_2": "12x 1G/10G SFP+ (MACsec) MDA-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "me12-100gb-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me12-100gb-qsfp28",
+    "port_layout": "12x 100G QSFP28",
+    "help_text_1": "MDA-e-XP (E4) with 12x 100G QSFP28",
+    "help_text_2": "12x 100G QSFP28 MDA-e-XP (E4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "me16-25gb-sfp28+2-100gb-qsfp-b",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me16-25gb-sfp28+2-100gb-qsfp-b",
+    "port_layout": "16x 25G SFP28 (MACsec) + 2x 100G QSFP28",
+    "help_text_1": "MDA-e-XP (E4, B variant) with 16x 25G SFP28 (MACsec) + 2x 100G QSFP28; PTP",
+    "help_text_2": "16x 25G SFP28 (MACsec) + 2x 100G QSFP28 MDA-e-XP (E4, B variant); PTP",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "me16-25gb-sfp28+2-100gb-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me16-25gb-sfp28+2-100gb-qsfp28",
+    "port_layout": "16x 25G SFP28 (MACsec) + 2x 100G QSFP28",
+    "help_text_1": "MDA-e-XP (E4) with 16x 25G SFP28 (MACsec) + 2x 100G QSFP28",
+    "help_text_2": "16x 25G SFP28 (MACsec) + 2x 100G QSFP28 MDA-e-XP (E4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "me2-100gb-ms-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me2-100gb-ms-qsfp28",
+    "port_layout": "2x 100G QSFP28 (MACsec)",
+    "help_text_1": "MDA-e with 2x 100G QSFP28 (MACsec)",
+    "help_text_2": "2x 100G QSFP28 (MACsec) MDA-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "me2-100gb-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me2-100gb-qsfp28",
+    "port_layout": "2x 100G QSFP28",
+    "help_text_1": "MDA-e with 2x 100G QSFP28",
+    "help_text_2": "2x 100G QSFP28 MDA-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "me3-200gb-cfp2-dco",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me3-200gb-cfp2-dco",
+    "port_layout": "3x 200G CFP2-DCO",
+    "help_text_1": "MDA-e-XP (E4) with 3x 200G CFP2-DCO",
+    "help_text_2": "3x 200G CFP2-DCO MDA-e-XP (E4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "me3-400gb-qsfpdd",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me3-400gb-qsfpdd",
+    "port_layout": "3x 400G QSFP-DD",
+    "help_text_1": "MDA-e-XP (E4) with 3x 400G QSFP-DD; 1.0 Tb/s IA",
+    "help_text_2": "3x 400G QSFP-DD MDA-e-XP (E4); 1.0 Tb/s IA",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "me40-1gb-csfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me40-1gb-csfp",
+    "port_layout": "20x 1G cSFP (40 logical ports) or 20x 1G SFP",
+    "help_text_1": "MDA-e with 20x 1G cSFP (40 logical ports) or 20x 1G SFP",
+    "help_text_2": "20x 1G cSFP (40 logical ports) or 20x 1G SFP MDA-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "me6-100gb-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me6-100gb-qsfp28",
+    "port_layout": "6x 100G QSFP28",
+    "help_text_1": "MDA-e-XP (E4) with 6x 100G QSFP28",
+    "help_text_2": "6x 100G QSFP28 MDA-e-XP (E4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "me6-10gb-sfp+",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me6-10gb-sfp+",
+    "port_layout": "6x 10G SFP+",
+    "help_text_1": "MDA-e with 6x 10G SFP+",
+    "help_text_2": "6x 10G SFP+ MDA-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "me6-400gb-qsfpdd",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me6-400gb-qsfpdd",
+    "port_layout": "6x 400G QSFP-DD",
+    "help_text_1": "MDA-e-XP (E4) with 6x 400G QSFP-DD; 2.0 Tb/s IA",
+    "help_text_2": "6x 400G QSFP-DD MDA-e-XP (E4); 2.0 Tb/s IA",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "me8-10/25gb-sfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "me8-10/25gb-sfp28",
+    "port_layout": "8x 10G/25G SFP28 (MACsec)",
+    "help_text_1": "MDA-e with 8x 10G/25G SFP28 (MACsec)",
+    "help_text_2": "8x 10G/25G SFP28 (MACsec) MDA-e",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "ms16-100gb-sfpdd+4-100gb-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms16-100gb-sfpdd+4-100gb-qsfp28",
+    "port_layout": "16x 100G SFP-DD (MACsec) + 4x 100G QSFP28",
+    "help_text_1": "MDA-s (E4) with 16x 100G SFP-DD (MACsec) + 4x 100G QSFP28",
+    "help_text_2": "16x 100G SFP-DD (MACsec) + 4x 100G QSFP28 MDA-s (E4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms16-sdd+4-qsfp28-b",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms16-sdd+4-qsfp28-b",
+    "port_layout": "16x 100G SFP-DD (MACsec) + 4x 100G QSFP28",
+    "help_text_1": "MDA-s (B variant) with 16x 100G SFP-DD (MACsec) + 4x 100G QSFP28; PTP",
+    "help_text_2": "16x 100G SFP-DD (MACsec) + 4x 100G QSFP28 MDA-s (B variant); PTP",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "ms18-100gb-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms18-100gb-qsfp28",
+    "port_layout": "18x 100G QSFP28",
+    "help_text_1": "MDA-s (E4) with 18x 100G QSFP28",
+    "help_text_2": "18x 100G QSFP28 MDA-s (E4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms2-100g-qsfp28+2-800g-qsfpdd",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms2-100g-qsfp28+2-800g-qsfpdd",
+    "port_layout": "2x 100G QSFP28 + 2x 800G QSFP-DD",
+    "help_text_1": "MDA2-s (E5) with 2x 100G QSFP28 + 2x 800G QSFP-DD; 1.0 Tb/s IA on IOM-s-1.5T",
+    "help_text_2": "2x 100G QSFP28 + 2x 800G QSFP-DD MDA2-s (E5); 1.0 Tb/s IA on IOM-s-1.5T",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms2-400gb-qsfpdd+2-100gb-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms2-400gb-qsfpdd+2-100gb-qsfp28",
+    "port_layout": "2x 400G QSFP-DD + 2x 100G QSFP28",
+    "help_text_1": "MDA-s (E4) with 2x 400G QSFP-DD + 2x 100G QSFP28",
+    "help_text_2": "2x 400G QSFP-DD + 2x 100G QSFP28 MDA-s (E4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms24-10/100gb-sfpdd",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms24-10/100gb-sfpdd",
+    "port_layout": "24x 100G SFP-DD",
+    "help_text_1": "MDA-s (E4) with 24x 100G SFP-DD; 2.0 Tb/s IA",
+    "help_text_2": "24x 100G SFP-DD MDA-s (E4); 2.0 Tb/s IA",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms24-100g-sfp112",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms24-100g-sfp112",
+    "port_layout": "24x 100G SFP112",
+    "help_text_1": "MDA2-s (E5) with 24x 100G SFP112; 1.0 Tb/s IA on IOM-s-1.5T",
+    "help_text_2": "24x 100G SFP112 MDA2-s (E5); 1.0 Tb/s IA on IOM-s-1.5T",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms3-200gb-cfp2-dco",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms3-200gb-cfp2-dco",
+    "port_layout": "3x 100G/200G CFP2-DCO",
+    "help_text_1": "MDA-s (E4) with 3x 100G/200G CFP2-DCO",
+    "help_text_2": "3x 100G/200G CFP2-DCO MDA-s (E4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms36-800g-qsfpdd",
+    "types": [
+      "Fixed-Port Virtual MDA"
+    ],
+    "nokia_name": "ms36-800g-qsfpdd",
+    "port_layout": "36x 800G QSFP-DD",
+    "help_text_1": "Fixed-Port Virtual MDA for 7750 SR-1se (FP5) with 36x 800G QSFP-DD; 19.2 Tb/s FD",
+    "help_text_2": "36x 800G QSFP-DD Fixed-Port Virtual MDA for 7750 SR-1se (FP5); 19.2 Tb/s FD",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms4-400gb-qsfpdd+4-100gb-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms4-400gb-qsfpdd+4-100gb-qsfp28",
+    "port_layout": "4x 400G QSFP-DD + 4x 100G QSFP28",
+    "help_text_1": "MDA-s (E4) with 4x 400G QSFP-DD + 4x 100G QSFP28",
+    "help_text_2": "4x 400G QSFP-DD + 4x 100G QSFP28 MDA-s (E4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms6-200gb-cfp2-dco",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms6-200gb-cfp2-dco",
+    "port_layout": "6x 100G/200G CFP2-DCO",
+    "help_text_1": "MDA-s (E4) with 6x 100G/200G CFP2-DCO",
+    "help_text_2": "6x 100G/200G CFP2-DCO MDA-s (E4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms8-100g-sfp112+2-800g-qsfpdd",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms8-100g-sfp112+2-800g-qsfpdd",
+    "port_layout": "8x 100G SFP112 + 2x 800G QSFP-DD",
+    "help_text_1": "MDA2-s (E5) with 8x 100G SFP112 + 2x 800G QSFP-DD; 1.0 Tb/s IA on IOM-s-1.5T",
+    "help_text_2": "8x 100G SFP112 + 2x 800G QSFP-DD MDA2-s (E5); 1.0 Tb/s IA on IOM-s-1.5T",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms8-100gb-sfpdd+2-100gb-qsfp28",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms8-100gb-sfpdd+2-100gb-qsfp28",
+    "port_layout": "8x 100G SFP-DD (MACsec) + 2x 100G QSFP28",
+    "help_text_1": "MDA-s (E4) with 8x 100G SFP-DD (MACsec) + 2x 100G QSFP28",
+    "help_text_2": "8x 100G SFP-DD (MACsec) + 2x 100G QSFP28 MDA-s (E4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "ms8-sdd+2-qsfp28-b",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "ms8-sdd+2-qsfp28-b",
+    "port_layout": "8x 100G SFP-DD (MACsec) + 2x 100G QSFP28",
+    "help_text_1": "MDA-s (B variant) with 8x 100G SFP-DD (MACsec) + 2x 100G QSFP28; PTP",
+    "help_text_2": "8x 100G SFP-DD (MACsec) + 2x 100G QSFP28 MDA-s (B variant); PTP",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "mse14-800g+4-400g",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "mse14-800g+4-400g",
+    "port_layout": "14x 800G QSFP-DD + 4x 400G QSFP112",
+    "help_text_1": "MDA-se (E5) with 14x 800G QSFP-DD + 4x 400G QSFP112; 6.4 Tb/s IA",
+    "help_text_2": "14x 800G QSFP-DD + 4x 400G QSFP112 MDA-se (E5); 6.4 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "mse24-200g-sfpdd",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "mse24-200g-sfpdd",
+    "port_layout": "24x 200G SFP-DD",
+    "help_text_1": "MDA-se (E5) with 24x 200G SFP-DD; 3.2 Tb/s IA",
+    "help_text_2": "24x 200G SFP-DD MDA-se (E5); 3.2 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "mse6-800g-cfp2-dco",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "mse6-800g-cfp2-dco",
+    "port_layout": "6x 800G CFP2-DCO",
+    "help_text_1": "MDA-se (E5) with 6x 800G CFP2-DCO; 3.2 Tb/s IA",
+    "help_text_2": "6x 800G CFP2-DCO MDA-se (E5); 3.2 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "mse6-800g-qsfpdd",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "mse6-800g-qsfpdd",
+    "port_layout": "6x 800G QSFP-DD",
+    "help_text_1": "MDA-se (E5) with 6x 800G QSFP-DD; 3.2 Tb/s IA",
+    "help_text_2": "6x 800G QSFP-DD MDA-se (E5); 3.2 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "p1-100g-cfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "p1-100g-cfp",
+    "port_layout": "1x 100G CFP",
+    "help_text_1": "Built-in IMM MDA with 1x 100G CFP",
+    "help_text_2": "1x 100G CFP built-in IMM MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "p10-10g-sfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "p10-10g-sfp",
+    "port_layout": "10x 10G SFP+",
+    "help_text_1": "Built-in IMM MDA with 10x 10G SFP+",
+    "help_text_2": "10x 10G SFP+ built-in IMM MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "p20-1gb-sfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "p20-1gb-sfp",
+    "port_layout": "20x 1G SFP",
+    "help_text_1": "Built-in IMM MDA with 20x 1G SFP",
+    "help_text_2": "20x 1G SFP built-in IMM MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "p6-10g-sfp",
+    "types": [
+      "MDA"
+    ],
+    "nokia_name": "p6-10g-sfp",
+    "port_layout": "6x 10G SFP+",
+    "help_text_1": "Built-in IMM MDA with 6x 10G SFP+",
+    "help_text_2": "6x 10G SFP+ built-in IMM MDA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "s18-100gb-qsfp28",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "s18-100gb-qsfp28",
+    "port_layout": "18x 100G QSFP28",
+    "help_text_1": "XMA-s (FP4, 1 forwarding complex) with 18x 100G QSFP28",
+    "help_text_2": "18x 100G QSFP28 XMA-s (FP4, 1 forwarding complex)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "s36-100gb-qsfp28",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "s36-100gb-qsfp28",
+    "port_layout": "36x 100G QSFP28",
+    "help_text_1": "XMA-s (FP4, 2 forwarding complexes) with 36x 100G QSFP28",
+    "help_text_2": "36x 100G QSFP28 XMA-s (FP4, 2 forwarding complexes)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "s36-100gb-qsfp28-3.6t",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "s36-100gb-qsfp28-3.6t",
+    "port_layout": "36x 100G QSFP28",
+    "help_text_1": "XMA-s (FP4, 3 forwarding complexes) with 36x 100G QSFP28",
+    "help_text_2": "36x 100G QSFP28 XMA-s (FP4, 3 forwarding complexes)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "s36-400gb-qsfpdd",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "s36-400gb-qsfpdd",
+    "port_layout": "36x QSFP-DD",
+    "help_text_1": "XMA-s (FP4, 4 forwarding complexes) with 36x QSFP-DD; 400G mode on 24 connectors",
+    "help_text_2": "36x QSFP-DD XMA-s (FP4, 4 forwarding complexes); 400G mode on 24 connectors",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "sar-1",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7705 SAR-1",
+    "port_layout": "10x 10G SFP+ + 6x 1G SFP",
+    "help_text_1": "Fixed chassis with 10x 10G SFP+ + 6x 1G SFP",
+    "help_text_2": "10x 10G SFP+ + 6x 1G SFP fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7705 SAR"
+  },
+  {
+    "schema_string": "sar-hm",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7705 SAR-Hm",
+    "port_layout": "6x 10M/100M RJ-45 + 2x RS-232",
+    "help_text_1": "Fixed chassis with 6x 10M/100M RJ-45 + 2x RS-232",
+    "help_text_2": "6x 10M/100M RJ-45 + 2x RS-232 fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7705 SAR"
+  },
+  {
+    "schema_string": "sar-hmc",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7705 SAR-Hmc",
+    "port_layout": "3x 10M/100M RJ-45 + 2x RS-232",
+    "help_text_1": "Fixed chassis with 3x 10M/100M RJ-45 + 2x RS-232",
+    "help_text_2": "3x 10M/100M RJ-45 + 2x RS-232 fixed chassis",
+    "forwarding_generation": null,
+    "product_family": "7705 SAR"
+  },
+  {
+    "schema_string": "sar-hx",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7705 SAR-Hx",
+    "port_layout": "4x 1G RJ-45 + 6x 10G SFP+ + 2x 25G SFP28",
+    "help_text_1": "Chassis with 4x 1G RJ-45 + 6x 10G SFP+ + 2x 25G SFP28; 1 MDA slot",
+    "help_text_2": "4x 1G RJ-45 + 6x 10G SFP+ + 2x 25G SFP28 chassis; 1 MDA slot",
+    "forwarding_generation": null,
+    "product_family": "7705 SAR"
+  },
+  {
+    "schema_string": "sar-mx",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7705 SAR-Mx",
+    "port_layout": "4x 1G RJ-45 + 6x 10G SFP+ + 2x 25G SFP28",
+    "help_text_1": "Chassis with 4x 1G RJ-45 + 6x 10G SFP+ + 2x 25G SFP28; 1 MDA slot",
+    "help_text_2": "4x 1G RJ-45 + 6x 10G SFP+ + 2x 25G SFP28 chassis; 1 MDA slot",
+    "forwarding_generation": null,
+    "product_family": "7705 SAR"
+  },
+  {
+    "schema_string": "sfm-2s",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM-2s",
+    "port_layout": null,
+    "help_text_1": "Fixed integrated SFM for 7750 SR-2s",
+    "help_text_2": "7750 SR-2s fixed integrated SFM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "sfm-2se",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM-2se",
+    "port_layout": null,
+    "help_text_1": "SFM for 7750 SR-2se",
+    "help_text_2": "7750 SR-2se SFM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "sfm-ixr-10",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM-IXR-10",
+    "port_layout": null,
+    "help_text_1": "SFM for 7250 IXR-10",
+    "help_text_2": "7250 IXR-10 SFM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "sfm-ixr-6",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM-IXR-6",
+    "port_layout": null,
+    "help_text_1": "SFM for 7250 IXR-6",
+    "help_text_2": "7250 IXR-6 SFM",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "sfm-s",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM-s",
+    "port_layout": null,
+    "help_text_1": "SFM-s (FP4-based) for 7750 SR-7s/SR-14s; XCM-s; FP4 cards",
+    "help_text_2": "7750 SR-7s/SR-14s SFM-s (FP4-based); XCM-s; FP4 cards",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "sfm-x20",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM-X20",
+    "port_layout": null,
+    "help_text_1": "Standard SFM for 7950 XRS-20/XRS-20e; FP3 cards only; CPM-X20",
+    "help_text_2": "7950 XRS-20/XRS-20e standard SFM; FP3 cards only; CPM-X20",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "sfm-x20-b",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM-X20-B",
+    "port_layout": null,
+    "help_text_1": "SFM for 7950 XRS-20/XRS-20e; FP3 cards only; CPM-X20; x40-10g-sfp / x4-100g-cfp2 compatible",
+    "help_text_2": "7950 XRS-20/XRS-20e SFM; FP3 cards only; CPM-X20; x40-10g-sfp / x4-100g-cfp2 compatible",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "sfm-x20s-b",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM-X20S-B",
+    "port_layout": null,
+    "help_text_1": "SFM for 7950 XRS-20/XRS-20e; FP3 cards only; CPM-X20; x40-10g-sfp / x4-100g-cfp2 compatible",
+    "help_text_2": "7950 XRS-20/XRS-20e SFM; FP3 cards only; CPM-X20; x40-10g-sfp / x4-100g-cfp2 compatible",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "sfm2-s",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM2-s",
+    "port_layout": null,
+    "help_text_1": "SFM2-s (FP5-based) for 7750 SR-7s/SR-14s; XCM2-s/XCM-b; FP4/FP5 cards",
+    "help_text_2": "7750 SR-7s/SR-14s SFM2-s (FP5-based); XCM2-s/XCM-b; FP4/FP5 cards",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "sfm2-x20s",
+    "types": [
+      "SFM"
+    ],
+    "nokia_name": "SFM2-X20S",
+    "port_layout": null,
+    "help_text_1": "SFM2 for 7950 XRS-20/XRS-20e; FP3/FP4 cards; CPM-X20/CPM2-X20",
+    "help_text_2": "7950 XRS-20/XRS-20e SFM2; FP3/FP4 cards; CPM-X20/CPM2-X20",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "sr-1",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-1",
+    "port_layout": null,
+    "help_text_1": "Modular chassis (FP4) with 2 MDA slots; simplex CPM",
+    "help_text_2": "2 MDA slots, FP4 modular chassis; simplex CPM",
+    "forwarding_generation": "FP4",
+    "product_family": "7750 SR"
+  },
+  {
+    "schema_string": "sr-1-24d",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-1-24D",
+    "port_layout": "24x 800G QSFP-DD",
+    "help_text_1": "Fixed chassis (FP5) with 24x 800G QSFP-DD; simplex CPM",
+    "help_text_2": "24x 800G QSFP-DD fixed chassis (FP5); simplex CPM",
+    "forwarding_generation": "FP5",
+    "product_family": "7750 SR-x"
+  },
+  {
+    "schema_string": "sr-1-46s",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-1-46S",
+    "port_layout": "40x 200G SFP-DD + 6x 800G QSFP-DD",
+    "help_text_1": "Fixed chassis (FP5) with 40x 200G SFP-DD + 6x 800G QSFP-DD; simplex CPM",
+    "help_text_2": "40x 200G SFP-DD + 6x 800G QSFP-DD fixed chassis (FP5); simplex CPM",
+    "forwarding_generation": "FP5",
+    "product_family": "7750 SR-x"
+  },
+  {
+    "schema_string": "sr-1-48d",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-1-48D",
+    "port_layout": "48x 400G QSFP-DD",
+    "help_text_1": "Fixed chassis (FP5) with 48x 400G QSFP-DD; simplex CPM",
+    "help_text_2": "48x 400G QSFP-DD fixed chassis (FP5); simplex CPM",
+    "forwarding_generation": "FP5",
+    "product_family": "7750 SR-x"
+  },
+  {
+    "schema_string": "sr-1-92s",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-1-92S",
+    "port_layout": "80x 200G SFP-DD + 12x 400G QSFP-DD",
+    "help_text_1": "Fixed chassis (FP5) with 80x 200G SFP-DD + 12x 400G QSFP-DD; simplex CPM",
+    "help_text_2": "80x 200G SFP-DD + 12x 400G QSFP-DD fixed chassis (FP5); simplex CPM",
+    "forwarding_generation": "FP5",
+    "product_family": "7750 SR-x"
+  },
+  {
+    "schema_string": "sr-12",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-12",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 10 IOM slots; FP3/FP4 compatible (FP4-capable chassis + SFM6 required); dual CPM support",
+    "help_text_2": "10 IOM slots, modular chassis; FP3/FP4 compatible (FP4-capable chassis + SFM6 required); dual CPM support",
+    "forwarding_generation": null,
+    "product_family": "7750 SR"
+  },
+  {
+    "schema_string": "sr-12e",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-12e",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 9 IOM slots; FP3/FP4 compatible (FP4-capable chassis + SFM6 required); dual CPM support",
+    "help_text_2": "9 IOM slots, modular chassis; FP3/FP4 compatible (FP4-capable chassis + SFM6 required); dual CPM support",
+    "forwarding_generation": null,
+    "product_family": "7750 SR"
+  },
+  {
+    "schema_string": "sr-14s",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-14s",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 12 line-card slots; FP4/FP5 compatible; dual CPM support",
+    "help_text_2": "12 line-card slots, modular chassis; FP4/FP5 compatible; dual CPM support",
+    "forwarding_generation": null,
+    "product_family": "7750 SR-s"
+  },
+  {
+    "schema_string": "sr-1e",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-1e",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 1 IOM-e slot; FP3 compatible; dual CPM-e support",
+    "help_text_2": "1 IOM-e slot, modular chassis; FP3 compatible; dual CPM-e support",
+    "forwarding_generation": "FP3",
+    "product_family": "7750 SR-e"
+  },
+  {
+    "schema_string": "sr-1s",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-1s",
+    "port_layout": null,
+    "help_text_1": "FP4 chassis; fixed or 2-MDA-slot variants; simplex CPM",
+    "help_text_2": "Fixed or 2-MDA-slot chassis (FP4); simplex CPM",
+    "forwarding_generation": "FP4",
+    "product_family": "7750 SR-s"
+  },
+  {
+    "schema_string": "sr-1se",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-1se",
+    "port_layout": "36x 800G QSFP-DD",
+    "help_text_1": "Fixed chassis (FP5) with 36x 800G QSFP-DD; 19.2 Tb/s FD; simplex CPM",
+    "help_text_2": "36x 800G QSFP-DD fixed chassis (FP5); 19.2 Tb/s FD; simplex CPM",
+    "forwarding_generation": "FP5",
+    "product_family": "7750 SR-s"
+  },
+  {
+    "schema_string": "sr-1x-48d",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-1x-48D",
+    "port_layout": "48x 800G QSFP-DD",
+    "help_text_1": "Fixed chassis (FP5) with 48x 800G QSFP-DD; simplex CPM",
+    "help_text_2": "48x 800G QSFP-DD fixed chassis (FP5); simplex CPM",
+    "forwarding_generation": "FP5",
+    "product_family": "7750 SR-x"
+  },
+  {
+    "schema_string": "sr-1x-92s",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-1x-92S",
+    "port_layout": "80x 200G SFP-DD + 12x 800G QSFP-DD",
+    "help_text_1": "Fixed chassis (FP5) with 80x 200G SFP-DD + 12x 800G QSFP-DD; simplex CPM",
+    "help_text_2": "80x 200G SFP-DD + 12x 800G QSFP-DD fixed chassis (FP5); simplex CPM",
+    "forwarding_generation": "FP5",
+    "product_family": "7750 SR-x"
+  },
+  {
+    "schema_string": "sr-2e",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-2e",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 2 IOM-e slots; FP3 compatible; dual CPM-e support",
+    "help_text_2": "2 IOM-e slots, modular chassis; FP3 compatible; dual CPM-e support",
+    "forwarding_generation": "FP3",
+    "product_family": "7750 SR-e"
+  },
+  {
+    "schema_string": "sr-2s",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-2s",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 2 line-card slots; FP4 compatible; dual CPM support",
+    "help_text_2": "2 line-card slots, modular chassis; FP4 compatible; dual CPM support",
+    "forwarding_generation": "FP4",
+    "product_family": "7750 SR-s"
+  },
+  {
+    "schema_string": "sr-2se",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-2se",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 2 line-card slots; FP5 compatible; dual CPM support",
+    "help_text_2": "2 line-card slots, modular chassis; FP5 compatible; dual CPM support",
+    "forwarding_generation": "FP5",
+    "product_family": "7750 SR-s"
+  },
+  {
+    "schema_string": "sr-3e",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-3e",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 3 IOM-e slots; FP3 compatible; dual CPM-e support",
+    "help_text_2": "3 IOM-e slots, modular chassis; FP3 compatible; dual CPM-e support",
+    "forwarding_generation": "FP3",
+    "product_family": "7750 SR-e"
+  },
+  {
+    "schema_string": "sr-7",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-7",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 5 IOM slots; FP3/FP4 compatible (FP4-capable chassis + SFM6 required); dual CPM support",
+    "help_text_2": "5 IOM slots, modular chassis; FP3/FP4 compatible (FP4-capable chassis + SFM6 required); dual CPM support",
+    "forwarding_generation": null,
+    "product_family": "7750 SR"
+  },
+  {
+    "schema_string": "sr-7s",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-7s",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 6 line-card slots; FP4/FP5 compatible; dual CPM support",
+    "help_text_2": "6 line-card slots, modular chassis; FP4/FP5 compatible; dual CPM support",
+    "forwarding_generation": null,
+    "product_family": "7750 SR-s"
+  },
+  {
+    "schema_string": "sr-a4",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-a4",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 1 IOM-a slot; FP3 compatible; dual CPM-a support",
+    "help_text_2": "1 IOM-a slot, modular chassis; FP3 compatible; dual CPM-a support",
+    "forwarding_generation": "FP3",
+    "product_family": "7750 SR-a"
+  },
+  {
+    "schema_string": "sr-a8",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7750 SR-a8",
+    "port_layout": null,
+    "help_text_1": "Modular chassis with 2 IOM-a slots; FP3 compatible; dual CPM-a support",
+    "help_text_2": "2 IOM-a slots, modular chassis; FP3 compatible; dual CPM-a support",
+    "forwarding_generation": "FP3",
+    "product_family": "7750 SR-a"
+  },
+  {
+    "schema_string": "vsr-i",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "VSR-I (VSR Integrated mode)",
+    "port_layout": null,
+    "help_text_1": "Integrated VSR; single VM for control, management and dataplane; 4 virtual MDA slots",
+    "help_text_2": "Single-VM VSR-I; integrated control and dataplane; 4 virtual MDA slots",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "x12-400g-qsfpdd",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "x12-400g-qsfpdd",
+    "port_layout": null,
+    "help_text_1": "7950 XRS XMA (FP4); 8/12-port QSFP-DD variants",
+    "help_text_2": "8/12-port QSFP-DD variants of the 7950 XRS XMA (FP4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "x2-100g-tun",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "x2-100g-tun",
+    "port_layout": null,
+    "help_text_1": "7950 XRS tunnel XMA",
+    "help_text_2": "Tunnel XMA for the 7950 XRS",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "x2-s36-400g-qsfp112-3.0t",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "x2-s36-400g-qsfp112-3.0t",
+    "port_layout": "36x 400G QSFP112",
+    "help_text_1": "XMA2-s (FP5, 1 forwarding complex) with 36x 400G QSFP112; 2.4 or 3.0 Tb/s FD by license; 9.6 Tb/s IA",
+    "help_text_2": "36x 400G QSFP112 XMA2-s (FP5, 1 forwarding complex); 2.4 or 3.0 Tb/s FD by license; 9.6 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "x2-s36-800g-qsfpdd-12.0t",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "x2-s36-800g-qsfpdd-12.0t",
+    "port_layout": "36x 800G QSFP-DD",
+    "help_text_1": "XMA2-s (FP5, 4 forwarding complexes) with 36x 800G QSFP-DD; 9.6 or 12.0 Tb/s FD by license; 19.2 Tb/s IA",
+    "help_text_2": "36x 800G QSFP-DD XMA2-s (FP5, 4 forwarding complexes); 9.6 or 12.0 Tb/s FD by license; 19.2 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "x2-s36-800g-qsfpdd-18.0t",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "x2-s36-800g-qsfpdd-18.0t",
+    "port_layout": "36x 800G QSFP-DD",
+    "help_text_1": "XMA2-s (FP5, 6 forwarding complexes) with 36x 800G QSFP-DD; 14.4 or 18.0 Tb/s FD by license; 19.2 Tb/s IA",
+    "help_text_2": "36x 800G QSFP-DD XMA2-s (FP5, 6 forwarding complexes); 14.4 or 18.0 Tb/s FD by license; 19.2 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "x2-s36-800g-qsfpdd-6.0t",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "x2-s36-800g-qsfpdd-6.0t",
+    "port_layout": "36x 800G QSFP-DD",
+    "help_text_1": "XMA2-s (FP5, 2 forwarding complexes) with 36x 800G QSFP-DD; 4.8 or 6.0 Tb/s FD by license; 19.2 Tb/s IA",
+    "help_text_2": "36x 800G QSFP-DD XMA2-s (FP5, 2 forwarding complexes); 4.8 or 6.0 Tb/s FD by license; 19.2 Tb/s IA",
+    "forwarding_generation": "FP5",
+    "product_family": null
+  },
+  {
+    "schema_string": "x24-100g-qsfp28",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "x24-100g-qsfp28",
+    "port_layout": null,
+    "help_text_1": "7950 XRS XMA (FP4); 12/16/24-port QSFP28 variants",
+    "help_text_2": "12/16/24-port QSFP28 variants of the 7950 XRS XMA (FP4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "x4-100g-cfp2",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "x4-100g-cfp2",
+    "port_layout": "4x 100G CFP2",
+    "help_text_1": "7950 XRS XMA (FP3) with 4x 100G CFP2",
+    "help_text_2": "4x 100G CFP2 7950 XRS XMA (FP3)",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "x40-10g-sfp",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "x40-10g-sfp",
+    "port_layout": "40x 10G SFP+",
+    "help_text_1": "7950 XRS XMA (FP3) with 40x 10G SFP+",
+    "help_text_2": "40x 10G SFP+ 7950 XRS XMA (FP3)",
+    "forwarding_generation": "FP3",
+    "product_family": null
+  },
+  {
+    "schema_string": "x6-200g-cfp2-dco",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "x6-200g-cfp2-dco",
+    "port_layout": "6x 200G CFP2-DCO",
+    "help_text_1": "7950 XRS XMA (FP4) with 6x 200G CFP2-DCO",
+    "help_text_2": "6x 200G CFP2-DCO 7950 XRS XMA (FP4)",
+    "forwarding_generation": "FP4",
+    "product_family": null
+  },
+  {
+    "schema_string": "x6-400g-cfp8",
+    "types": [
+      "XMA"
+    ],
+    "nokia_name": "x6-400g-cfp8",
+    "port_layout": null,
+    "help_text_1": "7950 XRS XMA; 4/6-port CFP8 variants",
+    "help_text_2": "4/6-port CFP8 variants of the 7950 XRS XMA",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xcm-14s",
+    "types": [
+      "XCM"
+    ],
+    "nokia_name": "xcm-14s",
+    "port_layout": null,
+    "help_text_1": "7750 SR-s XCM carrier for SR-14s; 2 XMA/IOM positions",
+    "help_text_2": "SR-14s XCM carrier (7750 SR-s); 2 XMA/IOM positions",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xcm-14s-b",
+    "types": [
+      "XCM"
+    ],
+    "nokia_name": "xcm-14s-b",
+    "port_layout": null,
+    "help_text_1": "7750 SR-s XCM carrier for SR-14s; 2 XMA/IOM positions",
+    "help_text_2": "SR-14s XCM carrier (7750 SR-s); 2 XMA/IOM positions",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xcm-2s",
+    "types": [
+      "XCM"
+    ],
+    "nokia_name": "xcm-2s",
+    "port_layout": null,
+    "help_text_1": "7750 SR-s XCM carrier for SR-2s; 1 XMA/IOM position",
+    "help_text_2": "SR-2s XCM carrier (7750 SR-s); 1 XMA/IOM position",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xcm-2se",
+    "types": [
+      "XCM"
+    ],
+    "nokia_name": "xcm-2se",
+    "port_layout": null,
+    "help_text_1": "7750 SR-s XCM carrier for SR-2se; 1 XMA/IOM position",
+    "help_text_2": "SR-2se XCM carrier (7750 SR-s); 1 XMA/IOM position",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xcm-7s",
+    "types": [
+      "XCM"
+    ],
+    "nokia_name": "xcm-7s",
+    "port_layout": null,
+    "help_text_1": "7750 SR-s XCM carrier for SR-7s; 1 XMA/IOM position",
+    "help_text_2": "SR-7s XCM carrier (7750 SR-s); 1 XMA/IOM position",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xcm-7s-b",
+    "types": [
+      "XCM"
+    ],
+    "nokia_name": "xcm-7s-b",
+    "port_layout": null,
+    "help_text_1": "7750 SR-s XCM carrier for SR-7s; 1 XMA/IOM position",
+    "help_text_2": "SR-7s XCM carrier (7750 SR-s); 1 XMA/IOM position",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xcm-x20",
+    "types": [
+      "XCM"
+    ],
+    "nokia_name": "xcm-x20",
+    "port_layout": null,
+    "help_text_1": "7950 XRS XCM carrier for XRS-20/20e; 2 XMA slots",
+    "help_text_2": "XRS-20/20e XCM carrier (7950 XRS); 2 XMA slots",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xcm2-14s",
+    "types": [
+      "XCM"
+    ],
+    "nokia_name": "xcm2-14s",
+    "port_layout": null,
+    "help_text_1": "7750 SR-s XCM2 carrier for SR-14s; 2 XMA/IOM positions",
+    "help_text_2": "SR-14s XCM2 carrier (7750 SR-s); 2 XMA/IOM positions",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xcm2-7s",
+    "types": [
+      "XCM"
+    ],
+    "nokia_name": "xcm2-7s",
+    "port_layout": null,
+    "help_text_1": "7750 SR-s XCM2 carrier for SR-7s; 1 XMA/IOM position",
+    "help_text_2": "SR-7s XCM2 carrier (7750 SR-s); 1 XMA/IOM position",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xcm2-x20",
+    "types": [
+      "XCM"
+    ],
+    "nokia_name": "xcm2-x20",
+    "port_layout": null,
+    "help_text_1": "7950 XRS XCM2 carrier for XRS-20/20e; 2 XMA slots",
+    "help_text_2": "XRS-20/20e XCM2 carrier (7950 XRS); 2 XMA slots",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xcmc-2se",
+    "types": [
+      "XCM"
+    ],
+    "nokia_name": "xcmc-2se",
+    "port_layout": null,
+    "help_text_1": "7750 SR-s XCM carrier for SR-2se",
+    "help_text_2": "SR-2se XCM carrier (7750 SR-s)",
+    "forwarding_generation": null,
+    "product_family": null
+  },
+  {
+    "schema_string": "xrs-20",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7950 XRS-20",
+    "port_layout": null,
+    "help_text_1": "Standard modular chassis (39RU) with 20 interface slots; 1.6 Tb/s FD per slot; FP3/FP4 compatible; dual CPM support",
+    "help_text_2": "20 interface slots, standard modular chassis (39RU); 1.6 Tb/s FD per slot; FP3/FP4 compatible; dual CPM support",
+    "forwarding_generation": null,
+    "product_family": "7950 XRS"
+  },
+  {
+    "schema_string": "xrs-20e",
+    "types": [
+      "chassis"
+    ],
+    "nokia_name": "7950 XRS-20e",
+    "port_layout": null,
+    "help_text_1": "Enhanced modular chassis (44RU) with 20 interface slots; 2.4 Tb/s FD per slot; enhanced power/cooling; FP3/FP4 compatible; dual CPM support",
+    "help_text_2": "20 interface slots, enhanced modular chassis (44RU); 2.4 Tb/s FD per slot; enhanced power/cooling; FP3/FP4 compatible; dual CPM support",
+    "forwarding_generation": null,
+    "product_family": "7950 XRS"
+  }
+]

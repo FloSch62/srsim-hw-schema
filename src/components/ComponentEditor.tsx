@@ -22,6 +22,7 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useMemo } from "react";
+import type { ReactNode } from "react";
 
 import {
   edaConnectorBreakoutLabel,
@@ -35,12 +36,12 @@ import {
 } from "../edaComponents";
 import {
   availableNumericSlotOptions,
+  componentCardSlotCount,
   componentCardSlotOptions,
   componentCpmSlotOptions,
   componentTypeOptions,
   cpmOptions,
   defaultComponentsForEntry,
-  defaultImpliesFields,
   defaultSfmForEntry,
   directMdaSlotOptions,
   directMdaOptions,
@@ -51,10 +52,11 @@ import {
   isCpmSlot,
   nextCpmSlot,
   nextNumericSlot,
-  schemaNumericSlotOptions,
+  onlyChoice,
+  slotCountLabel,
   sfmOptions,
-  xcmModuleSlotCount,
   xiomMdaSlotOptions,
+  withReplacedModules,
   xiomMdaOptions,
   xiomOptions
 } from "../matrix";
@@ -70,7 +72,43 @@ import type {
   SrsimXiom
 } from "../types";
 
-import { FieldAutocomplete } from "./FieldAutocomplete";
+import {
+  builtInMdas,
+  cardProductOf,
+  cardProducts,
+  chassisVariants,
+  cpmCarriers,
+  emptySlots,
+  fitsSfm,
+  fittingCarrier,
+  integratedCard,
+  isBuiltInComponent,
+  pinnedOptions,
+  productFits,
+  variantOf,
+  variantSlotType
+} from "../hardwareModel";
+import type { CardProduct, ChassisVariant, CpmCarrier } from "../hardwareModel";
+import {
+  chassisGroup,
+  chassisGroupOrder,
+  generationGroup,
+  generationGroupOrder,
+  productHelp,
+  productHelpText,
+  productName
+} from "../productNames";
+import {
+  componentWithXcmModules,
+  hasXcmModules,
+  variantModule,
+  xcmIomOptions,
+  xcmModuleSlotOptions,
+  xcmModulesFromComponent,
+  xcmXmaOptions
+} from "../xcmModules";
+import type { XcmModule, XcmModuleKind } from "../xcmModules";
+import { FieldAutocomplete, OptionText } from "./FieldAutocomplete";
 
 interface ComponentEditorProps {
   matrix: MatrixEntry[];
@@ -86,13 +124,48 @@ interface IndexedComponent {
 }
 
 type SlotOption = string | number;
+
+/** A line-card dropdown entry: a card type, or one physical card sharing it with its built-in MDAs. */
+interface CardChoice {
+  key: string;
+  type: string;
+  product?: CardProduct;
+  mda?: SrsimMda[];
+}
+
+const cardGroupOrder = ["XCM", "IOM", "IMM with ports", "Hybrid IMM", "IMM without ports"];
+
+/** Line-card group: IOMs take MDAs; IMMs have their ports built in, an ISA2 in place of ports or next to them. */
+function cardGroup(choice: CardChoice | undefined): string {
+  const type = choice?.type ?? "";
+  if (type.startsWith("xcm")) return "XCM";
+  if (type.startsWith("iom")) return "IOM";
+  const isaSlots = choice?.product?.mdas.filter((types) => types.every((mda) => mda.startsWith("isa"))).length ?? 0;
+  if (!isaSlots) return "IMM with ports";
+  return isaSlots === choice?.product?.mdas.length ? "IMM without ports" : "Hybrid IMM";
+}
+
+/** A chassis dropdown entry: a chassis type, or one physical product of it. */
+interface ChassisChoice {
+  key: string;
+  chassis: string;
+  variant?: ChassisVariant;
+}
 const nestedComponentGridColumns = { xs: "1fr", sm: "120px minmax(0, 1fr) auto" } as const;
 const nestedSlotCount = 2;
 
+// Labels describe how SR-SIM runs the chassis (Nokia's integrated vs. distributed model),
+// not the hardware: fixed FP5 platforms such as the SR-1x still need several containers.
 function deploymentModeLabel(mode: DeploymentMode): string {
-  if (mode === "distributed") return "Distributed";
-  if (mode === "integrated_redundant") return "Redundant integrated";
-  return "Integrated";
+  if (mode === "distributed") return "Multi-container";
+  if (mode === "integrated_redundant") return "Single container (redundant)";
+  return "Single container";
+}
+
+function deploymentModeDescription(mode: DeploymentMode): string {
+  if (mode === "distributed") return "SR-SIM runs one container per CPM and per line card.";
+  if (mode === "integrated_redundant") return "SR-SIM runs one combined container, or two for CPM redundancy.";
+  return "SR-SIM runs the whole router in one container.";
 }
 
 function withoutEmptyNested(component: SrsimComponent): SrsimComponent {
@@ -107,48 +180,96 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   const selectedEntry = getEntry(matrix, config.chassis);
   const selectedDeploymentMode = deploymentMode(selectedEntry);
   const distributed = selectedDeploymentMode === "distributed";
-  const chassisOptions = useMemo(() => matrix.map((entry) => entry.chassis), [matrix]);
+  // One chassis entry per physical product: SR-SIM runs some products as one chassis type.
+  const chassisChoices = useMemo(
+    () =>
+      matrix.flatMap((entry): ChassisChoice[] => {
+        const variants = chassisVariants(entry.chassis);
+        return variants.length
+          ? variants.map((variant) => ({ key: `${entry.chassis}:${variant.name}`, chassis: entry.chassis, variant }))
+          : [{ key: entry.chassis, chassis: entry.chassis }];
+      }),
+    [matrix]
+  );
+  const chassisChoice = (key: string) => chassisChoices.find((choice) => choice.key === key);
   const chassisDeploymentLabels = useMemo(
     () => Object.fromEntries(matrix.map((entry) => [entry.chassis, deploymentModeLabel(deploymentMode(entry))])),
     [matrix]
   );
-  const sharedSfmOptions = sfmOptions(selectedEntry, []);
-  const defaultSfm = defaultSfmForEntry(selectedEntry);
+  const integratedComponent = config.components[0] ?? { mda: [] };
+  const variants = chassisVariants(config.chassis);
+  // The product is fixed hardware: once chosen it stays, even when its module is removed.
+  // Unchosen, it follows the installed parts, else it is the variant without limits, else the first.
+  const selectedVariant =
+    variants.find((variant) => variant.name === config.hardwareVariant) ??
+    variantOf(config.chassis, config.components) ??
+    variants.find((variant) => !variant.parts.length && !variant.sfm?.length) ??
+    variants[0];
+  const variantFitsSfm = (sfm: string) => !selectedVariant?.sfm?.length || selectedVariant.sfm.includes(sfm);
+  const sharedSfmOptions = sfmOptions(selectedEntry, []).filter(variantFitsSfm);
+  const entryDefaultSfm = defaultSfmForEntry(selectedEntry);
+  const defaultSfm = variantFitsSfm(entryDefaultSfm) ? entryDefaultSfm : "";
+  const sfmAvailable = Boolean(defaultSfm || sharedSfmOptions.length);
 
   const indexed = config.components.map((component, index) => ({ component, index }));
   const cpms = indexed.filter(({ component }) => isCpmSlot(component.slot));
   const cards = indexed.filter(({ component }) => !isCpmSlot(component.slot));
-  const cpmSlotOptions = componentCpmSlotOptions(selectedEntry, slotRules.componentStringSlots);
+
+  // The CMA decides which CPM types fit, how many, and whether it takes a line-card slot.
+  const carriers = distributed ? cpmCarriers(config.chassis) : [];
+  const usedCardSlotNumbers = new Set(cards.map(({ component }) => Number(component.slot)));
+  const carrierBlockedReason = (carrier: CpmCarrier, sfm: string): string => {
+    if (!carrier.cpmTypes.some((type) => cpmOptions(selectedEntry, sfm).includes(type))) {
+      return `needs ${carrier.cpmTypes.join("/")}, which ${sfm || "this SFM"} does not support`;
+    }
+    const taken = carrier.blocksLineSlots.filter((slot) => usedCardSlotNumbers.has(slot));
+    return taken.length ? `line-card slot ${taken.join(", ")} is in use` : "";
+  };
+  const carrierFor = (sfm: string, chosen = config.cma): CpmCarrier | undefined => {
+    const usable = (carrier?: CpmCarrier) => (carrier && !carrierBlockedReason(carrier, sfm) ? carrier : undefined);
+    return (
+      usable(carriers.find((carrier) => carrier.type === chosen)) ??
+      usable(fittingCarrier(config.chassis, config.components)) ??
+      carriers.find((carrier) => !carrierBlockedReason(carrier, sfm))
+    );
+  };
+  const selectedCarrier = carrierFor(config.sfm);
+  const carrierCpmOptions = (sfm: string, carrier = carrierFor(sfm)) =>
+    pinnedOptions(
+      selectedVariant,
+      cpmOptions(selectedEntry, sfm).filter((type) => !carrier || carrier.cpmTypes.includes(type))
+    );
+
+  const cpmSlotOptions = selectedCarrier
+    ? selectedCarrier.cpmSlots
+    : componentCpmSlotOptions(selectedEntry, slotRules.componentStringSlots);
   const cardSlotOptions = componentCardSlotOptions(
     selectedEntry,
     cards.map(({ component }) => component),
     slotRules.componentIntegerMinimum
-  );
+  ).filter((slot) => !selectedCarrier?.blocksLineSlots.includes(slot));
   const usedCpmSlots = new Set(cpms.map(({ component }) => String(component.slot ?? "").toUpperCase()));
   const usedCardSlots = new Set(cards.map(({ component }) => String(component.slot ?? "")));
   const availableCpmSlots = cpmSlotOptions.filter((slot) => !usedCpmSlots.has(String(slot).toUpperCase()));
   const availableCardSlots = cardSlotOptions.filter((slot) => !usedCardSlots.has(String(slot)));
-  const integratedComponent = config.components[0] ?? { mda: [] };
-  const moduleSlotCount = xcmModuleSlotCount(selectedEntry?.chassis);
-  const xiomSlotOptions = schemaNumericSlotOptions([], moduleSlotCount ?? nestedSlotCount, slotRules.xiomIntegerMinimum);
 
   const updateConfig = (updates: Partial<SrsimConfig>) => onChange({ ...config, ...updates });
 
   const directMdaSlotsFor = (component: SrsimComponent, mdaType = "") =>
     freeXcmModuleSlots(
-      selectedEntry,
+      component.type,
       directMdaSlotOptions(selectedEntry, component, config.sfm, nestedSlotCount, slotRules.mdaIntegerMinimum, mdaType),
       component.xiom
     );
-
-  const xiomSlotsFor = (component: SrsimComponent) => freeXcmModuleSlots(selectedEntry, xiomSlotOptions, component.mda);
 
   const xiomMdaSlotsFor = (component: SrsimComponent, xiom: SrsimXiom, mdaType = "") =>
     xiomMdaSlotOptions(selectedEntry, component, xiom, config.sfm, nestedSlotCount, slotRules.mdaIntegerMinimum, mdaType);
 
   const nextDirectMdaFor = (component: SrsimComponent): SrsimMda | null => {
     const mdas = component.mda ?? [];
-    for (const type of directMdaOptions(selectedEntry, component, config.sfm)) {
+    // Built-in MDAs come with their card, so they are never added by hand.
+    const builtIn = builtInMdas(component.type || integratedCard(config.chassis)).map((mda) => mda.type);
+    for (const type of directMdaOptions(selectedEntry, component, config.sfm).filter((option) => !builtIn.includes(option))) {
       const slot = availableNumericSlotOptions(directMdaSlotsFor(component, type), mdas)[0];
       if (slot) return { slot, type };
     }
@@ -157,27 +278,51 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
 
   const nextXiomMdaFor = (component: SrsimComponent, xiom: SrsimXiom): SrsimMda | null => {
     const mdas = xiom.mda ?? [];
-    for (const type of xiomMdaOptions(selectedEntry, component, xiom, config.sfm)) {
+    const builtIn = builtInMdas(xiom.type).map((mda) => mda.type);
+    for (const type of xiomMdaOptions(selectedEntry, component, xiom, config.sfm).filter((option) => !builtIn.includes(option))) {
       const slot = availableNumericSlotOptions(xiomMdaSlotsFor(component, xiom, type), mdas)[0];
       if (slot) return { slot, type };
     }
     return null;
   };
 
-  const setChassis = (chassis: string) => {
+  const setChassis = (key: string) => {
+    const choice = chassisChoice(key);
+    if (!choice) return;
+    const { chassis, variant } = choice;
     const entry = getEntry(matrix, chassis);
-    const components = defaultComponentsForEntry(entry);
+    const entrySfm = defaultSfmForEntry(entry);
+    const components = defaultComponentsForEntry(entry).map((component) => {
+      if (!variant) return component;
+      const pinned = variantSlotType(chassis, component.slot, variant);
+      if (pinned && pinned !== component.type) {
+        // Only the default card's built-in MDA is implied; a pinned one is written out.
+        const mda = isCpmSlot(component.slot) ? [] : builtInMdas(pinned);
+        return { slot: component.slot, type: pinned, ...(mda.length ? { mda } : {}) };
+      }
+      const module = variantModule(variant);
+      return module && hasXcmModules(entry, component) ? componentWithXcmModules(entry, component, [module], entrySfm) : component;
+    });
+    const sfm = variant?.sfm?.length && !variant.sfm.includes(entrySfm) ? variant.sfm[0] : entrySfm;
     updateConfig({
       chassis,
-      components,
-      sfm: defaultSfmForEntry(entry),
+      // A backplane variant's SFM can rule out the default line card; the first card that fits replaces it.
+      components: components.map((component) => {
+        if (isCpmSlot(component.slot) || fitsSfm(component.type, sfm)) return component;
+        const choice = cardChoices(component.slot, sfm, entry, variant)[0];
+        return choice ? cardWithChoice({ slot: component.slot }, choice) : component;
+      }),
+      sfm,
+      cma: undefined,
+      hardwareVariant: variant?.name,
+      cardProducts: undefined,
       edaComponents: []
     });
   };
 
-  const normalizeComponent = (component: SrsimComponent, sfm: string): SrsimComponent => {
+  const normalizeComponent = (component: SrsimComponent, sfm: string, carrier = carrierFor(sfm)): SrsimComponent => {
     if (distributed && isCpmSlot(component.slot)) {
-      const options = cpmOptions(selectedEntry, sfm);
+      const options = carrierCpmOptions(sfm, carrier);
       return {
         slot: component.slot,
         type: component.type && options.includes(component.type) ? component.type : (options[0] ?? "")
@@ -190,11 +335,23 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     const type = component.type && typeOptions.includes(component.type)
       ? component.type
       : (typeOptions[0] ?? (distributed ? "" : component.type ?? ""));
+    // A replacement card shared by several physical cards comes with the built-in MDAs of the first one.
+    if (type !== component.type && cardProducts(type).length) {
+      const choice = cardChoices(component.slot, sfm).find((candidate) => candidate.type === type);
+      if (choice) return cardWithChoice({ slot: component.slot }, choice);
+    }
     const next: SrsimComponent = { slot: component.slot, type };
     const base = { slot: component.slot, type };
 
     const directOptions = directMdaOptions(selectedEntry, base, sfm);
     const directMdas = (component.mda ?? []).filter((mda) => mda.type && directOptions.includes(mda.type));
+    // A line card always carries its built-in MDAs, e.g. after switching IMMs.
+    // Single-container chassis are left alone: containerlab fills in their default MDA itself.
+    if (distributed && !isCpmSlot(component.slot)) {
+      for (const mda of builtInMdas(type)) {
+        if (!directMdas.some((existing) => Number(existing.slot) === mda.slot)) directMdas.push(mda);
+      }
+    }
     if (directMdas.length) next.mda = directMdas;
 
     const validXioms = (component.xiom ?? []).flatMap((xiom) => {
@@ -210,12 +367,13 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     return withoutEmptyNested(next);
   };
 
-  const normalizeComponents = (components: SrsimComponent[], sfm: string) =>
+  const normalizeComponents = (components: SrsimComponent[], sfm: string, carrier = carrierFor(sfm)) =>
     components
-      .map((component) => normalizeComponent(component, sfm))
+      .filter((component) => !carrier || !isCpmSlot(component.slot) || carrier.cpmSlots.includes(String(component.slot).toUpperCase()))
+      .map((component) => normalizeComponent(component, sfm, carrier))
       .filter((item) => item.mda?.length || item.xiom?.length || item.type);
 
-  const setComponents = (components: SrsimComponent[]) => {
+  const setComponents = (components: SrsimComponent[], extra: Partial<SrsimConfig> = {}) => {
     let nextSfm = config.sfm;
     let cleanComponents = normalizeComponents(components, nextSfm);
     const compatibleSfms = sfmOptions(selectedEntry, cleanComponents);
@@ -224,21 +382,34 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
       cleanComponents = normalizeComponents(components, nextSfm);
     }
     updateConfig({
+      ...extra,
       components: cleanComponents,
       sfm: nextSfm
     });
   };
 
-  const setIntegratedComponent = (component: SrsimComponent) => {
-    setComponents([withoutEmptyNested(component)].filter((item) => item.mda?.length || item.type));
+  const setIntegratedComponent = (component: SrsimComponent, extra: Partial<SrsimConfig> = {}) => {
+    setComponents([withoutEmptyNested(component)].filter((item) => item.mda?.length || item.type), extra);
   };
 
-  const applySfm = (sfm: string) => {
-    const nextSfm = sfm || defaultSfm || sharedSfmOptions[0] || "";
+  const applyCarrier = (type: string) => {
+    const carrier = carriers.find((candidate) => candidate.type === type);
+    if (!carrier) return;
+    const components = normalizeComponents(config.components, config.sfm, carrier);
+    const hasCpm = components.some((component) => isCpmSlot(component.slot));
     updateConfig({
-      sfm: nextSfm,
-      components: normalizeComponents(config.components, nextSfm)
+      cma: type,
+      components: hasCpm ? components : [{ slot: "A", type: carrierCpmOptions(config.sfm, carrier)[0] ?? "" }, ...components]
     });
+  };
+
+  const applySfm = (sfm: string, extra: Partial<SrsimConfig> = {}) => {
+    const nextSfm = sfm || defaultSfm || sharedSfmOptions[0] || "";
+    const components = normalizeComponents(config.components, nextSfm).map((after) => {
+      const before = config.components.find((component) => String(component.slot) === String(after.slot));
+      return before ? withReplacedModules(selectedEntry, before, after, nextSfm) : after;
+    });
+    updateConfig({ sfm: nextSfm, components, ...extra });
   };
 
   const updateComponent = (index: number, updates: Partial<SrsimComponent>) => {
@@ -254,13 +425,55 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   const addCpm = () => {
     const slot = availableCpmSlots[0] ?? nextCpmSlot(config.components);
     if (!slot) return;
-    setComponents([...config.components, { slot, type: cpmOptions(selectedEntry, config.sfm)[0] ?? "" }]);
+    setComponents([...config.components, { slot, type: carrierCpmOptions(config.sfm)[0] ?? "" }]);
+  };
+
+  // A card type that several physical cards share (imm-2pac-fp3) is offered as those cards, each with
+  // its built-in MDAs; only products whose MDAs the chassis offers are listed.
+  const cardChoices = (
+    slot: SrsimComponent["slot"],
+    sfm = config.sfm,
+    entry = selectedEntry,
+    variant = selectedVariant
+  ): CardChoice[] =>
+    pinnedOptions(variant, componentTypeOptions(entry, { slot }, sfm)).flatMap((type) => {
+      const available = directMdaOptions(entry, { slot, type }, sfm);
+      const products = cardProducts(type).filter((product) =>
+        product.mdas.every((types) => types.some((mda) => available.includes(mda)))
+      );
+      if (!products.length) return [{ key: type, type }];
+      return products.map((product) => ({
+        key: `${type}:${product.name}`,
+        type,
+        product,
+        mda: product.mdas.map((types, index) => ({ slot: index + 1, type: types.find((mda) => available.includes(mda)) ?? "" }))
+      }));
+    });
+  // The chosen product, while it still fits the MDAs; else the first product they fit.
+  const productOf = (component: SrsimComponent) =>
+    cardProducts(component.type).find(
+      (product) => product.name === config.cardProducts?.[String(component.slot)] && productFits(product, component)
+    ) ?? cardProductOf(component.type, component);
+  const cardChoiceKey = (component: SrsimComponent) => {
+    const product = productOf(component);
+    return product ? `${component.type}:${product.name}` : (component.type ?? "");
+  };
+  const withCardProduct = (slot: SrsimComponent["slot"], choice?: CardChoice) => ({
+    cardProducts: { ...config.cardProducts, [String(slot)]: choice?.product?.name ?? "" }
+  });
+  const cardWithChoice = (component: SrsimComponent, choice: CardChoice): SrsimComponent => {
+    if (choice.mda) return { slot: component.slot, type: choice.type, mda: choice.mda };
+    // A product's built-in MDAs do not carry over to another card.
+    return cardProducts(component.type).length ? { slot: component.slot, type: choice.type } : { ...component, type: choice.type };
   };
 
   const addCard = () => {
     const slot = availableCardSlots[0] ?? nextNumericSlot(cards.map(({ component }) => component));
-    const type = componentTypeOptions(selectedEntry, { slot }, config.sfm)[0] ?? "";
-    setComponents([...config.components, { slot, type }]);
+    const choice = cardChoices(slot)[0];
+    setComponents(
+      [...config.components, choice ? cardWithChoice({ slot }, choice) : { slot, type: "" }],
+      withCardProduct(slot, choice)
+    );
   };
 
   const resetDefaults = () => {
@@ -268,6 +481,9 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     updateConfig({
       components,
       sfm: defaultSfm,
+      cma: undefined,
+      hardwareVariant: undefined,
+      cardProducts: undefined,
       edaComponents: []
     });
   };
@@ -317,70 +533,10 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     updateComponent(componentIndex, { mda: (component.mda ?? []).filter((_, idx) => idx !== mdaIndex) });
   };
 
-  const addXiom = (componentIndex: number) => {
-    const component = config.components[componentIndex];
-    const xioms = component.xiom ?? [];
-    const slot = availableNumericSlotOptions(xiomSlotsFor(component), xioms)[0];
-    if (!slot) return;
-    updateComponent(componentIndex, {
-      xiom: [
-        ...xioms,
-        {
-          slot,
-          type: xiomOptions(selectedEntry, component, config.sfm)[0] ?? "",
-          mda: []
-        }
-      ]
-    });
-  };
-
-  const updateXiom = (componentIndex: number, xiomIndex: number, updates: Partial<SrsimXiom>) => {
-    const component = config.components[componentIndex];
-    const xioms = [...(component.xiom ?? [])];
-    xioms[xiomIndex] = { ...xioms[xiomIndex], ...updates };
-    updateComponent(componentIndex, { xiom: xioms });
-  };
-
-  const removeXiom = (componentIndex: number, xiomIndex: number) => {
-    const component = config.components[componentIndex];
-    updateComponent(componentIndex, { xiom: (component.xiom ?? []).filter((_, idx) => idx !== xiomIndex) });
-  };
-
-  const addXiomMda = (componentIndex: number, xiomIndex: number) => {
-    const component = config.components[componentIndex];
-    const xioms = [...(component.xiom ?? [])];
-    const xiom = xioms[xiomIndex];
-    const mdas = xiom.mda ?? [];
-    const nextMda = nextXiomMdaFor(component, xiom);
-    if (!nextMda) return;
-    xioms[xiomIndex] = {
-      ...xiom,
-      mda: [...mdas, nextMda]
-    };
-    updateComponent(componentIndex, { xiom: xioms });
-  };
-
-  const updateXiomMda = (
-    componentIndex: number,
-    xiomIndex: number,
-    mdaIndex: number,
-    updates: Partial<SrsimMda>
-  ) => {
-    const component = config.components[componentIndex];
-    const xioms = [...(component.xiom ?? [])];
-    const xiom = xioms[xiomIndex];
-    const mdas = [...(xiom.mda ?? [])];
-    mdas[mdaIndex] = { ...mdas[mdaIndex], ...updates };
-    xioms[xiomIndex] = { ...xiom, mda: mdas };
-    updateComponent(componentIndex, { xiom: xioms });
-  };
-
-  const removeXiomMda = (componentIndex: number, xiomIndex: number, mdaIndex: number) => {
-    const component = config.components[componentIndex];
-    const xioms = [...(component.xiom ?? [])];
-    const xiom = xioms[xiomIndex];
-    xioms[xiomIndex] = { ...xiom, mda: (xiom.mda ?? []).filter((_, idx) => idx !== mdaIndex) };
-    updateComponent(componentIndex, { xiom: xioms });
+  const setModules = (componentIndex: number, modules: XcmModule[]) => {
+    const next = [...config.components];
+    next[componentIndex] = componentWithXcmModules(selectedEntry, next[componentIndex], modules, config.sfm);
+    setComponents(next);
   };
 
   const setEdaComponents = (components: EdaTopoNodeComponent[]) => {
@@ -434,7 +590,9 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
           <Box>
             <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
               <Typography variant="h6">Hardware</Typography>
-              <Chip size="small" variant="outlined" label={deploymentModeLabel(selectedDeploymentMode)} />
+              <Tooltip title={deploymentModeDescription(selectedDeploymentMode)}>
+                <Chip size="small" variant="outlined" label={deploymentModeLabel(selectedDeploymentMode)} />
+              </Tooltip>
             </Stack>
             <Typography variant="body2" color="text.secondary">
               {selectedEntry?.models.join(", ") || "No chassis selected"}
@@ -464,67 +622,169 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
 
         <FieldAutocomplete
           label="Chassis type"
-          value={config.chassis}
-          options={chassisOptions}
-          optionAdornment={(chassis) => (
+          value={selectedVariant ? `${config.chassis}:${selectedVariant.name}` : config.chassis}
+          options={chassisChoices.map((choice) => choice.key)}
+          optionLabels={Object.fromEntries(
+            chassisChoices.map((choice) => [choice.key, choice.variant?.name ?? productName(choice.chassis)])
+          )}
+          optionDescription={(key) => {
+            const choice = chassisChoice(key);
+            return choice?.variant ? choice.variant.description : productHelpText(choice?.chassis ?? key);
+          }}
+          groupBy={(key) => chassisGroup(chassisChoice(key)?.chassis ?? key)}
+          groupOrder={chassisGroupOrder}
+          optionAdornment={(key) => (
             <Chip
               size="small"
               variant="outlined"
-              label={chassisDeploymentLabels[chassis] ?? deploymentModeLabel(selectedDeploymentMode)}
+              label={chassisDeploymentLabels[chassisChoice(key)?.chassis ?? key] ?? deploymentModeLabel(selectedDeploymentMode)}
               sx={{ flex: "0 0 auto", pointerEvents: "none" }}
             />
           )}
           onChange={setChassis}
           allowFreeText={false}
         />
-        <FormControl size="small" fullWidth>
-          <InputLabel id="sfm-select-label">SFM</InputLabel>
+        <FormControl
+          size="small"
+          fullWidth
+          disabled={!sfmAvailable || onlyChoice([defaultSfm, ...sharedSfmOptions].filter(Boolean), config.sfm || defaultSfm)}
+        >
+          <InputLabel id="sfm-select-label" shrink={sfmAvailable ? undefined : true}>SFM</InputLabel>
           <Select
             labelId="sfm-select-label"
             label="SFM"
-            value={config.sfm || defaultSfm}
+            notched={sfmAvailable ? undefined : true}
+            displayEmpty={!sfmAvailable}
+            value={sfmAvailable ? config.sfm || defaultSfm : ""}
+            renderValue={(sfm) => (sfmAvailable ? productName(sfm) : "N/A")}
             onChange={(event) => applySfm(event.target.value)}
           >
-            {defaultSfm ? <MenuItem value={defaultSfm}>Default ({defaultSfm})</MenuItem> : null}
+            {defaultSfm ? (
+              <MenuItem value={defaultSfm}>
+                <OptionText label={productName(defaultSfm)} description={productHelpText(defaultSfm)} />
+              </MenuItem>
+            ) : null}
             {sharedSfmOptions
               .filter((sfm) => sfm !== defaultSfm)
               .map((sfm) => (
                 <MenuItem key={sfm} value={sfm}>
-                  {sfm}
+                  <OptionText label={productName(sfm)} description={productHelpText(sfm)} />
                 </MenuItem>
               ))}
           </Select>
-          <FormHelperText>
-            {sharedSfmOptions.length ? "Set once on the node and applies to the whole chassis." : "This chassis has no SFM constraint"}
-          </FormHelperText>
+          {sfmAvailable ? <FormHelperText>Set once on the node and applies to the whole chassis.</FormHelperText> : null}
         </FormControl>
 
         {!distributed ? (
           <IntegratedComponentSection
+            chassis={config.chassis}
             component={integratedComponent}
             mdaOptions={directMdaOptions(selectedEntry, integratedComponent, config.sfm)}
             mdaSlotOptions={directMdaSlotsFor(integratedComponent)}
             slotOptionsByMda={(integratedComponent.mda ?? []).map((mda) => directMdaSlotsFor(integratedComponent, mda.type))}
             addMdaDisabled={!nextDirectMdaFor(integratedComponent)}
-            mdaDefaultSlots={(integratedComponent.mda ?? []).map((mda) =>
-              defaultImpliesFields(selectedEntry, { ...integratedComponent, mda: [mda] }, config.sfm, ["mda"]) ? [mda.slot ?? 1] : []
-            )}
-            mdaDefaultTypes={(integratedComponent.mda ?? []).map((mda) =>
-              directMdaOptions(selectedEntry, integratedComponent, config.sfm).filter((type) =>
-                defaultImpliesFields(selectedEntry, { ...integratedComponent, mda: [{ ...mda, type }] }, config.sfm, ["mda"])
-              )
-            )}
             onAddMda={addIntegratedMda}
             onUpdateMda={updateIntegratedMda}
             onRemoveMda={removeIntegratedMda}
+            modules={
+              hasXcmModules(selectedEntry, integratedComponent) ? (
+                <XcmModuleSection
+                  entry={selectedEntry}
+                  component={integratedComponent}
+                  sfm={config.sfm}
+                  mdaSlotsFor={(iom, mdaType) => xiomMdaSlotsFor(integratedComponent, iom, mdaType)}
+                  nextMdaFor={(iom) => nextXiomMdaFor(integratedComponent, iom)}
+                  onChange={(modules) =>
+                    setIntegratedComponent(componentWithXcmModules(selectedEntry, integratedComponent, modules, config.sfm))
+                  }
+                  variant={selectedVariant}
+                />
+              ) : undefined
+            }
           />
         ) : (
           <>
+            {carriers.length ? (
+              <Stack spacing={1.25}>
+                <Divider />
+                <Typography variant="subtitle1">Control modules</Typography>
+                <Paper variant="outlined" sx={{ p: 1.5 }}>
+                  <FormControl size="small" fullWidth>
+                    <InputLabel id="cma-select-label">CMA</InputLabel>
+                    <Select
+                      labelId="cma-select-label"
+                      label="CMA"
+                      value={selectedCarrier?.type ?? ""}
+                      renderValue={(type) => carriers.find((carrier) => carrier.type === type)?.label ?? type}
+                      onChange={(event) => applyCarrier(event.target.value)}
+                    >
+                      {carriers.map((carrier) => {
+                        const reason = carrierBlockedReason(carrier, config.sfm);
+                        return (
+                          <MenuItem key={carrier.type} value={carrier.type} disabled={Boolean(reason)}>
+                            <Box sx={{ display: "flex", flexDirection: "column" }}>
+                              {carrier.label}
+                              <Typography variant="caption" color="text.secondary">
+                                {reason || carrier.description}
+                              </Typography>
+                            </Box>
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                  <Stack spacing={1} sx={{ mt: 1.5 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+                      <Typography variant="subtitle2">CPMs</Typography>
+                      <Button
+                        size="small"
+                        startIcon={<AddIcon />}
+                        onClick={addCpm}
+                        disabled={!availableCpmSlots.length || !carrierCpmOptions(config.sfm).length}
+                      >
+                        Add
+                      </Button>
+                    </Box>
+                    {cpms.map(({ component, index }) => (
+                      <Box
+                        key={index}
+                        sx={{ display: "grid", gridTemplateColumns: nestedComponentGridColumns, gap: 1, alignItems: "center" }}
+                      >
+                        <SlotSelect
+                          label="Slot"
+                          value={component.slot}
+                          options={cpmSlotOptions}
+                          onChange={(slot) => updateComponent(index, { slot })}
+                        />
+                        <FieldAutocomplete
+                          label="Type"
+                          value={component.type ?? ""}
+                          options={carrierCpmOptions(config.sfm)}
+                          optionLabels={Object.fromEntries(carrierCpmOptions(config.sfm).map((type) => [type, productName(type)]))}
+                          optionDescription={productHelpText}
+                          onChange={(type) => updateComponent(index, { type })}
+                          allowFreeText={false}
+                        />
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => removeComponent(index)}
+                          sx={{ justifySelf: { xs: "end", sm: "auto" } }}
+                        >
+                          <DeleteOutlineIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Paper>
+              </Stack>
+            ) : (
             <ComponentSection
               title="Control modules"
+              count={{ used: cpms.length, max: cpmSlotOptions.length }}
               items={cpms}
               addLabel="Add CPM"
-              addDisabled={!availableCpmSlots.length || !cpmOptions(selectedEntry, config.sfm).length}
+              addDisabled={!availableCpmSlots.length || !carrierCpmOptions(config.sfm).length}
               onAdd={addCpm}
               renderItem={({ component, index }) => (
             <Paper variant="outlined" sx={{ p: 1.5 }}>
@@ -532,24 +792,29 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 label="CPM"
                 component={component}
                 onRemove={() => removeComponent(index)}
+                removeBlockedReason={
+                  isBuiltInComponent(config.chassis, component.slot)
+                    ? "Built into the chassis"
+                    : selectedVariant?.parts.includes(component.type ?? "")
+                      ? `Built into the ${selectedVariant.name}`
+                      : cpms.length <= 1
+                      ? "At least one CPM is required"
+                      : undefined
+                }
               />
               <Box sx={{ display: "grid", gridTemplateColumns: "120px minmax(0, 1fr)", gap: 1.5, mt: 1.5 }}>
                 <SlotSelect
                   label="Slot"
                   value={component.slot}
                   options={cpmSlotOptions}
-                  defaultOptions={cpmSlotOptions.filter((slot) =>
-                    defaultImpliesFields(selectedEntry, { ...component, slot }, config.sfm, [])
-                  )}
                   onChange={(slot) => updateComponent(index, { slot })}
                 />
                 <FieldAutocomplete
                   label="Type"
                   value={component.type ?? ""}
-                  options={cpmOptions(selectedEntry, config.sfm)}
-                  defaultOptions={cpmOptions(selectedEntry, config.sfm).filter((type) =>
-                    defaultImpliesFields(selectedEntry, { ...component, type }, config.sfm, [])
-                  )}
+                  options={carrierCpmOptions(config.sfm)}
+                  optionLabels={Object.fromEntries(carrierCpmOptions(config.sfm).map((type) => [type, productName(type)]))}
+                  optionDescription={productHelpText}
                   onChange={(type) => updateComponent(index, { type })}
                   allowFreeText={false}
                 />
@@ -557,9 +822,11 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
             </Paper>
               )}
             />
+            )}
 
             <ComponentSection
               title="Line cards"
+              count={{ used: cards.length, max: componentCardSlotCount(selectedEntry, slotRules.componentIntegerMinimum) }}
               items={cards}
               addLabel="Add card"
               addDisabled={!availableCardSlots.length || !componentTypeOptions(selectedEntry, {}, config.sfm).length}
@@ -570,99 +837,72 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 label="Line card"
                 component={component}
                 onRemove={() => removeComponent(index)}
+                removeBlockedReason={
+                  isBuiltInComponent(config.chassis, component.slot)
+                    ? "Built into the chassis"
+                    : selectedVariant?.parts.includes(component.type ?? "")
+                      ? `Built into the ${selectedVariant.name}`
+                      : undefined
+                }
               />
               <Box sx={{ display: "grid", gridTemplateColumns: "120px minmax(0, 1fr)", gap: 1.5, mt: 1.5 }}>
                 <SlotSelect
                   label="Slot"
                   value={component.slot}
                   options={cardSlotOptions}
-                  defaultOptions={cardSlotOptions.filter((slot) =>
-                    defaultImpliesFields(selectedEntry, { ...component, slot }, config.sfm, [])
-                  )}
                   onChange={(slot) => updateComponent(index, { slot })}
                 />
                 <FieldAutocomplete
                   label="Type"
-                  value={component.type ?? ""}
-                  options={componentTypeOptions(selectedEntry, { slot: component.slot }, config.sfm)}
-                  defaultOptions={componentTypeOptions(selectedEntry, { slot: component.slot }, config.sfm).filter((type) =>
-                    defaultImpliesFields(selectedEntry, { ...component, type }, config.sfm, [])
+                  value={cardChoiceKey(component)}
+                  options={cardChoices(component.slot).map((choice) => choice.key)}
+                  groupBy={(key) => cardGroup(cardChoices(component.slot).find((choice) => choice.key === key))}
+                  groupOrder={cardGroupOrder}
+                  optionLabels={Object.fromEntries(
+                    cardChoices(component.slot).flatMap((choice) =>
+                      choice.product ? [[choice.key, `${choice.product.name} (${choice.type})`]] : []
+                    )
                   )}
-                  onChange={(type) => updateComponent(index, { type })}
+                  optionDescription={(key) => {
+                    const choice = cardChoices(component.slot).find((candidate) => candidate.key === key);
+                    return choice?.product ? choice.product.description : productHelp(choice?.type ?? key);
+                  }}
+                  onChange={(key) => {
+                    const choice = cardChoices(component.slot).find((candidate) => candidate.key === key);
+                    if (!choice) return;
+                    const next = [...config.components];
+                    next[index] = withoutEmptyNested(cardWithChoice(component, choice));
+                    setComponents(next, withCardProduct(component.slot, choice));
+                  }}
                   allowFreeText={false}
                 />
               </Box>
 
-              {moduleSlotCount ? (
-                <FormHelperText sx={{ mt: 1.5 }}>
-                  {moduleSlotCount === 1
-                    ? "This XCM has one slot, for either a direct MDA or an XIOM."
-                    : `This XCM has ${moduleSlotCount} slots, each for either a direct MDA or an XIOM.`}
-                </FormHelperText>
-              ) : null}
-
-              <NestedMdaSection
-                title="Direct MDAs"
-                mdas={component.mda ?? []}
-                options={directMdaOptions(selectedEntry, component, config.sfm)}
-                slotOptions={directMdaSlotsFor(component)}
-                slotOptionsByMda={(component.mda ?? []).map((mda) => directMdaSlotsFor(component, mda.type))}
-                addDisabled={!nextDirectMdaFor(component)}
-                defaultSlots={(component.mda ?? []).map((mda) =>
-                  defaultImpliesFields(selectedEntry, { ...component, mda: [mda] }, config.sfm, ["mda"]) ? [mda.slot ?? 1] : []
-                )}
-                defaultTypes={(component.mda ?? []).map((mda) =>
-                  directMdaOptions(selectedEntry, component, config.sfm).filter((type) =>
-                    defaultImpliesFields(selectedEntry, { ...component, mda: [{ ...mda, type }] }, config.sfm, ["mda"])
-                  )
-                )}
-                onAdd={() => addMda(index)}
-                onUpdate={(mdaIndex, updates) => updateMda(index, mdaIndex, updates)}
-                onRemove={(mdaIndex) => removeMda(index, mdaIndex)}
-              />
-
-              <NestedXiomSection
-                xioms={component.xiom ?? []}
-                xiomOptions={xiomOptions(selectedEntry, component, config.sfm)}
-                mdaOptionsByXiom={(component.xiom ?? []).map((xiom) => xiomMdaOptions(selectedEntry, component, xiom, config.sfm))}
-                mdaSlotOptionsByXiom={(component.xiom ?? []).map((xiom) => xiomMdaSlotsFor(component, xiom))}
-                mdaSlotOptionsByXiomMda={(component.xiom ?? []).map((xiom) =>
-                  (xiom.mda ?? []).map((mda) => xiomMdaSlotsFor(component, xiom, mda.type))
-                )}
-                canAddMdaByXiom={(component.xiom ?? []).map((xiom) => Boolean(nextXiomMdaFor(component, xiom)))}
-                xiomSlotOptions={xiomSlotsFor(component)}
-                xiomDefaultSlots={(component.xiom ?? []).map((xiom) =>
-                  defaultImpliesFields(selectedEntry, { ...component, xiom: [xiom] }, config.sfm, ["xiom", "mda"]) ? [1] : []
-                )}
-                xiomDefaultTypes={(component.xiom ?? []).map((xiom) =>
-                  xiomOptions(selectedEntry, component, config.sfm).filter((type) =>
-                    defaultImpliesFields(selectedEntry, { ...component, xiom: [{ ...xiom, type }] }, config.sfm, ["xiom", "mda"])
-                  )
-                )}
-                mdaDefaultSlots={(component.xiom ?? []).map((xiom) =>
-                  (xiom.mda ?? []).map((mda) =>
-                    defaultImpliesFields(selectedEntry, { ...component, xiom: [{ ...xiom, mda: [mda] }] }, config.sfm, ["mda"]) ? [mda.slot ?? 1] : []
-                  )
-                )}
-                mdaDefaultTypes={(component.xiom ?? []).map((xiom) =>
-                  (xiom.mda ?? []).map((mda) =>
-                    xiomMdaOptions(selectedEntry, component, xiom, config.sfm).filter((type) =>
-                      defaultImpliesFields(
-                        selectedEntry,
-                        { ...component, xiom: [{ ...xiom, mda: [{ ...mda, type }] }] },
-                        config.sfm,
-                        ["mda"]
-                      )
-                    )
-                  )
-                )}
-                onAdd={() => addXiom(index)}
-                onUpdate={(xiomIndex, updates) => updateXiom(index, xiomIndex, updates)}
-                onRemove={(xiomIndex) => removeXiom(index, xiomIndex)}
-                onAddMda={(xiomIndex) => addXiomMda(index, xiomIndex)}
-                onUpdateMda={(xiomIndex, mdaIndex, updates) => updateXiomMda(index, xiomIndex, mdaIndex, updates)}
-                onRemoveMda={(xiomIndex, mdaIndex) => removeXiomMda(index, xiomIndex, mdaIndex)}
-              />
+              {hasXcmModules(selectedEntry, component) ? (
+                <XcmModuleSection
+                  entry={selectedEntry}
+                  component={component}
+                  sfm={config.sfm}
+                  mdaSlotsFor={(iom, mdaType) => xiomMdaSlotsFor(component, iom, mdaType)}
+                  nextMdaFor={(iom) => nextXiomMdaFor(component, iom)}
+                  onChange={(modules) => setModules(index, modules)}
+                />
+              ) : (
+                <NestedMdaSection
+                  title="MDAs"
+                  mdas={component.mda ?? []}
+                  builtIn={builtInMdas(component.type)}
+                  slotsWithoutMda={emptySlots(component.type)}
+                  product={productOf(component)}
+                  options={directMdaOptions(selectedEntry, component, config.sfm)}
+                  slotOptions={directMdaSlotsFor(component)}
+                  slotOptionsByMda={(component.mda ?? []).map((mda) => directMdaSlotsFor(component, mda.type))}
+                  addDisabled={!nextDirectMdaFor(component)}
+                  onAdd={() => addMda(index)}
+                  onUpdate={(mdaIndex, updates) => updateMda(index, mdaIndex, updates)}
+                  onRemove={(mdaIndex) => removeMda(index, mdaIndex)}
+                />
+              )}
             </Paper>
               )}
             />
@@ -688,11 +928,14 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
 function ComponentHeader({
   label,
   component,
-  onRemove
+  onRemove,
+  removeBlockedReason
 }: {
   label: string;
   component: SrsimComponent;
   onRemove: () => void;
+  /** Why this component cannot be removed; the button is disabled when set. */
+  removeBlockedReason?: string;
 }) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
@@ -703,16 +946,25 @@ function ComponentHeader({
         </Typography>
         {component.type ? (
           <Typography variant="body2" color="text.secondary" noWrap>
-            {component.type}
+            {productName(component.type)}
           </Typography>
         ) : null}
       </Stack>
-      <Tooltip title="Remove component">
-        <IconButton size="small" color="error" onClick={onRemove}>
+      <RemoveButton title="Remove component" blockedReason={removeBlockedReason} onClick={onRemove} />
+    </Box>
+  );
+}
+
+/** Delete button that stays visible but disabled, with the reason as tooltip, when removal is not allowed. */
+function RemoveButton({ title, blockedReason, onClick }: { title: string; blockedReason?: string; onClick: () => void }) {
+  return (
+    <Tooltip title={blockedReason ?? title}>
+      <Box component="span" sx={{ justifySelf: { xs: "end", sm: "auto" } }}>
+        <IconButton size="small" color="error" onClick={onClick} disabled={Boolean(blockedReason)} aria-label={title}>
           <DeleteOutlineIcon fontSize="small" />
         </IconButton>
-      </Tooltip>
-    </Box>
+      </Box>
+    </Tooltip>
   );
 }
 
@@ -1005,27 +1257,28 @@ function EdaPowerSection({
 }
 
 function IntegratedComponentSection({
+  chassis,
   component,
   mdaOptions: mdaTypeOptions,
   mdaSlotOptions,
   slotOptionsByMda,
   addMdaDisabled,
-  mdaDefaultSlots,
-  mdaDefaultTypes,
   onAddMda,
   onUpdateMda,
-  onRemoveMda
+  onRemoveMda,
+  modules
 }: {
+  chassis: string;
   component: SrsimComponent;
   mdaOptions: string[];
   mdaSlotOptions: number[];
   slotOptionsByMda?: number[][];
   addMdaDisabled?: boolean;
-  mdaDefaultSlots?: SlotOption[][];
-  mdaDefaultTypes?: string[][];
   onAddMda: () => void;
   onUpdateMda: (index: number, updates: Partial<SrsimMda>) => void;
   onRemoveMda: (index: number) => void;
+  /** Module sections that replace the MDA list when the card takes XMAs or IOMs. */
+  modules?: ReactNode;
 }) {
   return (
     <Stack spacing={1.25}>
@@ -1041,23 +1294,25 @@ function IntegratedComponentSection({
           </Typography>
           {component.type ? (
             <Typography variant="body2" color="text.secondary" noWrap>
-              {component.type}
+              {productName(component.type)}
             </Typography>
           ) : null}
         </Stack>
-        <NestedMdaSection
-          title="MDAs"
-          mdas={component.mda ?? []}
-          options={mdaTypeOptions}
-          slotOptions={mdaSlotOptions}
-          slotOptionsByMda={slotOptionsByMda}
-          addDisabled={addMdaDisabled}
-          defaultSlots={mdaDefaultSlots}
-          defaultTypes={mdaDefaultTypes}
-          onAdd={onAddMda}
-          onUpdate={onUpdateMda}
-          onRemove={onRemoveMda}
-        />
+        {modules ?? (
+          <NestedMdaSection
+            title="MDAs"
+            mdas={component.mda ?? []}
+            builtIn={builtInMdas(component.type || integratedCard(chassis))}
+            slotsWithoutMda={emptySlots(component.type || integratedCard(chassis))}
+            options={mdaTypeOptions}
+            slotOptions={mdaSlotOptions}
+            slotOptionsByMda={slotOptionsByMda}
+            addDisabled={addMdaDisabled}
+            onAdd={onAddMda}
+            onUpdate={onUpdateMda}
+            onRemove={onRemoveMda}
+          />
+        )}
       </Paper>
     </Stack>
   );
@@ -1065,6 +1320,7 @@ function IntegratedComponentSection({
 
 function ComponentSection({
   title,
+  count,
   items,
   addLabel,
   addDisabled,
@@ -1072,6 +1328,8 @@ function ComponentSection({
   renderItem
 }: {
   title: string;
+  /** Configured and maximum number of components, shown after the title. */
+  count?: { used: number; max: number };
   items: IndexedComponent[];
   addLabel: string;
   addDisabled?: boolean;
@@ -1082,7 +1340,14 @@ function ComponentSection({
     <Stack spacing={1.25}>
       <Divider />
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-        <Typography variant="subtitle1">{title}</Typography>
+        <Typography variant="subtitle1">
+          {title}
+          {count ? (
+            <Box component="span" sx={{ color: "text.secondary", ml: 1 }}>
+              {slotCountLabel(count.used, count.max)}
+            </Box>
+          ) : null}
+        </Typography>
         <Button size="small" startIcon={<AddIcon />} onClick={onAdd} disabled={addDisabled}>
           {addLabel}
         </Button>
@@ -1113,35 +1378,26 @@ function SlotSelect({
   label,
   value,
   options,
-  defaultOptions = [],
   onChange
 }: {
   label: string;
   value?: SlotOption;
   options: SlotOption[];
-  defaultOptions?: SlotOption[];
   onChange: (slot: SlotOption) => void;
 }) {
   const visibleOptions = withCurrentSlotOption(options, value);
-  const defaultSet = new Set(defaultOptions.map((option) => String(option)));
-  const optionLabel = (option: SlotOption) => defaultSet.has(String(option)) ? `${String(option)} (default)` : String(option);
-  const selectedLabel = (selected: unknown) => {
-    const text = String(selected);
-    return defaultSet.has(text) ? `${text} default` : text;
-  };
 
   return (
-    <FormControl size="small" fullWidth>
+    <FormControl size="small" fullWidth disabled={onlyChoice(visibleOptions, value)}>
       <InputLabel>{label}</InputLabel>
       <Select
         label={label}
         value={value === undefined || value === "" ? "" : String(value)}
-        renderValue={selectedLabel}
         onChange={(event: SelectChangeEvent) => onChange(slotFromSelectValue(event.target.value, visibleOptions))}
       >
         {visibleOptions.map((option) => (
           <MenuItem key={String(option)} value={String(option)}>
-            {optionLabel(option)}
+            {String(option)}
           </MenuItem>
         ))}
       </Select>
@@ -1156,11 +1412,12 @@ function NestedMdaSection({
   slotOptions,
   slotOptionsByMda,
   addDisabled,
-  defaultSlots,
-  defaultTypes,
   onAdd,
   onUpdate,
-  onRemove
+  onRemove,
+  builtIn = [],
+  product,
+  slotsWithoutMda = []
 }: {
   title: string;
   mdas: SrsimMda[];
@@ -1168,107 +1425,39 @@ function NestedMdaSection({
   slotOptions: number[];
   slotOptionsByMda?: number[][];
   addDisabled?: boolean;
-  defaultSlots?: SlotOption[][];
-  defaultTypes?: string[][];
   onAdd: () => void;
   onUpdate: (index: number, updates: Partial<SrsimMda>) => void;
   onRemove: (index: number) => void;
+  /** The card's built-in MDAs; they keep their type and cannot be removed. */
+  builtIn?: Array<{ slot: number; type: string }>;
+  /** The physical card, when several share the card type: its MDAs are built in, only their type may change. */
+  product?: CardProduct;
+  /** Slot numbers the card has but cannot fill; shown as locked rows so the numbering has no gaps. */
+  slotsWithoutMda?: number[];
 }) {
+  const isBuiltInMda = (mda: SrsimMda) => builtIn.some((fixed) => fixed.slot === Number(mda.slot) && fixed.type === mda.type);
+  const typeOptions = (mda: SrsimMda) => {
+    if (product) return options.filter((option) => product.mdas[Number(mda.slot) - 1]?.includes(option));
+    return isBuiltInMda(mda) ? [mda.type ?? ""] : options.filter((option) => !builtIn.some((fixed) => fixed.type === option));
+  };
+  const removeBlockedReason = (mda: SrsimMda) =>
+    product ? `Built into the ${product.name}` : isBuiltInMda(mda) ? "Built into its card" : undefined;
   return (
     <Stack spacing={1} sx={{ mt: 1.5 }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
         <Typography variant="subtitle2">{title}</Typography>
-        <Button size="small" startIcon={<AddIcon />} onClick={onAdd} disabled={addDisabled}>
+        <Button size="small" startIcon={<AddIcon />} onClick={onAdd} disabled={addDisabled || Boolean(product)}>
           Add
         </Button>
       </Box>
-      {mdas.map((mda, index) => (
-        <Box
-          key={index}
-          sx={{
-            display: "grid",
-            gridTemplateColumns: nestedComponentGridColumns,
-            gap: 1,
-            alignItems: "center"
-          }}
-        >
-          <SlotSelect
-            label="Slot"
-            value={mda.slot}
-            options={slotOptionsByMda?.[index] ?? slotOptions}
-            defaultOptions={defaultSlots?.[index] ?? []}
-            onChange={(slot) => onUpdate(index, { slot })}
-          />
-          <FieldAutocomplete
-            label="Type"
-            value={mda.type ?? ""}
-            options={options}
-            defaultOptions={defaultTypes?.[index] ?? []}
-            onChange={(type) => onUpdate(index, { type })}
-            allowFreeText={false}
-          />
-          <IconButton size="small" color="error" onClick={() => onRemove(index)} sx={{ justifySelf: { xs: "end", sm: "auto" } }}>
-            <DeleteOutlineIcon fontSize="small" />
-          </IconButton>
-        </Box>
-      ))}
-    </Stack>
-  );
-}
-
-function NestedXiomSection({
-  xioms,
-  xiomOptions: xiomTypeOptions,
-  mdaOptionsByXiom,
-  mdaSlotOptionsByXiom,
-  mdaSlotOptionsByXiomMda,
-  canAddMdaByXiom,
-  xiomSlotOptions,
-  xiomDefaultSlots,
-  xiomDefaultTypes,
-  mdaDefaultSlots,
-  mdaDefaultTypes,
-  onAdd,
-  onUpdate,
-  onRemove,
-  onAddMda,
-  onUpdateMda,
-  onRemoveMda
-}: {
-  xioms: SrsimXiom[];
-  xiomOptions: string[];
-  mdaOptionsByXiom: string[][];
-  mdaSlotOptionsByXiom: number[][];
-  mdaSlotOptionsByXiomMda: number[][][];
-  canAddMdaByXiom: boolean[];
-  xiomSlotOptions: number[];
-  xiomDefaultSlots?: SlotOption[][];
-  xiomDefaultTypes?: string[][];
-  mdaDefaultSlots?: SlotOption[][][];
-  mdaDefaultTypes?: string[][][];
-  onAdd: () => void;
-  onUpdate: (index: number, updates: Partial<SrsimXiom>) => void;
-  onRemove: (index: number) => void;
-  onAddMda: (xiomIndex: number) => void;
-  onUpdateMda: (xiomIndex: number, mdaIndex: number, updates: Partial<SrsimMda>) => void;
-  onRemoveMda: (xiomIndex: number, mdaIndex: number) => void;
-}) {
-  return (
-    <Stack spacing={1} sx={{ mt: 1.5 }}>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-        <Typography variant="subtitle2">XIOMs</Typography>
-        <Button
-          size="small"
-          startIcon={<AddIcon />}
-          onClick={onAdd}
-          disabled={!xiomTypeOptions.length || !availableNumericSlotOptions(xiomSlotOptions, xioms).length}
-        >
-          Add XIOM
-        </Button>
-      </Box>
-      {xioms.map((xiom, xiomIndex) => (
-        <Paper key={xiomIndex} variant="outlined" sx={{ p: 1.25, bgcolor: "action.hover" }}>
+      {[
+        ...mdas.map((mda, index) => ({ slot: Number(mda.slot), mda, index })),
+        ...slotsWithoutMda.map((slot) => ({ slot, mda: undefined, index: -1 }))
+      ]
+        .sort((a, b) => a.slot - b.slot)
+        .map(({ slot, mda, index }) => (
           <Box
+            key={mda ? index : `empty-${slot}`}
             sx={{
               display: "grid",
               gridTemplateColumns: nestedComponentGridColumns,
@@ -1276,40 +1465,180 @@ function NestedXiomSection({
               alignItems: "center"
             }}
           >
-            <SlotSelect
-              label="Slot"
-              value={xiom.slot}
-              options={xiomSlotOptions}
-              defaultOptions={xiomDefaultSlots?.[xiomIndex] ?? []}
-              onChange={(slot) => onUpdate(xiomIndex, { slot })}
-            />
-            <FieldAutocomplete
-              label="XIOM type"
-              value={xiom.type ?? ""}
-              options={xiomTypeOptions}
-              defaultOptions={xiomDefaultTypes?.[xiomIndex] ?? []}
-              onChange={(type) => onUpdate(xiomIndex, { type })}
-              allowFreeText={false}
-            />
-            <IconButton size="small" color="error" onClick={() => onRemove(xiomIndex)} sx={{ justifySelf: { xs: "end", sm: "auto" } }}>
-              <DeleteOutlineIcon fontSize="small" />
-            </IconButton>
+            {mda ? (
+              <>
+                <SlotSelect
+                  label="Slot"
+                  value={mda.slot}
+                  options={product || isBuiltInMda(mda) ? [slot] : (slotOptionsByMda?.[index] ?? slotOptions)}
+                  onChange={(next) => onUpdate(index, { slot: next })}
+                />
+                <FieldAutocomplete
+                  label="Type"
+                  value={mda.type ?? ""}
+                  options={typeOptions(mda)}
+                  groupBy={generationGroup}
+                  groupOrder={generationGroupOrder}
+                  onChange={(type) => onUpdate(index, { type })}
+                  allowFreeText={false}
+                />
+                <RemoveButton title="Remove MDA" blockedReason={removeBlockedReason(mda)} onClick={() => onRemove(index)} />
+              </>
+            ) : (
+              <>
+                <SlotSelect label="Slot" value={slot} options={[slot]} onChange={() => undefined} />
+                <TextField size="small" label="Type" value="No MDA" disabled />
+                <RemoveButton title="Remove MDA" blockedReason="This slot takes no MDA" onClick={() => undefined} />
+              </>
+            )}
           </Box>
-          <NestedMdaSection
-            title="XIOM MDAs"
-            mdas={xiom.mda ?? []}
-            options={mdaOptionsByXiom[xiomIndex] ?? []}
-            slotOptions={mdaSlotOptionsByXiom[xiomIndex] ?? []}
-            slotOptionsByMda={mdaSlotOptionsByXiomMda[xiomIndex] ?? []}
-            addDisabled={!canAddMdaByXiom[xiomIndex]}
-            defaultSlots={mdaDefaultSlots?.[xiomIndex]}
-            defaultTypes={mdaDefaultTypes?.[xiomIndex]}
-            onAdd={() => onAddMda(xiomIndex)}
-            onUpdate={(mdaIndex, updates) => onUpdateMda(xiomIndex, mdaIndex, updates)}
-            onRemove={(mdaIndex) => onRemoveMda(xiomIndex, mdaIndex)}
-          />
-        </Paper>
-      ))}
+        ))}
     </Stack>
+  );
+}
+
+/** Module slots of an XCM: each holds an XMA, or an IOM with its MDAs. */
+function XcmModuleSection({
+  entry,
+  component,
+  sfm,
+  mdaSlotsFor,
+  nextMdaFor,
+  onChange,
+  variant
+}: {
+  entry: MatrixEntry | undefined;
+  component: SrsimComponent;
+  sfm: string;
+  mdaSlotsFor: (iom: SrsimXiom, mdaType?: string) => number[];
+  nextMdaFor: (iom: SrsimXiom) => SrsimMda | null;
+  onChange: (modules: XcmModule[]) => void;
+  /** Selected hardware variant; limits the modules to what that variant installs. */
+  variant?: ChassisVariant;
+}) {
+  const modules = xcmModulesFromComponent(component);
+  const slots = xcmModuleSlotOptions(entry, component);
+  const optionsByKind: Record<XcmModuleKind, string[]> = {
+    xma: xcmXmaOptions(entry, component, sfm).filter((type) => !variant?.parts.length || variant.parts.includes(type)),
+    iom: xcmIomOptions(entry, component, sfm).filter((type) => !variant?.parts.length || variant.parts.includes(type))
+  };
+  const freeSlots = (own?: number) => slots.filter((slot) => slot === own || !modules.some((module) => module.slot === slot));
+  const update = (target: XcmModule, updates: Partial<XcmModule>) =>
+    onChange(modules.map((module) => (module === target ? { ...module, ...updates } : module)));
+  const remove = (target: XcmModule) => onChange(modules.filter((module) => module !== target));
+  const add = (kind: XcmModuleKind) => {
+    const slot = freeSlots()[0];
+    if (slot === undefined || !optionsByKind[kind].length) return;
+    onChange([...modules, { slot, kind, type: optionsByKind[kind][0], mda: [] }]);
+  };
+  const slotText = slots.length === 1 ? "One module slot, for" : `${slots.length} module slots, each for`;
+
+  const moduleRow = (module: XcmModule) => (
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: nestedComponentGridColumns,
+        gap: 1,
+        alignItems: "center"
+      }}
+    >
+      <SlotSelect
+        label="Slot"
+        value={module.slot}
+        options={freeSlots(module.slot)}
+        onChange={(slot) => update(module, { slot: Number(slot) })}
+      />
+      <FieldAutocomplete
+        label={module.kind === "xma" ? "XMA type" : "IOM type"}
+        value={module.type}
+        options={optionsByKind[module.kind]}
+        groupBy={generationGroup}
+        groupOrder={generationGroupOrder}
+        onChange={(type) => update(module, { type, mda: module.kind === "iom" ? [] : module.mda })}
+        allowFreeText={false}
+      />
+      <RemoveButton
+        title={module.kind === "xma" ? "Remove XMA" : "Remove IOM"}
+        blockedReason={variant?.parts.includes(module.type) ? `Built into the ${variant.name}` : undefined}
+        onClick={() => remove(module)}
+      />
+    </Box>
+  );
+
+  // XMAs and IOMs share the module slots: a kind with no module of its own and no free slot is blocked by the other.
+  const blockedBy = (kind: XcmModuleKind): string => {
+    if (freeSlots().length || modules.some((module) => module.kind === kind)) return "";
+    return kind === "xma" ? "IOM" : "XMA";
+  };
+
+  const header = (kind: XcmModuleKind, title: string, addLabel: string) => {
+    const blocker = blockedBy(kind);
+    return (
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+        <Typography variant="subtitle2" sx={{ color: blocker ? "text.disabled" : undefined }}>
+          {title}
+          {blocker ? (
+            <Box component="span" sx={{ fontWeight: 400 }}>
+              {` (Blocked by ${blocker})`}
+            </Box>
+          ) : null}
+        </Typography>
+        <Button size="small" startIcon={<AddIcon />} onClick={() => add(kind)} disabled={!optionsByKind[kind].length || !freeSlots().length}>
+          {addLabel}
+        </Button>
+      </Box>
+    );
+  };
+
+  return (
+    <>
+      <FormHelperText sx={{ mt: 1.5 }}>
+        {optionsByKind.xma.length && optionsByKind.iom.length
+          ? `${slotText} either an XMA or an IOM with MDAs.`
+          : optionsByKind.iom.length
+            ? `${slotText} an IOM with MDAs.`
+            : `${slotText} an XMA.`}
+      </FormHelperText>
+
+      {optionsByKind.xma.length ? (
+        <Stack spacing={1} sx={{ mt: 1.5 }}>
+          {header("xma", "XMA", "Add XMA")}
+          {modules.filter((module) => module.kind === "xma").map((module) => (
+            <Box key={module.slot}>{moduleRow(module)}</Box>
+          ))}
+        </Stack>
+      ) : null}
+
+      {optionsByKind.iom.length ? (
+        <Stack spacing={1} sx={{ mt: 1.5 }}>
+          {header("iom", "IOM + MDA", "Add IOM")}
+          {modules.filter((module) => module.kind === "iom").map((module) => {
+            const iom = { slot: module.slot, type: module.type, mda: module.mda };
+            return (
+              <Paper key={module.slot} variant="outlined" sx={{ p: 1.25, bgcolor: "action.hover" }}>
+                {moduleRow(module)}
+                <NestedMdaSection
+                  title="MDAs"
+                  mdas={module.mda}
+                  builtIn={builtInMdas(iom.type)}
+                  options={xiomMdaOptions(entry, component, iom, sfm)}
+                  slotOptions={mdaSlotsFor(iom)}
+                  slotOptionsByMda={module.mda.map((mda) => mdaSlotsFor(iom, mda.type))}
+                  addDisabled={!nextMdaFor(iom)}
+                  onAdd={() => {
+                    const mda = nextMdaFor(iom);
+                    if (mda) update(module, { mda: [...module.mda, mda] });
+                  }}
+                  onUpdate={(mdaIndex, updates) =>
+                    update(module, { mda: module.mda.map((mda, idx) => (idx === mdaIndex ? { ...mda, ...updates } : mda)) })
+                  }
+                  onRemove={(mdaIndex) => update(module, { mda: module.mda.filter((_, idx) => idx !== mdaIndex) })}
+                />
+              </Paper>
+            );
+          })}
+        </Stack>
+      ) : null}
+    </>
   );
 }

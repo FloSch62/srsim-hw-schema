@@ -54,6 +54,18 @@ export interface SrsimConfig {
   chassis: string;
   sfm: string;
   components: SrsimComponent[];
+  /** Chosen CPM adapter (CMA); editor state only, SR-SIM has no CMA. Unset: derived from the CPMs. */
+  cma?: string;
+  /**
+   * Chosen physical chassis variant (editor state only, never written to YAML). Unset means
+   * "read it from the installed module", e.g. after a chassis change or a reset.
+   */
+  hardwareVariant?: string;
+  /**
+   * Chosen physical card per line-card slot when several share a card type (editor state only, never
+   * written to YAML); needed where the MDAs alone do not tell the products apart, e.g. ISA2 vs ISA2-E.
+   */
+  cardProducts?: Record<string, string>;
   edaNamespace: string;
   edaNodeProfile: string;
   edaVersion: string;
@@ -150,7 +162,7 @@ export interface EdaYangCatalog {
 }
 
 export interface ValidationIssue {
-  source: "yaml" | "schema" | "hardware";
+  source: "yaml" | "schema" | "srsim" | "hardware";
   message: string;
   path?: string;
 }

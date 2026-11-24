@@ -3915,7 +3915,7 @@
         "default_rows": 84,
         "supported_rows": 427,
         "allow_unknown_values": false,
-        "component_definitions": 44
+        "component_definitions": 48
     },
     "x-srsim-schema-ref": "https://raw.githubusercontent.com/srl-labs/containerlab/main/schemas/srsim-hw.schema.json"
 }

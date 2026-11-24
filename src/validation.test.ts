@@ -26,7 +26,7 @@ const validConfig = {
   chassis: "sr-7s",
   sfm: "sfm-s",
   components: [
-    { slot: "A", type: "cpm2-s" },
+    { slot: "A", type: "cpm-s" },
     {
       slot: 1,
       type: "xcm-7s",
@@ -138,6 +138,27 @@ describe("topology validation", () => {
     assert.equal(yaml.includes("- slot: A\n          mda:\n            - slot: 1\n              type: s18-100gb-qsfp28"), true);
     assert.equal(validateTopologyYaml(yaml, hardware).valid, true);
     assert.equal(integratedCardTypeIsImplied(getEntry(buildMatrix(hardware), "sar-mx"), { slot: "A", type: "iom-sar-1x" }), false);
+  });
+
+  it("accepts the SR-1s with its integrated IOM-s and MDA-s instead of an XMA-s", () => {
+    const entry = getEntry(buildMatrix(hardware), "sr-1s");
+    const component = {
+      slot: "A",
+      type: "cpm-1s",
+      xiom: [{ slot: 1, type: "iom-s-3.0t", mda: [{ slot: 1, type: "ms16-100gb-sfpdd+4-100gb-qsfp28" }] }]
+    };
+    const yaml = buildTopologyYaml({ labName: "srsimtest", nodeName: "sros1", chassis: "sr-1s", sfm: "", components: [component] }, {
+      shouldWriteComponentType: (candidate) => !integratedCardTypeIsImplied(entry, candidate)
+    });
+
+    assert.equal(yaml.includes("type: iom-s-3.0t"), true);
+    assert.deepEqual(validateTopologyYaml(yaml, hardware).issues, []);
+
+    const bothInOneSlot = buildTopologyYaml(
+      { labName: "srsimtest", nodeName: "sros1", chassis: "sr-1s", sfm: "", components: [{ ...component, mda: [{ slot: 1, type: "s36-100gb-qsfp28" }] }] },
+      { shouldWriteComponentType: () => false }
+    );
+    assert.equal(validateTopologyYaml(bothInOneSlot, hardware).valid, false);
   });
 
   it("can include integrated default slot and CPM type in generated YAML", () => {
@@ -260,6 +281,16 @@ describe("topology validation", () => {
     assert.equal(validateTopologyYaml(yaml, hardware).valid, true);
   });
 
+  it("tells hardware SR-SIM runs but that does not exist apart from what SR-SIM rejects", () => {
+    // SR-SIM's appendix pairs CPM2-s with SFM-s, but CPM2-s runs only in an FP5 (SFM2-s) system.
+    const report = validateTopologyYaml(
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-100gb-qsfp28\n",
+      hardware
+    );
+
+    assert.deepEqual(report.issues.map((issue) => issue.source), ["hardware"]);
+  });
+
   it("reports incompatible pasted SR-SIM hardware tuples", () => {
     const yaml = buildTopologyYaml({
       ...validConfig,
@@ -276,7 +307,7 @@ describe("topology validation", () => {
     const report = validateTopologyYaml(yaml, hardware);
 
     assert.equal(report.valid, false);
-    assert.ok(report.issues.some((issue) => issue.source === "hardware"));
+    assert.ok(report.issues.some((issue) => issue.source === "srsim"));
   });
 
   it("requires SFM for non-default supported CPMs", () => {
@@ -296,7 +327,7 @@ describe("topology validation", () => {
 
   it("accepts SFM at node level, the only place containerlab allows it", () => {
     const report = validateTopologyYaml(
-      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n        - slot: 2\n          type: xcm-7s\n          xiom:\n            - slot: 1\n              type: iom-s-3.0t\n              mda:\n                - slot: 1\n                  type: ms2-400gb-qsfpdd+2-100gb-qsfp28\n",
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n        - slot: 2\n          type: xcm-7s\n          xiom:\n            - slot: 1\n              type: iom-s-3.0t\n              mda:\n                - slot: 1\n                  type: ms2-400gb-qsfpdd+2-100gb-qsfp28\n",
       hardware
     );
 
@@ -324,7 +355,7 @@ describe("topology validation", () => {
 
     assert.equal(report.valid, false);
     assert.ok(report.issues.some((issue) => issue.source === "schema"));
-    assert.ok(report.issues.some((issue) => issue.source === "hardware" && issue.message.startsWith("unsupported tuple")));
+    assert.ok(report.issues.some((issue) => issue.source === "srsim" && issue.message.startsWith("unsupported tuple")));
   });
 
   it("rejects a node SFM on a chassis without SFMs", () => {
@@ -351,7 +382,7 @@ describe("topology validation", () => {
 
   it("accepts an uppercase chassis type because containerlab lowercases it", () => {
     const report = validateTopologyYaml(
-      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: SR-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm2-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n",
+      "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: SR-7s\n      sfm: sfm-s\n      components:\n        - slot: A\n          type: cpm-s\n        - slot: 1\n          type: xcm-7s\n          mda:\n            - slot: 1\n              type: s36-400gb-qsfpdd\n",
       hardware
     );
 
@@ -392,7 +423,7 @@ describe("topology validation", () => {
     assert.equal(singleComponent.valid, false);
     assert.ok(singleComponent.issues.some((issue) => issue.message.includes("requires a CPM component slot")));
     assert.equal(outOfRange.valid, false);
-    assert.ok(outOfRange.issues.some((issue) => issue.message.includes("slot must be between 1 and 7")));
+    assert.ok(outOfRange.issues.some((issue) => issue.message.includes("sr-7s has line-card slots 1, 2, 3, 4, 5, 6, not 99")));
   });
 
   it("rejects duplicate distributed component slots", () => {
@@ -412,37 +443,36 @@ describe("topology validation", () => {
     );
 
     assert.equal(report.valid, false);
-    assert.ok(report.issues.some((issue) => issue.message.includes("m20-1g-csfp must use MDA slot(s) 1, 2, 3")));
+    assert.ok(report.issues.some((issue) => issue.message.includes("m20-1g-csfp fits slot 1, 2, 3 of iom-ixr-r4, not slot 4")));
   });
 
-  it("rejects direct MDA slots outside the matrix slot options", () => {
+  it("rejects direct MDA slots that the card does not have", () => {
     const report = validateTopologyYaml(
       "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-1x-48d\n      components:\n        - slot: A\n        - slot: 1\n          type: i48-800g-qsfpdd-1x\n          mda:\n            - slot: 3\n              type: m48-800g-qsfpdd-1x\n",
       hardware
     );
 
     assert.equal(report.valid, false);
-    assert.ok(report.issues.some((issue) => issue.message.includes("m48-800g-qsfpdd-1x must use MDA slot(s) 1, 2")));
+    assert.ok(report.issues.some((issue) => issue.message.includes("i48-800g-qsfpdd-1x has MDA slot 1, not 3")));
   });
 
-  it("rejects SR-1e direct MDA slots above the numbered default slots", () => {
+  it("rejects SR-1e direct MDA slots that the IOM-e does not have", () => {
     const report = validateTopologyYaml(
       "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-1e\n      components:\n        - slot: A\n          type: cpm-e\n        - slot: 1\n          type: iom-e\n          mda:\n            - slot: 5\n              type: isa2-aa\n",
       hardware
     );
 
     assert.equal(report.valid, false);
-    assert.ok(report.issues.some((issue) => issue.message.includes("isa2-aa must use MDA slot(s) 4")));
+    assert.ok(report.issues.some((issue) => issue.message.includes("iom-e has MDA slots 1, 2, 3, 4, not 5")));
   });
 
-  it("rejects SR-1e direct MDA type and slot combinations outside numbered fields", () => {
+  it("accepts an ISA2 in any SR-1e MDA-e slot", () => {
     const report = validateTopologyYaml(
       "name: srsim-lab\ntopology:\n  nodes:\n    sros1:\n      kind: nokia_srsim\n      type: sr-1e\n      components:\n        - slot: A\n          type: cpm-e\n        - slot: 1\n          type: iom-e\n          mda:\n            - slot: 1\n              type: isa2-aa\n",
       hardware
     );
 
-    assert.equal(report.valid, false);
-    assert.ok(report.issues.some((issue) => issue.message.includes("isa2-aa must use MDA slot(s) 4")));
+    assert.equal(report.valid, true);
   });
 
   it("validates split IXR-e CPM and IMM values from slash-combined appendix rows", () => {
@@ -486,8 +516,8 @@ describe("XIOM and XCM slot limits", () => {
     return `          xiom:\n${slots.map((slot) => `            - slot: ${slot}\n              type: iom-s-3.0t\n              mda:\n${mdas}`).join("")}`;
   };
   const sr2s = (modules: string) => topology("sr-2s", "sfm-2s", "cpm-2s", "xcm-2s", modules);
-  const sr7s = (modules: string) => topology("sr-7s", "sfm-s", "cpm2-s", "xcm-7s", modules);
-  const sr14s = (modules: string) => topology("sr-14s", "sfm-s", "cpm2-s", "xcm-14s", modules);
+  const sr7s = (modules: string) => topology("sr-7s", "sfm-s", "cpm-s", "xcm-7s", modules);
+  const sr14s = (modules: string) => topology("sr-14s", "sfm-s", "cpm-s", "xcm-14s", modules);
 
   const expectValid = (yaml: string) => assert.deepEqual(validateTopologyYaml(yaml, hardware).issues, []);
   const expectRejected = (yaml: string, message: string) => {
@@ -502,20 +532,20 @@ describe("XIOM and XCM slot limits", () => {
 
   it("limits an XIOM to two MDAs", () => {
     expectValid(sr7s(xiom([1], [1, 2])));
-    expectRejected(sr7s(xiom([1], [1, 2, 3])), "must use MDA slot(s) 1, 2");
-    expectRejected(sr7s(xiom([1], [3])), "must use MDA slot(s) 1, 2");
+    expectRejected(sr7s(xiom([1], [1, 2, 3])), "has MDA slots 1, 2, not 3");
+    expectRejected(sr7s(xiom([1], [3])), "has MDA slots 1, 2, not 3");
   });
 
   for (const [name, build] of [["SR-2s", sr2s], ["SR-7s", sr7s]] as const) {
     it(`gives ${name} one XCM slot for an XMA or an XIOM`, () => {
       expectValid(build(direct(1)));
       expectValid(build(xiom([1])));
-      expectRejected(build(direct(1) + xiom([1])), "XCM slot 1 holds either a direct MDA or an XIOM, not both");
-      expectRejected(build(direct(1) + xiom([2])), "XIOM must use XCM slot(s) 1");
-      expectRejected(build(direct(1, 2)), "must use MDA slot(s) 1");
-      expectRejected(build(direct(2)), "must use MDA slot(s) 1");
-      expectRejected(build(xiom([1, 2])), "XIOM must use XCM slot(s) 1");
-      expectRejected(build(xiom([2])), "XIOM must use XCM slot(s) 1");
+      expectRejected(build(direct(1) + xiom([1])), "module slot 1 holds either an XMA or an IOM, not both");
+      expectRejected(build(direct(1) + xiom([2])), "has module slot 1, not 2");
+      expectRejected(build(direct(1, 2)), "has module slot 1, not 2");
+      expectRejected(build(direct(2)), "has module slot 1, not 2");
+      expectRejected(build(xiom([1, 2])), "has module slot 1, not 2");
+      expectRejected(build(xiom([2])), "has module slot 1, not 2");
     });
   }
 
@@ -524,14 +554,14 @@ describe("XIOM and XCM slot limits", () => {
     expectValid(sr14s(direct(2) + xiom([1])));
     expectValid(sr14s(direct(1, 2)));
     expectValid(sr14s(xiom([1, 2])));
-    expectRejected(sr14s(direct(1) + xiom([1])), "XCM slot 1 holds either a direct MDA or an XIOM, not both");
-    expectRejected(sr14s(direct(3)), "must use MDA slot(s) 1, 2");
-    expectRejected(sr14s(xiom([3])), "XIOM must use XCM slot(s) 1, 2");
+    expectRejected(sr14s(direct(1) + xiom([1])), "module slot 1 holds either an XMA or an IOM, not both");
+    expectRejected(sr14s(direct(3)), "has module slots 1, 2, not 3");
+    expectRejected(sr14s(xiom([3])), "has module slots 1, 2, not 3");
   });
 
   it("applies the XCM limits to every XCM generation and chassis type spelling", () => {
     expectRejected(topology("sr-7s", "sfm2-s", "cpm2-s", "xcm2-7s", direct(1) + xiom([1])), "not both");
-    expectRejected(topology("SR-7s", "sfm-s", "cpm2-s", "xcm-7s", direct(1) + xiom([1])), "not both");
+    expectRejected(topology("SR-7s", "sfm-s", "cpm-s", "xcm-7s", direct(1) + xiom([1])), "not both");
   });
 
   it("reports duplicate XIOM slots on chassis without a documented XCM slot count", () => {

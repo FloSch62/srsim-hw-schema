@@ -3,6 +3,7 @@ import YAML from "yaml";
 
 import clabSchemaData from "./data/clab.schema.json";
 import srsimSchemaData from "./data/srsim-hw.schema.json";
+import { cardSlots, hardwareIssues, integratedCard, lineCardSlots } from "./hardwareModel";
 import {
   buildMatrix,
   canonicalToken,
@@ -11,10 +12,8 @@ import {
   directMdaSlotOptions,
   deploymentMode,
   isEmptyValue,
-  schemaNumericSlotOptions,
   sfmOptions,
   splitValues,
-  xcmModuleSlotCount,
   xiomMdaSlotOptions
 } from "./matrix";
 import type {
@@ -189,7 +188,7 @@ function validateCriteria(params: {
   const { schema, nodeName, location, modelName, strict } = params;
   const modelMatch = findChassisEntry(schema, modelName);
   if (!modelMatch) {
-    return [{ source: "hardware", message: `${nodeName}: model/chassis not found: ${modelName}` }];
+    return [{ source: "srsim", message: `${nodeName}: model/chassis not found: ${modelName}` }];
   }
 
   const [, model] = modelMatch;
@@ -201,7 +200,7 @@ function validateCriteria(params: {
   if (!matches.length) {
     return [
       {
-        source: "hardware",
+        source: "srsim",
         path: location,
         message: `unsupported tuple ${JSON.stringify(criteria)}`
       }
@@ -223,7 +222,7 @@ function validateCriteria(params: {
     if (missing.size) {
       return [
         {
-          source: "hardware",
+          source: "srsim",
           path: location,
           message: `missing required field(s): ${[...missing].sort().join(", ")}; tuple ${JSON.stringify(criteria)}`
         }
@@ -262,7 +261,7 @@ function validateNestedMdaSlot(params: {
 
   if (slotText) {
     if (seenSlots.has(slotText)) {
-      issues.push({ source: "hardware", path: location, message: `duplicate MDA slot ${slotText}` });
+      issues.push({ source: "srsim", path: location, message: `duplicate MDA slot ${slotText}` });
     } else {
       seenSlots.add(slotText);
     }
@@ -271,43 +270,21 @@ function validateNestedMdaSlot(params: {
   const slotNumber = numericSlot(slot);
   if (slotNumber !== null && allowedSlots.length && !allowedSlots.includes(slotNumber)) {
     const label = String(type ?? "MDA");
-    issues.push({ source: "hardware", path: location, message: `${label} must use MDA slot(s) ${allowedSlots.join(", ")}` });
+    issues.push({ source: "srsim", path: location, message: `${label} must use MDA slot(s) ${allowedSlots.join(", ")}` });
   }
 
   return issues;
 }
 
-function validateXcmModuleSlots(params: {
-  location: string;
-  chassis: string;
-  mdas: unknown[];
-  xioms: unknown[];
-}): ValidationIssue[] {
-  const { location, chassis, mdas, xioms } = params;
-  const slotCount = xcmModuleSlotCount(chassis);
-  const slotText = (item: unknown) => String(asRecord(item)?.slot ?? "").trim();
-  const mdaSlots = new Set(mdas.map(slotText));
-  const seenSlots = new Set<string>();
+function duplicateXiomSlots(location: string, xioms: unknown[]): ValidationIssue[] {
+  const seen = new Set<string>();
   const issues: ValidationIssue[] = [];
-
-  for (const slot of xioms.map(slotText).filter(Boolean)) {
-    const path = `${location}.xiom[${slot}]`;
-    if (seenSlots.has(slot)) {
-      issues.push({ source: "hardware", path, message: `duplicate XIOM slot ${slot}` });
+  for (const slot of xioms.map((item) => String(asRecord(item)?.slot ?? "").trim()).filter(Boolean)) {
+    if (seen.has(slot)) {
+      issues.push({ source: "srsim", path: `${location}.xiom[${slot}]`, message: `duplicate XIOM slot ${slot}` });
     }
-    seenSlots.add(slot);
-    if (slotCount === undefined) continue;
-
-    const slotNumber = numericSlot(slot);
-    if (slotNumber !== null && slotNumber > slotCount) {
-      const allowed = schemaNumericSlotOptions([], slotCount).join(", ");
-      issues.push({ source: "hardware", path, message: `XIOM must use XCM slot(s) ${allowed}` });
-    }
-    if (mdaSlots.has(slot)) {
-      issues.push({ source: "hardware", path, message: `XCM slot ${slot} holds either a direct MDA or an XIOM, not both` });
-    }
+    seen.add(slot);
   }
-
   return issues;
 }
 
@@ -337,19 +314,19 @@ function validateComponent(params: {
     xioms = asList(component.xiom, "XIOM");
     mdas = asList(component.mda, "MDA");
   } catch (error) {
-    return [{ source: "hardware", path: location, message: (error as Error).message }];
+    return [{ source: "srsim", path: location, message: (error as Error).message }];
   }
 
   if (!xioms.length && !mdas.length) {
     return validateCriteria({ schema, nodeName, location, modelName: chassis, criteria: base, strict });
   }
 
-  const issues: ValidationIssue[] = [...validateXcmModuleSlots({ location, chassis, mdas, xioms })];
+  const issues: ValidationIssue[] = duplicateXiomSlots(location, xioms);
   const seenDirectMdaSlots = new Set<string>();
   for (const mda of mdas) {
     const mdaRecord = asRecord(mda);
     if (!mdaRecord) {
-      issues.push({ source: "hardware", path: location, message: "MDA entries must be mappings" });
+      issues.push({ source: "srsim", path: location, message: "MDA entries must be mappings" });
       continue;
     }
     const mdaLocation = `${location}.mda[${String(mdaRecord.slot ?? "?")}]`;
@@ -358,7 +335,10 @@ function validateComponent(params: {
         location: mdaLocation,
         slot: mdaRecord.slot,
         type: mdaRecord.type,
-        allowedSlots: directMdaSlotOptions(matrixEntry, baseComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
+        // Cards in the hardware model are checked there; this only covers the rest.
+        allowedSlots: cardSlots(baseComponent.type || integratedCard(clabChassisToken(chassis))).length
+          ? []
+          : directMdaSlotOptions(matrixEntry, baseComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
         seenSlots: seenDirectMdaSlots
       })
     );
@@ -377,7 +357,7 @@ function validateComponent(params: {
   for (const xiom of xioms) {
     const xiomRecord = asRecord(xiom);
     if (!xiomRecord) {
-      issues.push({ source: "hardware", path: location, message: "XIOM entries must be mappings" });
+      issues.push({ source: "srsim", path: location, message: "XIOM entries must be mappings" });
       continue;
     }
 
@@ -386,7 +366,7 @@ function validateComponent(params: {
       xiomMdas = asList(xiomRecord.mda, "mda");
     } catch (error) {
       issues.push({
-        source: "hardware",
+        source: "srsim",
         path: `${location}.xiom[${String(xiomRecord.slot ?? "?")}]`,
         message: (error as Error).message
       });
@@ -414,7 +394,7 @@ function validateComponent(params: {
       const mdaRecord = asRecord(mda);
       if (!mdaRecord) {
         issues.push({
-          source: "hardware",
+          source: "srsim",
           path: `${location}.xiom[${String(xiomRecord.slot ?? "?")}]`,
           message: "MDA entries must be mappings"
         });
@@ -426,7 +406,9 @@ function validateComponent(params: {
           location: mdaLocation,
           slot: mdaRecord.slot,
           type: mdaRecord.type,
-          allowedSlots: xiomMdaSlotOptions(matrixEntry, baseComponent, xiomComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
+          allowedSlots: cardSlots(xiomComponent.type).length
+            ? []
+            : xiomMdaSlotOptions(matrixEntry, baseComponent, xiomComponent, base.sfm, 2, 1, String(mdaRecord.type ?? "")),
           seenSlots: seenXiomMdaSlots
         })
       );
@@ -446,17 +428,6 @@ function validateComponent(params: {
   return issues;
 }
 
-function inferredComponentSlotCount(chassis: string): number {
-  const value = clabChassisToken(chassis);
-  const srA = value.match(/^sr-a(\d+)$/);
-  if (srA) return Number(srA[1]);
-  const ixrR = value.match(/^ixr-r(\d+)/);
-  if (ixrR) return Number(ixrR[1]);
-  const modular = value.match(/^(?:ess|ixr|sr|xrs)-(\d+)(?:[a-z]*)$/);
-  if (modular) return Number(modular[1]);
-  return 1;
-}
-
 function validateComponentListShape(params: {
   schema: HardwareSchema;
   nodeName: string;
@@ -467,7 +438,11 @@ function validateComponentListShape(params: {
   const { schema, nodeName, chassis, sfm, components } = params;
   const matrixEntry = buildMatrix(schema).find((entry) => entry.chassis === clabChassisToken(chassis));
   const mode = deploymentMode(matrixEntry);
-  const issues: ValidationIssue[] = [];
+  const issues: ValidationIssue[] = hardwareIssues(clabChassisToken(chassis), components, sfm).map((issue) => {
+    const [slot, ...rest] = issue.path.split(".");
+    const path = slot ? [componentName(nodeName, slot), ...rest].join(".") : undefined;
+    return { source: "hardware", ...(path ? { path } : {}), message: path ? issue.message : `${nodeName}: ${issue.message}` };
+  });
   const slotValue = (component: unknown) => {
     const record = asRecord(component);
     return record?.slot === undefined || record.slot === null ? "" : String(record.slot).trim();
@@ -480,34 +455,30 @@ function validateComponentListShape(params: {
     if (!slot) continue;
     const key = slot.toUpperCase();
     if (seenSlots.has(key)) {
-      issues.push({ source: "hardware", path: componentName(nodeName, slot), message: `duplicate component slot ${slot}` });
+      issues.push({ source: "srsim", path: componentName(nodeName, slot), message: `duplicate component slot ${slot}` });
     } else {
       seenSlots.add(key);
     }
   }
 
   if (sfm && !sfmOptions(matrixEntry, []).length) {
-    issues.push({ source: "hardware", message: `${nodeName}: SR-SIM chassis ${chassis} does not use an SFM, remove sfm` });
+    issues.push({ source: "srsim", message: `${nodeName}: SR-SIM chassis ${chassis} does not use an SFM, remove sfm` });
   }
   for (const component of components) {
     const record = asRecord(component);
     if (record && "sfm" in record) {
-      issues.push({ source: "hardware", path: componentName(nodeName, slotValue(component)), message: "sfm must be set on the node, not on a component" });
+      issues.push({ source: "srsim", path: componentName(nodeName, slotValue(component)), message: "sfm must be set on the node, not on a component" });
     }
   }
 
   if (mode === "standalone") {
     if (components.length > 1) {
-      issues.push({ source: "hardware", message: `${nodeName}: standalone SR-SIM chassis ${chassis} accepts at most one component override` });
+      issues.push({ source: "srsim", message: `${nodeName}: standalone SR-SIM chassis ${chassis} accepts at most one component override` });
     }
     for (const component of components) {
-      const record = asRecord(component);
       const slot = slotValue(component);
       if (slot && slot.toUpperCase() !== "A") {
-        issues.push({ source: "hardware", path: componentName(nodeName, slot), message: "standalone component slot must be omitted or A" });
-      }
-      if (record?.xiom) {
-        issues.push({ source: "hardware", path: componentName(nodeName, slot), message: "standalone component must not set xiom" });
+        issues.push({ source: "srsim", path: componentName(nodeName, slot), message: "standalone component slot must be omitted or A" });
       }
     }
     return issues;
@@ -515,36 +486,29 @@ function validateComponentListShape(params: {
 
   if (mode === "integrated_redundant") {
     if (components.length > 2) {
-      issues.push({ source: "hardware", message: `${nodeName}: ${chassis} accepts at most two redundant integrated components` });
+      issues.push({ source: "srsim", message: `${nodeName}: ${chassis} accepts at most two redundant integrated components` });
     }
     for (const component of components) {
       const slot = slotValue(component);
       if (slot && !["A", "B"].includes(slot.toUpperCase())) {
-        issues.push({ source: "hardware", path: componentName(nodeName, slot), message: "redundant integrated component slot must be A or B" });
+        issues.push({ source: "srsim", path: componentName(nodeName, slot), message: "redundant integrated component slot must be A or B" });
       }
     }
     return issues;
   }
 
   if (components.length && components.length < 2) {
-    issues.push({ source: "hardware", message: `${nodeName}: distributed SR-SIM chassis ${chassis} requires at least two components` });
+    issues.push({ source: "srsim", message: `${nodeName}: distributed SR-SIM chassis ${chassis} requires at least two components` });
   }
   if (components.length && !alphaSlots.length) {
-    issues.push({ source: "hardware", message: `${nodeName}: distributed SR-SIM chassis ${chassis} requires a CPM component slot` });
+    issues.push({ source: "srsim", message: `${nodeName}: distributed SR-SIM chassis ${chassis} requires a CPM component slot` });
   }
   if (components.length && !numericSlots.length) {
-    issues.push({ source: "hardware", message: `${nodeName}: distributed SR-SIM chassis ${chassis} requires a numeric line-card component slot` });
-  }
-  const maxSlot = inferredComponentSlotCount(chassis);
-  for (const slot of numericSlots) {
-    const slotNumber = Number(slot);
-    if (slotNumber < 1 || slotNumber > maxSlot) {
-      issues.push({ source: "hardware", path: componentName(nodeName, slot), message: `slot must be between 1 and ${maxSlot}` });
-    }
+    issues.push({ source: "srsim", message: `${nodeName}: distributed SR-SIM chassis ${chassis} requires a numeric line-card component slot` });
   }
   for (const [index, component] of components.entries()) {
     if (asRecord(component) && !slots[index]) {
-      issues.push({ source: "hardware", path: componentName(nodeName, slots[index]), message: "distributed components require a slot" });
+      issues.push({ source: "srsim", path: componentName(nodeName, slots[index]), message: "distributed components require a slot" });
     }
   }
   return issues;
@@ -555,7 +519,7 @@ export function validateSrsimHardware(topology: unknown, schema: HardwareSchema,
   const topologyRecord = root ? asRecord(root.topology) : null;
   const nodes = topologyRecord ? asRecord(topologyRecord.nodes) : null;
   if (!nodes) {
-    return [{ source: "hardware", path: "/topology/nodes", message: "expected topology.nodes mapping" }];
+    return [{ source: "srsim", path: "/topology/nodes", message: "expected topology.nodes mapping" }];
   }
 
   const issues: ValidationIssue[] = [];
@@ -567,7 +531,7 @@ export function validateSrsimHardware(topology: unknown, schema: HardwareSchema,
     const chassis = String(node.type ?? "");
     if (!chassis) {
       issues.push({
-        source: "hardware",
+        source: "srsim",
         path: `/topology/nodes/${nodeName}/type`,
         message: `${nodeName}: nokia_srsim node with components requires a type/chassis`
       });
@@ -579,7 +543,7 @@ export function validateSrsimHardware(topology: unknown, schema: HardwareSchema,
       components = asList(node.components, "components");
     } catch (error) {
       issues.push({
-        source: "hardware",
+        source: "srsim",
         path: `/topology/nodes/${nodeName}/components`,
         message: `${nodeName}: ${(error as Error).message}`
       });
@@ -593,7 +557,7 @@ export function validateSrsimHardware(topology: unknown, schema: HardwareSchema,
       const componentRecord = asRecord(component);
       if (!componentRecord) {
         issues.push({
-          source: "hardware",
+          source: "srsim",
           path: `/topology/nodes/${nodeName}/components`,
           message: `${nodeName}: component entries must be mappings`
         });
