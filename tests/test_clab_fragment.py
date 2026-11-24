@@ -68,14 +68,20 @@ SAMPLE_HARDWARE_SCHEMA = {
                     "chassis": "SR-1s",
                     "mda": "s18-100gb-qsfp28\ns36-100gb-qsfp28\ns36-400gb-qsfpdd",
                 },
+                {
+                    "card": "cpm-1s",
+                    "chassis": "SR-1s",
+                    "mda": "ms16-100gb-sfpdd+4-100gb-qsfp28",
+                    "xiom": "iom-s-3.0t",
+                },
             ],
             "supported_values": {
                 "card": ["cpm-1s"],
                 "chassis": ["SR-1s"],
-                "mda": ["s18-100gb-qsfp28", "s36-100gb-qsfp28", "s36-400gb-qsfpdd"],
+                "mda": ["ms16-100gb-sfpdd+4-100gb-qsfp28", "s18-100gb-qsfp28", "s36-100gb-qsfp28", "s36-400gb-qsfpdd"],
                 "sfm": [],
                 "slot": ["A"],
-                "xiom": [],
+                "xiom": ["iom-s-3.0t"],
             },
         },
         "7750 SR-2s": {
@@ -227,7 +233,7 @@ class ClabFragmentTest(unittest.TestCase):
         sr1s_component = definitions["srsim-component-sr-1s"]
         sr1s_encoded = srsim.dumps_json(sr1s_component)
         self.assertIn('"s36-100gb-qsfp28"', sr1s_encoded)
-        self.assertIn({"not": {"required": ["xiom"]}}, sr1s_component["allOf"])
+        self.assertIn("iom-s-3.0t", sr1s_encoded)
 
         sr1s_node_rules = [
             rule
@@ -293,6 +299,31 @@ class ClabFragmentTest(unittest.TestCase):
         self.assertIn("sros1[slot=A]: sfm must be set on the node, not on a component", on_component)
         self.assertTrue(any("does not use an SFM" in error for error in no_sfm_chassis))
 
+    def test_sr1s_accepts_its_integrated_iom_with_mdas(self) -> None:
+        # The SR-1s holds an XMA-s or an IOM-s with MDA-s; containerlab passes the XIOM through.
+        sr1s = srsim.build_srsim_schema_module(SAMPLE_HARDWARE_SCHEMA)["definitions"]["srsim-component-sr-1s"]
+        self.assertNotIn({"not": {"required": ["xiom"]}}, sr1s["allOf"])
+        xiom_items = next(
+            rule["properties"]["xiom"]["items"]
+            for rule in sr1s["allOf"]
+            if "xiom" in rule.get("properties", {}) and "items" in rule["properties"]["xiom"]
+            and "type" in rule["properties"]["xiom"]["items"].get("properties", {})
+        )
+        self.assertEqual(xiom_items["properties"]["type"]["enum"], ["iom-s-3.0t"])
+
+        def errors(component: dict) -> list[str]:
+            return srsim.validate_component(
+                schema=SAMPLE_HARDWARE_SCHEMA, node_name="sros1", chassis="sr-1s", sfm="", component=component, strict=True
+            ) + srsim.validate_component_list_shape(
+                schema=SAMPLE_HARDWARE_SCHEMA, node_name="sros1", chassis="sr-1s", components=[component]
+            )
+
+        iom = {"slot": 1, "type": "iom-s-3.0t", "mda": [{"slot": 1, "type": "ms16-100gb-sfpdd+4-100gb-qsfp28"}]}
+        self.assertEqual(errors({"slot": "A", "type": "cpm-1s", "xiom": [iom]}), [])
+        self.assertTrue(errors({"slot": "A", "type": "cpm-1s", "xiom": [{**iom, "type": "iom-s-1.5t"}]}))
+        both = {"slot": "A", "type": "cpm-1s", "mda": [{"slot": 1, "type": "s36-100gb-qsfp28"}], "xiom": [iom]}
+        self.assertIn("sros1[slot=A].xiom[1]: module slot 1 holds either an XMA or an IOM, not both", errors(both))
+
     def test_validate_component_reads_sfm_from_the_node(self) -> None:
         component = {"slot": 1, "type": "xcm-7s"}
         unsupported = srsim.validate_component(
@@ -322,61 +353,43 @@ class ClabFragmentTest(unittest.TestCase):
         self.assertEqual(xiom_mdas["maxItems"], 2)
         self.assertIn({"properties": {"slot": {"enum": [1, 2]}}}, xiom_mdas["items"]["allOf"])
 
-        single_slot_rules = srsim.xcm_module_rules(1)
+        single_slot_rules = srsim.card_slot_rules([1])
         for rule in single_slot_rules:
             self.assertIn(rule, definitions["srsim-component-sr-7s"]["allOf"])
-            self.assertNotIn(rule, definitions["srsim-component-sr-1s"]["allOf"])
+            self.assertIn(rule, definitions["srsim-component-sr-1s"]["allOf"])
 
-        two_slot_rules = srsim.xcm_module_rules(2)
+        two_slot_rules = srsim.card_slot_rules([1, 2])
         self.assertEqual(two_slot_rules[0]["properties"]["xiom"]["maxItems"], 2)
         self.assertEqual(two_slot_rules[0]["properties"]["mda"]["items"]["properties"]["slot"]["enum"], [1, 2])
         self.assertEqual(len(two_slot_rules), 3)
 
-    def test_xcm_module_errors_follow_the_chassis_slot_count(self) -> None:
-        def errors(chassis: str, mda_slots: list[int], xiom_slots: list[int]) -> list[str]:
-            return srsim.xcm_module_errors(
-                location="sros1[slot=1]",
-                chassis=chassis,
-                mdas=[{"slot": slot, "type": "mda"} for slot in mda_slots],
-                xioms=[{"slot": slot, "type": "xiom"} for slot in xiom_slots],
+    def test_component_list_reports_hardware_model_issues(self) -> None:
+        def errors(chassis: str, components: list[dict]) -> list[str]:
+            return srsim.validate_component_list_shape(
+                schema=SAMPLE_HARDWARE_SCHEMA, node_name="sros1", chassis=chassis, components=components
             )
 
-        shared = "sros1[slot=1]: XCM slot 1 holds either a direct MDA or an XIOM, not both"
-        self.assertEqual(errors("sr-7s", [1], []), [])
-        self.assertEqual(errors("SR-2s", [], [1]), [])
-        self.assertIn(shared, errors("sr-7s", [1], [1]))
-        self.assertIn("sros1[slot=1].xiom[2]: XIOM must use slot(s) 1", errors("sr-7s", [1], [2]))
-        self.assertIn("sros1[slot=1].mda[2]: MDA must use slot(s) 1", errors("sr-2s", [1, 2], []))
+        iom = {"slot": 1, "type": "iom-s-1.5t", "mda": [{"slot": 3, "type": "ms2-400gb-qsfpdd+2-100gb-qsfp28"}]}
+        self.assertIn(
+            "sros1[slot=1].xiom[1].mda[3]: iom-s-1.5t has MDA slots 1, 2, not 3",
+            errors("sr-7s", [{"slot": "A", "type": "cpm-s"}, {"slot": 1, "type": "xcm-7s", "xiom": [iom]}]),
+        )
+        self.assertIn(
+            "sros1[slot=1].xiom[2]: xcm-7s has module slot 1, not 2",
+            errors("sr-7s", [{"slot": "A", "type": "cpm-s"}, {"slot": 1, "type": "xcm-7s", "xiom": [{**iom, "slot": 2}]}]),
+        )
 
-        self.assertEqual(errors("sr-14s", [1], [2]), [])
-        self.assertEqual(errors("sr-14s", [1, 2], []), [])
-        self.assertIn(shared, errors("sr-14s", [1], [1]))
-        self.assertIn("sros1[slot=1].xiom[3]: XIOM must use slot(s) 1, 2", errors("sr-14s", [], [3]))
-
-        self.assertEqual(errors("sr-2se", [1], [1]), [])
-        self.assertIn("sros1[slot=1].xiom[1]: duplicate XIOM slot 1", errors("sr-2se", [], [1, 1]))
-
-    def test_validate_component_limits_xiom_mda_slots(self) -> None:
+    def test_validate_component_rejects_duplicate_nested_slots(self) -> None:
         errors = srsim.validate_component(
             schema=SAMPLE_HARDWARE_SCHEMA,
             node_name="sros1",
             chassis="sr-7s",
             sfm="sfm-s",
-            component={
-                "slot": 1,
-                "type": "xcm-7s",
-                "xiom": [
-                    {
-                        "slot": 1,
-                        "type": "iom-s-1.5t",
-                        "mda": [{"slot": 3, "type": "ms2-400gb-qsfpdd+2-100gb-qsfp28"}],
-                    }
-                ],
-            },
+            component={"slot": 1, "type": "xcm-7s", "xiom": [{"slot": 1, "type": "iom-s-1.5t"}, {"slot": 1, "type": "iom-s-1.5t"}]},
             strict=False,
         )
 
-        self.assertIn("sros1[slot=1].xiom[1].mda[3]: MDA must use slot(s) 1, 2", errors)
+        self.assertIn("sros1[slot=1].xiom[1]: duplicate XIOM slot 1", errors)
 
     def test_component_shape_validation_rejects_wrong_chassis_modes(self) -> None:
         sr1s_errors = srsim.validate_component_list_shape(
@@ -435,7 +448,7 @@ class ClabFragmentTest(unittest.TestCase):
                 row["chassis"] = "SR-7e"
         schema["models"]["7750 SR-7e"] = duplicate
 
-        with patch.dict(srsim.XCM_MODULE_SLOTS, {"sr-7e": srsim.XCM_MODULE_SLOTS["sr-7s"]}):
+        with patch.dict(srsim.HARDWARE.chassis, {"sr-7e": srsim.HARDWARE.chassis["sr-7s"]}):
             sidecar = srsim.build_srsim_schema_module(schema)
         definitions = sidecar["definitions"]
         component_definitions = [

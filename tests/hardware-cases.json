@@ -1,0 +1,354 @@
+[
+  {
+    "name": "SR-7s: single CPM-s leaves all six XCM slots",
+    "chassis": "sr-7s",
+    "components": [{"slot": "A", "type": "cpm-s"}, {"slot": 6, "type": "xcm-7s"}],
+    "issues": []
+  },
+  {
+    "name": "SR-7s: two CPM-s need the dual CMA, which takes XCM slot 6",
+    "chassis": "sr-7s",
+    "components": [{"slot": "A", "type": "cpm-s"}, {"slot": "B", "type": "cpm-s"}, {"slot": 6, "type": "xcm-7s"}],
+    "issues": [{"code": "occupied", "path": "6"}]
+  },
+  {
+    "name": "SR-7s: two CPM2-s fit the single-slot CMA2-7s",
+    "chassis": "sr-7s",
+    "components": [{"slot": "A", "type": "cpm2-s"}, {"slot": "B", "type": "cpm2-s"}, {"slot": 6, "type": "xcm2-7s"}],
+    "issues": []
+  },
+  {
+    "name": "SR-7s: CPM types without a common CMA",
+    "chassis": "sr-7s",
+    "components": [{"slot": "A", "type": "cpm-s"}, {"slot": "B", "type": "cpm2-s"}],
+    "issues": [{"code": "cpm-carrier", "path": "A,B"}]
+  },
+  {
+    "name": "SR-7s: there is no line-card slot 7",
+    "chassis": "sr-7s",
+    "components": [{"slot": "A"}, {"slot": 7, "type": "xcm-7s"}],
+    "issues": [{"code": "no-such-slot", "path": "7"}]
+  },
+  {
+    "name": "SR-14s: six XCM slots, two modules each",
+    "chassis": "sr-14s",
+    "components": [
+      {"slot": "A", "type": "cpm-s"},
+      {"slot": 6, "type": "xcm-14s", "mda": [{"slot": 2, "type": "s36-100gb-qsfp28"}], "xiom": [{"slot": 3, "type": "iom-s-3.0t"}]},
+      {"slot": 7, "type": "xcm-14s"}
+    ],
+    "issues": [{"code": "module-slot", "path": "6.xiom[3]"}, {"code": "no-such-slot", "path": "7"}]
+  },
+  {
+    "name": "SR-2s: IOM-s has two MDA slots",
+    "chassis": "sr-2s",
+    "components": [
+      {"slot": "A", "type": "cpm-2s"},
+      {"slot": 1, "type": "xcm-2s", "xiom": [{"slot": 1, "type": "iom-s-3.0t", "mda": [{"slot": 2, "type": "ms18-100gb-qsfp28"}, {"slot": 3, "type": "ms18-100gb-qsfp28"}]}]}
+    ],
+    "issues": [{"code": "mda-slot", "path": "1.xiom[1].mda[3]"}]
+  },
+  {
+    "name": "SR-2s: CPMs only in A and B",
+    "chassis": "sr-2s",
+    "components": [{"slot": "C", "type": "cpm-2s"}],
+    "issues": [{"code": "no-such-slot", "path": "C"}]
+  },
+  {
+    "name": "SR-2se: XCM-2se and XCMc-2se are not mixed",
+    "chassis": "sr-2se",
+    "components": [{"slot": "A"}, {"slot": 1, "type": "xcm-2se"}, {"slot": 2, "type": "xcmc-2se"}],
+    "issues": [{"code": "mixed-types", "path": ""}]
+  },
+  {
+    "name": "SR-1s: one module slot on the integrated card",
+    "chassis": "sr-1s",
+    "components": [{"slot": "A", "mda": [{"slot": 2, "type": "s36-100gb-qsfp28"}]}],
+    "issues": [{"code": "module-slot", "path": "A.mda[2]"}]
+  },
+  {
+    "name": "SR-2s: CPM slots take only the CPM-2s",
+    "chassis": "sr-2s",
+    "components": [{"slot": "A", "type": "cpm-s"}, {"slot": 1, "type": "xcm-2s"}],
+    "issues": [{"code": "slot-type", "path": "A"}]
+  },
+  {
+    "name": "SR-7s: a one-complex XMA2-s is an XIOM with one built-in MDA",
+    "chassis": "sr-7s",
+    "components": [
+      {"slot": "A", "type": "cpm2-s"},
+      {"slot": 1, "type": "xcm2-7s", "xiom": [{"slot": 1, "type": "x2-s36-400g-qsfp112-3.0t", "mda": [{"slot": 1, "type": "m36-400g-qsfp112"}, {"slot": 2, "type": "m36-400g-qsfp112"}]}]}
+    ],
+    "issues": [{"code": "mda-slot", "path": "1.xiom[1].mda[2]"}]
+  },
+  {
+    "name": "SR-1x-48D: built-in CPM, line card and MDA",
+    "chassis": "sr-1x-48d",
+    "components": [{"slot": "A", "type": "cpm-1x"}, {"slot": 1, "type": "i48-800g-qsfpdd-1x", "mda": [{"slot": 1, "type": "m48-800g-qsfpdd-1x"}]}],
+    "issues": []
+  },
+  {
+    "name": "SR-1se: the built-in MDA exists once, in slot 1",
+    "chassis": "sr-1se",
+    "components": [{"slot": "A"}, {"slot": 1, "type": "imm36-800g-qsfpdd", "mda": [{"slot": 1, "type": "ms36-800g-qsfpdd"}, {"slot": 2, "type": "ms36-800g-qsfpdd"}]}],
+    "issues": [{"code": "module-slot", "path": "1.mda[2]"}]
+  },
+  {
+    "name": "SR-1-24D: built-in parts cannot be swapped",
+    "chassis": "sr-1-24d",
+    "components": [{"slot": "A", "type": "cpm-1se"}, {"slot": 1, "type": "i48-400g-qsfpdd-1", "mda": [{"slot": 1, "type": "m48-400g-qsfpdd-1"}]}],
+    "issues": [{"code": "fixed", "path": "1"}, {"code": "fixed", "path": "A"}]
+  },
+  {
+    "name": "SR-1-92S: one CPM slot and one line-card slot",
+    "chassis": "sr-1-92s",
+    "components": [{"slot": "A"}, {"slot": "B"}, {"slot": 2, "type": "i80-200g-sfpdd+12-400g-qsfpdd-1"}],
+    "issues": [{"code": "no-such-slot", "path": "2"}, {"code": "no-such-slot", "path": "B"}]
+  },
+  {
+    "name": "SR-1se: a built-in line card is checked when its type is left out",
+    "chassis": "sr-1se",
+    "components": [{"slot": "A"}, {"slot": 1, "mda": [{"slot": 1, "type": "m48-800g-qsfpdd-1x"}]}],
+    "issues": [{"code": "fixed", "path": "1.mda[1]"}]
+  },
+  {
+    "name": "DMS-1-24D: the MDA is fixed",
+    "chassis": "dms-1-24d",
+    "components": [{"slot": "A", "type": "cpm-1x"}, {"slot": 1, "type": "dms24-800g-qsfpdd-1", "mda": [{"slot": 1, "type": "m24-800g-qsfpdd-1"}]}],
+    "issues": [{"code": "fixed", "path": "1.mda[1]"}]
+  },
+  {
+    "name": "SR-1: the integrated card has two MDA-e-XP slots",
+    "chassis": "sr-1",
+    "components": [{"slot": "A", "mda": [{"slot": 1, "type": "me6-100gb-qsfp28"}, {"slot": 2, "type": "me12-100gb-qsfp28"}, {"slot": 3, "type": "me6-100gb-qsfp28"}]}],
+    "issues": [{"code": "module-slot", "path": "A.mda[3]"}]
+  },
+  {
+    "name": "SR-7: five IOM slots and two CPM slots",
+    "chassis": "sr-7",
+    "components": [{"slot": "A", "type": "cpm5"}, {"slot": "C", "type": "cpm5"}, {"slot": 5, "type": "iom5-e"}, {"slot": 6, "type": "iom5-e"}],
+    "issues": [{"code": "no-such-slot", "path": "6"}, {"code": "no-such-slot", "path": "C"}]
+  },
+  {
+    "name": "ESS-12: IOMs take two MDAs, IMMs keep their built-in ones",
+    "chassis": "ess-12",
+    "components": [
+      {"slot": "A", "type": "cpm5"},
+      {"slot": 1, "type": "iom4-e", "mda": [{"slot": 1, "type": "me10-10gb-sfp+"}, {"slot": 3, "type": "me10-10gb-sfp+"}]},
+      {"slot": 2, "type": "imm48-1gb-sfp-c", "mda": [{"slot": 1, "type": "imm24-1gb-xp-sfp"}, {"slot": 2, "type": "imm24-1gb-xp-sfp"}]},
+      {"slot": 10, "type": "imm-2pac-fp3", "mda": [{"slot": 1, "type": "p1-100g-cfp"}, {"slot": 2, "type": "p10-10g-sfp"}]}
+    ],
+    "issues": [{"code": "module-slot", "path": "1.mda[3]"}]
+  },
+  {
+    "name": "SR-12e: nine IOM slots; a 400G IMM has one built-in MDA",
+    "chassis": "sr-12e",
+    "components": [
+      {"slot": "B", "type": "cpm5"},
+      {"slot": 9, "type": "imm40-10gb-sfp", "mda": [{"slot": 1, "type": "m4-100g-cfp4"}, {"slot": 2, "type": "m40-10g-sfp"}]},
+      {"slot": 10, "type": "iom5-e"}
+    ],
+    "issues": [{"code": "fixed", "path": "9.mda[1]"}, {"code": "module-slot", "path": "9.mda[2]"}, {"code": "no-such-slot", "path": "10"}]
+  },
+  {
+    "name": "SR-1e: one IOM-e with four MDA-e slots, CPM-e in A or B",
+    "chassis": "sr-1e",
+    "components": [
+      {"slot": "B", "type": "cpm-e"},
+      {"slot": 1, "type": "iom-e", "mda": [{"slot": 1, "type": "isa2-aa"}, {"slot": 4, "type": "me10-10gb-sfp+"}, {"slot": 5, "type": "me10-10gb-sfp+"}]},
+      {"slot": 2, "type": "iom-e"}
+    ],
+    "issues": [{"code": "module-slot", "path": "1.mda[5]"}, {"code": "no-such-slot", "path": "2"}]
+  },
+  {
+    "name": "SR-3e: three IOM-e slots",
+    "chassis": "sr-3e",
+    "components": [{"slot": "A", "type": "cpm-e"}, {"slot": 3, "type": "iom-e"}, {"slot": 4, "type": "iom-e"}],
+    "issues": [{"code": "no-such-slot", "path": "4"}]
+  },
+  {
+    "name": "SR-a4: a single IOM-a with four MDA-a slots",
+    "chassis": "sr-a4",
+    "components": [
+      {"slot": "A", "type": "cpm-a"},
+      {"slot": 1, "type": "iom-a", "mda": [{"slot": 1, "type": "ma44-1gb-csfp"}, {"slot": 4, "type": "maxp1-100gb-cfp"}]},
+      {"slot": 2, "type": "iom-a"}
+    ],
+    "issues": [{"code": "no-such-slot", "path": "2"}]
+  },
+  {
+    "name": "SR-a8: two IOM-a slots, not eight",
+    "chassis": "sr-a8",
+    "components": [{"slot": "A", "type": "cpm-a"}, {"slot": 2, "type": "iom-a"}, {"slot": 3, "type": "iom-a"}],
+    "issues": [{"code": "no-such-slot", "path": "3"}]
+  },
+  {
+    "name": "XRS-20: ten XCM slots, two XMA slots per XCM",
+    "chassis": "xrs-20",
+    "components": [
+      {"slot": "A", "type": "cpm2-x20"},
+      {"slot": 10, "type": "xcm2-x20", "mda": [{"slot": 1, "type": "x24-100g-qsfp28"}, {"slot": 2, "type": "x12-400g-qsfpdd"}, {"slot": 3, "type": "x24-100g-qsfp28"}]},
+      {"slot": 11, "type": "xcm2-x20"}
+    ],
+    "issues": [{"code": "module-slot", "path": "10.mda[3]"}, {"code": "no-such-slot", "path": "11"}]
+  },
+  {
+    "name": "SAR-Mx: one pluggable MDA slot; the built-in MDA stays in slot 2",
+    "chassis": "sar-mx",
+    "components": [
+      {"slot": "A", "type": "iom-sar-1x", "mda": [{"slot": 1, "type": "m4-1g-rj+6-10g-sfp++2-25g-sfp28"}, {"slot": 2, "type": "m8-1g-sfp"}, {"slot": 3, "type": "isa-ms-v"}]}
+    ],
+    "issues": [{"code": "built-in", "path": "A.mda[1]"}, {"code": "fixed", "path": "A.mda[2]"}]
+  },
+  {
+    "name": "SAR-Hx: a pluggable MDA and the built-in ones",
+    "chassis": "sar-hx",
+    "components": [{"mda": [{"slot": 1, "type": "m8-t1e1-rj48"}, {"slot": 2, "type": "m4-1g-rj+6-10g-sfp++2-25g-sfp28"}, {"slot": 4, "type": "isa-ms-v"}]}],
+    "issues": []
+  },
+  {
+    "name": "SAR-1: every MDA slot is built in",
+    "chassis": "sar-1",
+    "components": [{"slot": "A", "type": "cpm-sar-hm", "mda": [{"slot": 1, "type": "isa-ms-v"}, {"slot": 4, "type": "isa-ms-v"}]}],
+    "issues": [{"code": "slot-type", "path": "A"}, {"code": "fixed", "path": "A.mda[1]"}, {"code": "module-slot", "path": "A.mda[4]"}]
+  },
+  {
+    "name": "SAR-Hmc: MDA slot 4 stays empty",
+    "chassis": "sar-hmc",
+    "components": [{"slot": "A", "mda": [{"slot": 4, "type": "i1-wlan"}, {"slot": 6, "type": "isa-ms-v"}]}],
+    "issues": [{"code": "empty-slot", "path": "A.mda[4]"}]
+  },
+  {
+    "name": "IXR-6: four line-card slots",
+    "chassis": "ixr-6",
+    "components": [{"slot": "A", "type": "cpm-ixr"}, {"slot": "B", "type": "cpm-ixr"}, {"slot": 5, "type": "imm36-100g-qsfp28"}],
+    "issues": [{"code": "no-such-slot", "path": "5"}]
+  },
+  {
+    "name": "IXR-R4: m20-1g-csfp only in MDA slots 1-3, the integrated MDA in slot 5",
+    "chassis": "ixr-r4",
+    "components": [{"slot": "A", "type": "cpm-ixr-r4"}, {"slot": 1, "type": "iom-ixr-r4", "mda": [{"slot": 4, "type": "m20-1g-csfp"}, {"slot": 5, "type": "m10-1g-sfp+2-10g-sfp+"}]}],
+    "issues": [{"code": "slot-type", "path": "1.mda[4]"}]
+  },
+  {
+    "name": "IXR-R6: a32-chds1v2 only in MDA slots 5-6",
+    "chassis": "ixr-r6",
+    "components": [{"slot": "A", "type": "cpiom-ixr-r6", "mda": [{"slot": 1, "type": "a32-chds1v2"}, {"slot": 6, "type": "a32-chds1v2"}]}],
+    "issues": [{"code": "slot-type", "path": "A.mda[1]"}]
+  },
+  {
+    "name": "IXR-R6d: slim MDAs only, no 46-port SFP+",
+    "chassis": "ixr-r6d",
+    "components": [{"slot": "A", "type": "cpm-ixr-r6d"}, {"slot": 1, "type": "iom-ixr-r6d", "mda": [{"slot": 1, "type": "m18-25g-sfp28"}, {"slot": 2, "type": "m46-10g-sfp+"}]}],
+    "issues": [{"code": "chassis-mda", "path": "1.mda[2]"}]
+  },
+  {
+    "name": "IXR-R6dl: wide MDAs, including the 46-port SFP+",
+    "chassis": "ixr-r6dl",
+    "components": [{"slot": "A", "type": "cpm-ixr-r6d"}, {"slot": 1, "type": "iom-ixr-r6d", "mda": [{"slot": 1, "type": "m18-25g-sfp28"}, {"slot": 2, "type": "m46-10g-sfp+"}]}],
+    "issues": []
+  },
+  {
+    "name": "IXR-X: X1 and Xs line cards, not the X3 one",
+    "chassis": "ixr-x",
+    "components": [{"slot": "A", "type": "cpm-ixr-x"}, {"slot": 1, "type": "imm36-qsfpdd"}],
+    "issues": [{"code": "slot-type", "path": "1"}]
+  },
+  {
+    "name": "SR-7s FP5: CPM-s and XCM-7s are FP4-only",
+    "chassis": "sr-7s",
+    "sfm": "sfm2-s",
+    "components": [{"slot": "A", "type": "cpm-s"}, {"slot": 1, "type": "xcm-7s"}],
+    "issues": [{"code": "sfm", "path": "A"}, {"code": "sfm", "path": "1"}]
+  },
+  {
+    "name": "SR-14s FP4: CPM2-s is FP5-only",
+    "chassis": "sr-14s",
+    "sfm": "sfm-s",
+    "components": [{"slot": "A", "type": "cpm2-s"}, {"slot": 1, "type": "xcm-14s"}],
+    "issues": [{"code": "sfm", "path": "A"}]
+  },
+  {
+    "name": "SR-14s FP5: XCM-14s-b and XCM2-14s mix",
+    "chassis": "sr-14s",
+    "sfm": "sfm2-s",
+    "components": [{"slot": "A", "type": "cpm2-s"}, {"slot": 1, "type": "xcm-14s-b", "mda": [{"slot": 1, "type": "s36-400gb-qsfpdd"}]}, {"slot": 2, "type": "xcm2-14s", "mda": [{"slot": 1, "type": "x2-s36-800g-qsfpdd-18.0t"}]}],
+    "issues": []
+  },
+  {
+    "name": "SR-7s FP5: XCM-7s-b keeps FP4 XMA-s",
+    "chassis": "sr-7s",
+    "sfm": "sfm2-s",
+    "components": [{"slot": "A", "type": "cpm2-s"}, {"slot": 1, "type": "xcm-7s-b", "mda": [{"slot": 1, "type": "s36-100gb-qsfp28"}]}],
+    "issues": []
+  },
+  {
+    "name": "SR-7s: XCM2-7s holds XMA2-s or IOM2-se, not IOM-s",
+    "chassis": "sr-7s",
+    "sfm": "sfm2-s",
+    "components": [{"slot": "A", "type": "cpm2-s"}, {"slot": 1, "type": "xcm2-7s", "xiom": [{"slot": 1, "type": "iom-s-3.0t"}]}],
+    "issues": [{"code": "slot-type", "path": "1.xiom[1]"}]
+  },
+  {
+    "name": "SR-12: IOM5-e needs SFM6",
+    "chassis": "sr-12",
+    "sfm": "m-sfm5-12",
+    "components": [{"slot": "A", "type": "cpm5"}, {"slot": 1, "type": "iom5-e"}, {"slot": 2, "type": "iom4-e"}],
+    "issues": [{"code": "sfm", "path": "1"}]
+  },
+  {
+    "name": "SR-7: the FP2 IMM fails with SFM6",
+    "chassis": "sr-7",
+    "sfm": "m-sfm6-7/12",
+    "components": [{"slot": "A", "type": "cpm5"}, {"slot": 1, "type": "imm48-1gb-sfp-c"}, {"slot": 2, "type": "iom5-e"}],
+    "issues": [{"code": "sfm", "path": "1"}]
+  },
+  {
+    "name": "SR-2se: XCMc-2se takes only one- and two-complex XMA2-s",
+    "chassis": "sr-2se",
+    "components": [{"slot": "A"}, {"slot": 1, "type": "xcmc-2se", "mda": [{"slot": 1, "type": "x2-s36-800g-qsfpdd-18.0t"}]}],
+    "issues": [{"code": "slot-type", "path": "1.mda[1]"}]
+  },
+  {
+    "name": "SR-12e: IOM4-e takes MDA-e and ISA2, IOM5-e only MDA-e-XP",
+    "chassis": "sr-12e",
+    "sfm": "m-sfm6-12e",
+    "components": [
+      {"slot": "A", "type": "cpm5"},
+      {"slot": 1, "type": "iom4-e", "mda": [{"slot": 1, "type": "me10-10gb-sfp+"}, {"slot": 2, "type": "isa2-aa"}]},
+      {"slot": 2, "type": "iom4-e-hs", "mda": [{"slot": 1, "type": "isa2-aa"}]},
+      {"slot": 3, "type": "iom4-e", "mda": [{"slot": 1, "type": "me6-100gb-qsfp28"}]},
+      {"slot": 4, "type": "iom5-e", "mda": [{"slot": 1, "type": "me6-100gb-qsfp28"}, {"slot": 2, "type": "me10-10gb-sfp+"}]}
+    ],
+    "issues": [{"code": "slot-type", "path": "2.mda[1]"}, {"code": "slot-type", "path": "3.mda[1]"}, {"code": "slot-type", "path": "4.mda[2]"}]
+  },
+  {
+    "name": "XRS-20: FP4 XCM2-X20 and CPM2-X20 need SFM2-X20S; each XCM takes its own XMA generation",
+    "chassis": "xrs-20",
+    "sfm": "sfm-x20-b",
+    "components": [
+      {"slot": "A", "type": "cpm2-x20"},
+      {"slot": 1, "type": "xcm-x20", "mda": [{"slot": 1, "type": "x40-10g-sfp"}, {"slot": 2, "type": "x24-100g-qsfp28"}]},
+      {"slot": 2, "type": "xcm2-x20", "mda": [{"slot": 1, "type": "x24-100g-qsfp28"}]}
+    ],
+    "issues": [{"code": "slot-type", "path": "1.mda[2]"}, {"code": "sfm", "path": "A"}, {"code": "sfm", "path": "2"}]
+  },
+  {
+    "name": "SR-12: an imm-2pac-fp3 carries the built-in MDAs of one IMM",
+    "chassis": "sr-12",
+    "components": [
+      {"slot": "A", "type": "cpm5"},
+      {"slot": 1, "type": "imm-2pac-fp3", "mda": [{"slot": 1, "type": "isa2-aa"}, {"slot": 2, "type": "isa2-tunnel"}]},
+      {"slot": 2, "type": "imm-2pac-fp3", "mda": [{"slot": 2, "type": "p20-1gb-sfp"}]},
+      {"slot": 3, "type": "imm-2pac-fp3", "mda": [{"slot": 1, "type": "p6-10g-sfp"}, {"slot": 2, "type": "p1-100g-cfp"}]},
+      {"slot": 4, "type": "imm-2pac-fp3", "mda": [{"slot": 1, "type": "p10-10g-sfp"}, {"slot": 2, "type": "isa2-aa"}]}
+    ],
+    "issues": [{"code": "product", "path": "3.mda"}, {"code": "product", "path": "4.mda"}]
+  },
+  {
+    "name": "Chassis without a model are not checked",
+    "chassis": "vsr-i",
+    "components": [{"slot": 99, "type": "iom5-e"}],
+    "issues": []
+  }
+]

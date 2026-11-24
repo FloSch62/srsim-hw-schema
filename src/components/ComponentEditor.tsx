@@ -53,8 +53,8 @@ import {
   nextNumericSlot,
   schemaNumericSlotOptions,
   sfmOptions,
-  xcmModuleSlotCount,
   xiomMdaSlotOptions,
+  withReplacedModules,
   xiomMdaOptions,
   xiomOptions
 } from "../matrix";
@@ -70,6 +70,8 @@ import type {
   SrsimXiom
 } from "../types";
 
+import { cpmCarriers, fittingCarrier, moduleSlots } from "../hardwareModel";
+import type { CpmCarrier } from "../hardwareModel";
 import { FieldAutocomplete } from "./FieldAutocomplete";
 
 interface ComponentEditorProps {
@@ -118,30 +120,58 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   const indexed = config.components.map((component, index) => ({ component, index }));
   const cpms = indexed.filter(({ component }) => isCpmSlot(component.slot));
   const cards = indexed.filter(({ component }) => !isCpmSlot(component.slot));
-  const cpmSlotOptions = componentCpmSlotOptions(selectedEntry, slotRules.componentStringSlots);
+
+  // The CMA decides which CPM types fit, how many, and whether it takes a line-card slot.
+  const carriers = distributed ? cpmCarriers(config.chassis) : [];
+  const usedCardSlotNumbers = new Set(cards.map(({ component }) => Number(component.slot)));
+  const carrierBlockedReason = (carrier: CpmCarrier, sfm: string): string => {
+    if (!carrier.cpmTypes.some((type) => cpmOptions(selectedEntry, sfm).includes(type))) {
+      return `needs ${carrier.cpmTypes.join("/")}, which ${sfm || "this SFM"} does not support`;
+    }
+    const taken = carrier.blocksLineSlots.filter((slot) => usedCardSlotNumbers.has(slot));
+    return taken.length ? `line-card slot ${taken.join(", ")} is in use` : "";
+  };
+  const carrierFor = (sfm: string, chosen = config.cma): CpmCarrier | undefined => {
+    const usable = (carrier?: CpmCarrier) => (carrier && !carrierBlockedReason(carrier, sfm) ? carrier : undefined);
+    return (
+      usable(carriers.find((carrier) => carrier.type === chosen)) ??
+      usable(fittingCarrier(config.chassis, config.components)) ??
+      carriers.find((carrier) => !carrierBlockedReason(carrier, sfm))
+    );
+  };
+  const selectedCarrier = carrierFor(config.sfm);
+  const carrierCpmOptions = (sfm: string, carrier = carrierFor(sfm)) =>
+    cpmOptions(selectedEntry, sfm).filter((type) => !carrier || carrier.cpmTypes.includes(type));
+
+  const cpmSlotOptions = selectedCarrier
+    ? selectedCarrier.cpmSlots
+    : componentCpmSlotOptions(selectedEntry, slotRules.componentStringSlots);
   const cardSlotOptions = componentCardSlotOptions(
     selectedEntry,
     cards.map(({ component }) => component),
     slotRules.componentIntegerMinimum
-  );
+  ).filter((slot) => !selectedCarrier?.blocksLineSlots.includes(slot));
   const usedCpmSlots = new Set(cpms.map(({ component }) => String(component.slot ?? "").toUpperCase()));
   const usedCardSlots = new Set(cards.map(({ component }) => String(component.slot ?? "")));
   const availableCpmSlots = cpmSlotOptions.filter((slot) => !usedCpmSlots.has(String(slot).toUpperCase()));
   const availableCardSlots = cardSlotOptions.filter((slot) => !usedCardSlots.has(String(slot)));
   const integratedComponent = config.components[0] ?? { mda: [] };
-  const moduleSlotCount = xcmModuleSlotCount(selectedEntry?.chassis);
-  const xiomSlotOptions = schemaNumericSlotOptions([], moduleSlotCount ?? nestedSlotCount, slotRules.xiomIntegerMinimum);
 
   const updateConfig = (updates: Partial<SrsimConfig>) => onChange({ ...config, ...updates });
 
   const directMdaSlotsFor = (component: SrsimComponent, mdaType = "") =>
     freeXcmModuleSlots(
-      selectedEntry,
+      component.type,
       directMdaSlotOptions(selectedEntry, component, config.sfm, nestedSlotCount, slotRules.mdaIntegerMinimum, mdaType),
       component.xiom
     );
 
-  const xiomSlotsFor = (component: SrsimComponent) => freeXcmModuleSlots(selectedEntry, xiomSlotOptions, component.mda);
+  const xiomSlotsFor = (component: SrsimComponent) =>
+    freeXcmModuleSlots(
+      component.type,
+      schemaNumericSlotOptions([], moduleSlots(component.type).length || nestedSlotCount, slotRules.xiomIntegerMinimum),
+      component.mda
+    );
 
   const xiomMdaSlotsFor = (component: SrsimComponent, xiom: SrsimXiom, mdaType = "") =>
     xiomMdaSlotOptions(selectedEntry, component, xiom, config.sfm, nestedSlotCount, slotRules.mdaIntegerMinimum, mdaType);
@@ -171,13 +201,14 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
       chassis,
       components,
       sfm: defaultSfmForEntry(entry),
+      cma: undefined,
       edaComponents: []
     });
   };
 
-  const normalizeComponent = (component: SrsimComponent, sfm: string): SrsimComponent => {
+  const normalizeComponent = (component: SrsimComponent, sfm: string, carrier = carrierFor(sfm)): SrsimComponent => {
     if (distributed && isCpmSlot(component.slot)) {
-      const options = cpmOptions(selectedEntry, sfm);
+      const options = carrierCpmOptions(sfm, carrier);
       return {
         slot: component.slot,
         type: component.type && options.includes(component.type) ? component.type : (options[0] ?? "")
@@ -210,9 +241,10 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     return withoutEmptyNested(next);
   };
 
-  const normalizeComponents = (components: SrsimComponent[], sfm: string) =>
+  const normalizeComponents = (components: SrsimComponent[], sfm: string, carrier = carrierFor(sfm)) =>
     components
-      .map((component) => normalizeComponent(component, sfm))
+      .filter((component) => !carrier || !isCpmSlot(component.slot) || carrier.cpmSlots.includes(String(component.slot).toUpperCase()))
+      .map((component) => normalizeComponent(component, sfm, carrier))
       .filter((item) => item.mda?.length || item.xiom?.length || item.type);
 
   const setComponents = (components: SrsimComponent[]) => {
@@ -233,12 +265,24 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     setComponents([withoutEmptyNested(component)].filter((item) => item.mda?.length || item.type));
   };
 
+  const applyCarrier = (type: string) => {
+    const carrier = carriers.find((candidate) => candidate.type === type);
+    if (!carrier) return;
+    const components = normalizeComponents(config.components, config.sfm, carrier);
+    const hasCpm = components.some((component) => isCpmSlot(component.slot));
+    updateConfig({
+      cma: type,
+      components: hasCpm ? components : [{ slot: "A", type: carrierCpmOptions(config.sfm, carrier)[0] ?? "" }, ...components]
+    });
+  };
+
   const applySfm = (sfm: string) => {
     const nextSfm = sfm || defaultSfm || sharedSfmOptions[0] || "";
-    updateConfig({
-      sfm: nextSfm,
-      components: normalizeComponents(config.components, nextSfm)
+    const components = normalizeComponents(config.components, nextSfm).map((after) => {
+      const before = config.components.find((component) => String(component.slot) === String(after.slot));
+      return before ? withReplacedModules(selectedEntry, before, after, nextSfm) : after;
     });
+    updateConfig({ sfm: nextSfm, components });
   };
 
   const updateComponent = (index: number, updates: Partial<SrsimComponent>) => {
@@ -254,7 +298,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
   const addCpm = () => {
     const slot = availableCpmSlots[0] ?? nextCpmSlot(config.components);
     if (!slot) return;
-    setComponents([...config.components, { slot, type: cpmOptions(selectedEntry, config.sfm)[0] ?? "" }]);
+    setComponents([...config.components, { slot, type: carrierCpmOptions(config.sfm)[0] ?? "" }]);
   };
 
   const addCard = () => {
@@ -268,6 +312,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
     updateConfig({
       components,
       sfm: defaultSfm,
+      cma: undefined,
       edaComponents: []
     });
   };
@@ -520,11 +565,84 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
           />
         ) : (
           <>
+            {carriers.length ? (
+              <Stack spacing={1.25}>
+                <Divider />
+                <Typography variant="subtitle1">Control modules</Typography>
+                <Paper variant="outlined" sx={{ p: 1.5 }}>
+                  <FormControl size="small" fullWidth>
+                    <InputLabel id="cma-select-label">CMA</InputLabel>
+                    <Select
+                      labelId="cma-select-label"
+                      label="CMA"
+                      value={selectedCarrier?.type ?? ""}
+                      renderValue={(type) => carriers.find((carrier) => carrier.type === type)?.label ?? type}
+                      onChange={(event) => applyCarrier(event.target.value)}
+                    >
+                      {carriers.map((carrier) => {
+                        const reason = carrierBlockedReason(carrier, config.sfm);
+                        return (
+                          <MenuItem key={carrier.type} value={carrier.type} disabled={Boolean(reason)}>
+                            <Box sx={{ display: "flex", flexDirection: "column" }}>
+                              {carrier.label}
+                              <Typography variant="caption" color="text.secondary">
+                                {reason || carrier.description}
+                              </Typography>
+                            </Box>
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                  <Stack spacing={1} sx={{ mt: 1.5 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+                      <Typography variant="subtitle2">CPMs</Typography>
+                      <Button
+                        size="small"
+                        startIcon={<AddIcon />}
+                        onClick={addCpm}
+                        disabled={!availableCpmSlots.length || !carrierCpmOptions(config.sfm).length}
+                      >
+                        Add
+                      </Button>
+                    </Box>
+                    {cpms.map(({ component, index }) => (
+                      <Box
+                        key={index}
+                        sx={{ display: "grid", gridTemplateColumns: nestedComponentGridColumns, gap: 1, alignItems: "center" }}
+                      >
+                        <SlotSelect
+                          label="Slot"
+                          value={component.slot}
+                          options={cpmSlotOptions}
+                          onChange={(slot) => updateComponent(index, { slot })}
+                        />
+                        <FieldAutocomplete
+                          label="Type"
+                          value={component.type ?? ""}
+                          options={carrierCpmOptions(config.sfm)}
+                          onChange={(type) => updateComponent(index, { type })}
+                          allowFreeText={false}
+                        />
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => removeComponent(index)}
+                          sx={{ justifySelf: { xs: "end", sm: "auto" } }}
+                        >
+                          <DeleteOutlineIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Paper>
+              </Stack>
+            ) : (
             <ComponentSection
               title="Control modules"
               items={cpms}
               addLabel="Add CPM"
-              addDisabled={!availableCpmSlots.length || !cpmOptions(selectedEntry, config.sfm).length}
+              addDisabled={!availableCpmSlots.length || !carrierCpmOptions(config.sfm).length}
               onAdd={addCpm}
               renderItem={({ component, index }) => (
             <Paper variant="outlined" sx={{ p: 1.5 }}>
@@ -546,8 +664,8 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 <FieldAutocomplete
                   label="Type"
                   value={component.type ?? ""}
-                  options={cpmOptions(selectedEntry, config.sfm)}
-                  defaultOptions={cpmOptions(selectedEntry, config.sfm).filter((type) =>
+                  options={carrierCpmOptions(config.sfm)}
+                  defaultOptions={carrierCpmOptions(config.sfm).filter((type) =>
                     defaultImpliesFields(selectedEntry, { ...component, type }, config.sfm, [])
                   )}
                   onChange={(type) => updateComponent(index, { type })}
@@ -557,6 +675,7 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
             </Paper>
               )}
             />
+            )}
 
             <ComponentSection
               title="Line cards"
@@ -593,11 +712,11 @@ export function ComponentEditor({ matrix, config, mode, edaCatalog, onChange }: 
                 />
               </Box>
 
-              {moduleSlotCount ? (
+              {moduleSlots(component.type).length ? (
                 <FormHelperText sx={{ mt: 1.5 }}>
-                  {moduleSlotCount === 1
+                  {moduleSlots(component.type).length === 1
                     ? "This XCM has one slot, for either a direct MDA or an XIOM."
-                    : `This XCM has ${moduleSlotCount} slots, each for either a direct MDA or an XIOM.`}
+                    : `This XCM has ${moduleSlots(component.type).length} slots, each for either a direct MDA or an XIOM.`}
                 </FormHelperText>
               ) : null}
 

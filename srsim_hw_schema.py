@@ -23,6 +23,8 @@ from urllib.request import Request, urlopen
 
 import yaml
 
+import hardware_model
+
 
 SROS_RELEASE = "26.7"
 DEFAULT_APPENDIX_URL = (
@@ -63,17 +65,10 @@ INTEGRATED_CHASSIS = {
     "ixr-e3x",
 }
 REDUNDANT_INTEGRATED_CHASSIS = {"ixr-r6"}
-MDA_SLOT_RESTRICTIONS: dict[tuple[str, str], list[int]] = {
-    ("ixr-r4", "m20-1g-csfp"): [1, 2, 3],
-    ("ixr-r4", "m10-1g-sfp+2-10g-sfp+"): [5],
-    ("ixr-r6", "a32-chds1v2"): [5, 6],
-    ("ixr-r6", "m20-1g-csfp"): [3, 4],
-}
 # MDA slots in an XIOM and the slots an XCM has for XMA or XIOM modules, from
 # https://documentation.nokia.com/sr/26-10/7750-sr/books/interface-configuration/configuration-overview.html
 # "mda N" and "xiom xN" occupy the same physical XCM slot N.
-XIOM_MDA_SLOTS = [1, 2]
-XCM_MODULE_SLOTS = {"sr-2s": 1, "sr-7s": 1, "sr-14s": 2}
+HARDWARE = hardware_model.build_model()
 EDA_COMPONENT_KIND_ORDER = {
     "controlCard": 0,
     "lineCard": 1,
@@ -1240,10 +1235,10 @@ def build_clab_definitions(values: dict[str, list[str]], allow_unknown: bool = F
                     "items": {
                         "allOf": [
                             {"$ref": "#/definitions/srsim-mda"},
-                            {"properties": {"slot": {"enum": XIOM_MDA_SLOTS}}},
+                            {"properties": {"slot": {"enum": hardware_model.iom_mda_slots(HARDWARE)}}},
                         ]
                     },
-                    "maxItems": len(XIOM_MDA_SLOTS),
+                    "maxItems": len(hardware_model.iom_mda_slots(HARDWARE)),
                     "uniqueItems": True,
                 },
             },
@@ -1304,24 +1299,23 @@ def disallow_property(name: str) -> dict[str, Any]:
     return {"not": {"required": [name]}}
 
 
-def mda_slot_restriction(chassis: str, mda_type: str) -> list[int]:
-    aliases = {clab_chassis_token(chassis)}
-    return next(
-        (
-            slots
-            for (restricted_chassis, restricted_mda), slots in MDA_SLOT_RESTRICTIONS.items()
-            if restricted_chassis in aliases and canonical_token(restricted_mda) == canonical_token(mda_type)
-        ),
-        [],
-    )
+def mda_slot_rule_slots(card: str, mda_type: str) -> list[int]:
+    """Slots an MDA type is limited to on a card: from the hardware model when it knows the card."""
+    modelled = hardware_model.card_slots(HARDWARE, card)
+    if not modelled:
+        return []
+    allowed = hardware_model.mda_slots_for(HARDWARE, card, mda_type)
+    return [] if allowed == modelled else allowed
 
 
-def array_item_type_schema(values: list[str], *, chassis: str = "", restrict_mda_slots: bool = False) -> dict[str, Any]:
+def array_item_type_schema(
+    values: list[str], *, card: str = "", restrict_mda_slots: bool = False
+) -> dict[str, Any]:
     item: dict[str, Any] = {"properties": {"type": {"enum": values}}}
     if restrict_mda_slots:
         rules: list[dict[str, Any]] = []
         for value in values:
-            slots = mda_slot_restriction(chassis, value)
+            slots = mda_slot_rule_slots(card, value)
             if slots:
                 rules.append(
                     {
@@ -1371,6 +1365,10 @@ def card_compatibility(chassis_entry: dict[str, Any]) -> dict[str, dict[str, Any
                 mode = deployment_mode("", chassis_entry)
                 if mode in {"standalone", "integrated_redundant"} and row_mdas and "xiom" not in row:
                     merge_values(entry["direct_mda"], row_mdas)
+                if mode in {"standalone", "integrated_redundant"} and "xiom" in row:
+                    merge_values(entry["xiom"], row["xiom"])
+                    for xiom in row["xiom"]:
+                        merge_values(entry["xiom_mda"].setdefault(xiom, []), row_mdas)
 
             for card in line_cards:
                 entry = compatibility.setdefault(
@@ -1404,7 +1402,7 @@ def xiom_schema_for_card(entry: dict[str, Any], chassis: str) -> dict[str, Any]:
                 "properties": {
                     "mda": array_item_type_schema(
                         mdas,
-                        chassis=chassis,
+                        card=xiom,
                         restrict_mda_slots=True,
                     )
                 }
@@ -1425,14 +1423,16 @@ def xiom_schema_for_card(entry: dict[str, Any], chassis: str) -> dict[str, Any]:
     return schema
 
 
-def component_rule_for_card(card: str, entry: dict[str, Any], chassis: str) -> dict[str, Any]:
+def component_rule_for_card(
+    card: str, entry: dict[str, Any], chassis: str, card_slots: list[int] | None = None
+) -> dict[str, Any]:
     then: dict[str, Any] = {"properties": {}}
-    all_of: list[dict[str, Any]] = []
+    all_of: list[dict[str, Any]] = card_slot_rules(card_slots) if card_slots else []
 
     if entry["direct_mda"]:
         then["properties"]["mda"] = array_item_type_schema(
             entry["direct_mda"],
-            chassis=chassis,
+            card=card,
             restrict_mda_slots=True,
         )
     else:
@@ -1457,10 +1457,9 @@ def component_rule_for_card(card: str, entry: dict[str, Any], chassis: str) -> d
     }
 
 
-def xcm_module_rules(slot_count: int) -> list[dict[str, Any]]:
-    """Limit XMAs and XIOMs to the XCM slots and keep them from sharing one."""
-    slots = list(range(1, slot_count + 1))
-    modules = {"maxItems": slot_count, "items": {"properties": {"slot": {"enum": slots}}}}
+def card_slot_rules(slots: list[int]) -> list[dict[str, Any]]:
+    """Limit MDAs, XMAs and XIOMs to the slots of a card and keep an MDA and an XIOM from sharing one."""
+    modules = {"maxItems": len(slots), "items": {"properties": {"slot": {"enum": slots}}}}
     rules: list[dict[str, Any]] = [{"properties": {"mda": modules, "xiom": modules}}]
     for slot in slots:
         in_slot = {"contains": {"properties": {"slot": {"const": slot}}, "required": ["slot"]}}
@@ -1500,21 +1499,29 @@ def build_chassis_component_definition(chassis: str, chassis_entry: dict[str, An
             rules.append({"properties": {"type": {"enum": cpms}}})
 
         standalone_mdas: list[str] = []
+        standalone_xioms: dict[str, Any] = {"xiom": [], "xiom_mda": {}}
         for entry in card_compatibility(chassis_entry).values():
             merge_values(standalone_mdas, entry["direct_mda"])
+            merge_values(standalone_xioms["xiom"], entry["xiom"])
+            for xiom, mdas in entry["xiom_mda"].items():
+                merge_values(standalone_xioms["xiom_mda"].setdefault(xiom, []), mdas)
         if standalone_mdas:
             rules.append(
                 {
                     "properties": {
                         "mda": array_item_type_schema(
                             standalone_mdas,
-                            chassis=chassis,
+                            card=hardware_model.integrated_card(HARDWARE, clab_chassis_token(chassis)),
                             restrict_mda_slots=True,
                         )
                     }
                 }
             )
-        rules.append(disallow_property("xiom"))
+        # Containerlab derives the card from the node type, so XIOMs are checked without a component type too.
+        if standalone_xioms["xiom"]:
+            rules.append({"properties": {"xiom": {"items": xiom_schema_for_card(standalone_xioms, chassis)}}})
+        else:
+            rules.append(disallow_property("xiom"))
     elif cpms:
         rules.append(
             {
@@ -1536,12 +1543,22 @@ def build_chassis_component_definition(chassis: str, chassis_entry: dict[str, An
             }
         )
 
+    # One slot layout for every card also covers components that leave the type to containerlab.
+    layouts = {tuple(hardware_model.card_slots(HARDWARE, card)) for card in (*cpms, *cards)} - {()}
+    shared_layout = list(layouts.pop()) if len(layouts) == 1 else []
     for card, entry in sorted(card_compatibility(chassis_entry).items()):
-        rules.append(component_rule_for_card(card, entry, chassis))
-
-    module_slots = XCM_MODULE_SLOTS.get(clab_chassis_token(chassis))
-    if module_slots:
-        rules.extend(xcm_module_rules(module_slots))
+        card_slots = [] if shared_layout else hardware_model.card_slots(HARDWARE, card)
+        rules.append(component_rule_for_card(card, entry, chassis, card_slots))
+    if shared_layout:
+        rules.extend(card_slot_rules(shared_layout))
+    line_slots = hardware_model.line_card_slots(HARDWARE, clab_chassis_token(chassis))
+    if line_slots:
+        rules.append(
+            {
+                "if": {"properties": {"slot": {"type": "integer"}}, "required": ["slot"]},
+                "then": {"properties": {"slot": {"enum": line_slots}}},
+            }
+        )
 
     definition: dict[str, Any] = {
         "allOf": [
@@ -1976,8 +1993,7 @@ def validate_criteria(
     except SystemExit as exc:
         return [f"{node_name}: {exc}"]
 
-    mda_slot = criteria.get("_mda_slot", "")
-    clean_criteria = {k: v for k, v in criteria.items() if v and not k.startswith("_")}
+    clean_criteria = {k: v for k, v in criteria.items() if v}
     supported_matches = matching_rows(model.get("supported_hardware", []), clean_criteria)
     default_matches = matching_rows(model.get("default_layout", []), clean_criteria)
     matches = supported_matches + default_matches
@@ -2007,19 +2023,6 @@ def validate_criteria(
                 f"tuple {json.dumps(clean_criteria, sort_keys=True)}"
             )
 
-    mda_type = clean_criteria.get("mda", "")
-    if mda_type and mda_slot:
-        try:
-            slot_number = int(mda_slot)
-        except ValueError:
-            slot_number = 0
-        restricted_slots = mda_slot_restriction(model_name, mda_type)
-        if restricted_slots and slot_number not in restricted_slots:
-            errors.append(
-                f"{location}: {mda_type} must use MDA slot(s) "
-                f"{', '.join(str(slot) for slot in restricted_slots)}"
-            )
-
     return errors
 
 
@@ -2028,7 +2031,6 @@ def nested_slot_errors(
     key: str,
     label: str,
     items: list[Any],
-    allowed: list[int] | None = None,
 ) -> list[str]:
     errors: list[str] = []
     seen: set[str] = set()
@@ -2040,23 +2042,6 @@ def nested_slot_errors(
         if slot in seen:
             errors.append(f"{where}: duplicate {label} slot {slot}")
         seen.add(slot)
-        if allowed and slot.isdigit() and int(slot) not in allowed:
-            errors.append(f"{where}: {label} must use slot(s) {', '.join(str(value) for value in allowed)}")
-    return errors
-
-
-def xcm_module_errors(*, location: str, chassis: str, mdas: list[Any], xioms: list[Any]) -> list[str]:
-    slot_count = XCM_MODULE_SLOTS.get(clab_chassis_token(chassis))
-    allowed = list(range(1, slot_count + 1)) if slot_count else None
-    errors = [
-        *nested_slot_errors(location, "mda", "MDA", mdas, allowed),
-        *nested_slot_errors(location, "xiom", "XIOM", xioms, allowed),
-    ]
-    if slot_count:
-        mda_slots = {str(mda.get("slot")).strip() for mda in mdas if isinstance(mda, dict)}
-        xiom_slots = {str(xiom.get("slot")).strip() for xiom in xioms if isinstance(xiom, dict)}
-        for slot in sorted(mda_slots & xiom_slots):
-            errors.append(f"{location}: XCM slot {slot} holds either a direct MDA or an XIOM, not both")
     return errors
 
 
@@ -2095,7 +2080,8 @@ def validate_component(
             strict=strict,
         )
 
-    errors.extend(xcm_module_errors(location=location, chassis=chassis, mdas=mdas, xioms=xioms))
+    errors.extend(nested_slot_errors(location, "mda", "MDA", mdas))
+    errors.extend(nested_slot_errors(location, "xiom", "XIOM", xioms))
 
     for mda in mdas:
         if not isinstance(mda, dict):
@@ -2104,7 +2090,6 @@ def validate_component(
         criteria = {
             **base,
             "mda": str(mda.get("type", "")),
-            "_mda_slot": str(mda.get("slot", "")),
         }
         errors.extend(
             validate_criteria(
@@ -2132,7 +2117,6 @@ def validate_component(
                 "mda",
                 "MDA",
                 xiom_mdas,
-                XIOM_MDA_SLOTS,
             )
         )
         xiom_base = {**base, "xiom": str(xiom.get("type", ""))}
@@ -2155,7 +2139,6 @@ def validate_component(
             criteria = {
                 **xiom_base,
                 "mda": str(mda.get("type", "")),
-                "_mda_slot": str(mda.get("slot", "")),
             }
             errors.extend(
                 validate_criteria(
@@ -2173,24 +2156,10 @@ def validate_component(
     return errors
 
 
-def inferred_component_slot_count(chassis: str, chassis_entry: dict[str, Any]) -> int:
-    value = clab_chassis_token(chassis)
-    sr_a = re.match(r"^sr-a(\d+)$", value)
-    if sr_a:
-        return int(sr_a.group(1))
-    ixr_r = re.match(r"^ixr-r(\d+)", value)
-    if ixr_r:
-        return int(ixr_r.group(1))
-    modular = re.match(r"^(?:ess|ixr|sr|xrs)-(\d+)(?:[a-z]*)$", value)
-    if modular:
-        return int(modular.group(1))
-    matrix_slots = [
-        int(slot)
-        for row in chassis_entry.get("default_layout", []) + chassis_entry.get("supported_hardware", [])
-        for slot in row.get("slot", [])
-        if str(slot).isdigit()
-    ]
-    return max(matrix_slots, default=1)
+def hardware_issue_text(node_name: str, issue: hardware_model.Issue) -> str:
+    slot, _, rest = issue.path.partition(".")
+    location = component_name(node_name, slot) + (f".{rest}" if rest else "") if slot else node_name
+    return f"{location}: {issue.message}"
 
 
 def validate_component_list_shape(
@@ -2207,7 +2176,10 @@ def validate_component_list_shape(
         return []
 
     mode = deployment_mode(chassis, matrix_entry)
-    errors: list[str] = []
+    errors = [
+        hardware_issue_text(node_name, issue)
+        for issue in hardware_model.hardware_issues(HARDWARE, clab_chassis_token(chassis), components, sfm)
+    ]
 
     def slot_value(component: Any) -> str:
         if not isinstance(component, dict) or component.get("slot") is None:
@@ -2240,8 +2212,6 @@ def validate_component_list_shape(
             slot = slot_value(component)
             if slot and slot.upper() != "A":
                 errors.append(f"{component_name(node_name, slot)}: standalone component slot must be omitted or A")
-            if isinstance(component, dict) and component.get("xiom"):
-                errors.append(f"{component_name(node_name, slot)}: standalone component must not set xiom")
         return errors
 
     if mode == "integrated_redundant":
@@ -2260,11 +2230,6 @@ def validate_component_list_shape(
     if components and not numeric_slots:
         errors.append(f"{node_name}: distributed SR-SIM chassis {chassis} requires a numeric line-card component slot")
 
-    max_slot = inferred_component_slot_count(chassis, matrix_entry)
-    for slot in numeric_slots:
-        number = int(slot)
-        if number < 1 or number > max_slot:
-            errors.append(f"{component_name(node_name, slot)}: slot must be between 1 and {max_slot}")
 
     for component, slot in zip(components, slots, strict=False):
         if isinstance(component, dict) and not slot:
@@ -2500,6 +2465,11 @@ def cmd_validate_topology(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_generate_hardware_model(args: argparse.Namespace) -> int:
+    write_json_output(hardware_model.model_json(hardware_model.build_model()), args.output)
+    return 0
+
+
 def cmd_generate_eda_catalog(args: argparse.Namespace) -> int:
     catalog = build_eda_yang_catalog(args.yang_source)
     write_json_output(catalog, args.output)
@@ -2611,6 +2581,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="do not require fields present in matching appendix rows, such as SFM",
     )
     validate.set_defaults(func=cmd_validate_topology)
+
+    model = sub.add_parser("generate-hardware-model", help="export the physical hardware model as JSON")
+    model.add_argument("--output", "-o", default="-", help="output JSON path or '-'")
+    model.set_defaults(func=cmd_generate_hardware_model)
 
     catalog = sub.add_parser(
         "generate-eda-catalog",
